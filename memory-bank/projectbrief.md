@@ -45,3 +45,21 @@ Full-stack приложение для отслеживания шахматны
 - 200+ партий
 - 50+ записей истории рейтингов
 - 2 пользователя (admin + user)
+
+## Структура модулей (для агента)
+
+Подробное описание каждого модуля — в `memory-bank/modules/`:
+
+| Файл | Описание |
+|------|----------|
+| `modules/overview.md` | Карта модулей, dependency graph, quick lookup index |
+| `modules/core-layer.md` | Config, database, security (JWT, bcrypt) |
+| `modules/models-layer.md` | 7 SQLAlchemy ORM моделей |
+| `modules/schemas-layer.md` | 7 Pydantic схем валидации |
+| `modules/services-layer.md` | 10 сервисов бизнес-логики |
+| `modules/api-layer.md` | 12 route-модулей, endpoints, deps |
+| `modules/web-layer.md` | Jinja2 шаблоны, CSS, JS (HTMX, Alpine.js) |
+| `modules/alembic.md` | Миграции БД |
+| `modules/testing.md` | Тесты (pytest, 20 тестов) |
+| `modules/telegram-bot.md` | Telegram-бот (stub, M9) |
+| `modules/docker-infra.md` | Docker Compose, network, commands |

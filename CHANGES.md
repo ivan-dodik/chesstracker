@@ -111,3 +111,20 @@
 - Исправлена ошибка `get_flashed_messages` не определён — удалена зависимость от Flask-специфичной функции
 - Все 4 страницы возвращают HTTP 200, 20/20 тестов проходят
 - Файлы: backend/app/static/css/style.css, backend/app/static/js/main.js, backend/app/templates/base.html, backend/app/templates/login.html, backend/app/templates/index.html, backend/app/templates/players/list.html, backend/app/templates/tournaments/list.html, backend/app/templates/partials/player_row.html, backend/app/templates/partials/tournament_row.html, backend/app/templates/partials/pagination.html, backend/app/api/web.py, backend/app/main.py
+
+## 2026-06-06 20:42
+### Memory Bank расширен module-файлами
+- Созданы файлы описания модулей в `memory-bank/modules/` (11 файлов):
+  - `overview.md` — карта модулей, dependency graph, quick lookup index
+  - `core-layer.md` — config, database, security (JWT, bcrypt)
+  - `models-layer.md` — 7 SQLAlchemy ORM моделей
+  - `schemas-layer.md` — 7 Pydantic схем валидации
+  - `services-layer.md` — 10 сервисов бизнес-логики
+  - `api-layer.md` — 12 route-модулей, endpoints, deps
+  - `web-layer.md` — Jinja2 шаблоны, CSS, JS (HTMX, Alpine.js)
+  - `alembic.md` — миграции БД
+  - `testing.md` — тесты (pytest, 20 тестов)
+  - `telegram-bot.md` — Telegram-бот (stub, M9)
+  - `docker-infra.md` — Docker Compose, network, commands
+- Обновлены core-файлы Memory Bank: добавлены ссылки на module-файлы
+- Файлы: memory-bank/modules/*.md, memory-bank/projectbrief.md, memory-bank/productContext.md, memory-bank/systemPatterns.md, memory-bank/techContext.md, memory-bank/activeContext.md, memory-bank/progress.md

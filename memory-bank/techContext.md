@@ -62,77 +62,27 @@ docker compose up --build
 chess-tracker/
 ├── backend/
 │   ├── app/
-│   │   ├── __init__.py
 │   │   ├── main.py              # FastAPI приложение
-│   │   ├── core/
-│   │   │   ├── __init__.py
-│   │   │   ├── config.py        # Настройки (pydantic-settings)
-│   │   │   ├── database.py      # Подключение к БД
-│   │   │   └── security.py      # JWT, хеширование паролей
-│   │   ├── models/
-│   │   │   ├── __init__.py
-│   │   │   ├── user.py
-│   │   │   ├── player.py
-│   │   │   ├── tournament.py
-│   │   │   ├── game.py
-│   │   │   ├── rating_history.py
-│   │   │   ├── favorite.py
-│   │   │   └── activity_log.py
-│   │   ├── schemas/
-│   │   │   ├── __init__.py
-│   │   │   ├── user.py
-│   │   │   ├── player.py
-│   │   │   ├── tournament.py
-│   │   │   ├── game.py
-│   │   │   └── ... (остальные схемы)
-│   │   ├── api/
-│   │   │   ├── __init__.py
-│   │   │   ├── auth.py
-│   │   │   ├── players.py
-│   │   │   ├── tournaments.py
-│   │   │   ├── games.py
-│   │   │   ├── ratings.py
-│   │   │   ├── favorites.py
-│   │   │   ├── stats.py
-│   │   │   ├── export.py
-│   │   │   └── sse.py
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── player_service.py
-│   │   │   ├── tournament_service.py
-│   │   │   ├── game_service.py
-│   │   │   ├── rating_service.py
-│   │   │   └── ... (остальные сервисы)
-│   │   ├── templates/
-│   │   │   ├── base.html
-│   │   │   ├── index.html
-│   │   │   ├── players/
-│   │   │   ├── tournaments/
-│   │   │   └── auth/
-│   │   └── static/
-│   │       ├── css/
-│   │       └── js/
-│   ├── alembic/
-│   │   ├── env.py
-│   │   └── versions/
-│   ├── tests/
-│   │   ├── conftest.py
-│   │   ├── test_players.py
-│   │   ├── test_tournaments.py
-│   │   └── ...
+│   │   ├── core/                # Config, database, security
+│   │   ├── models/              # SQLAlchemy ORM (7 моделей)
+│   │   ├── schemas/             # Pydantic v2 (7 файлов)
+│   │   ├── api/                 # 12 route-модулей
+│   │   ├── services/            # 10 сервисов
+│   │   ├── templates/           # Jinja2 (5 шаблонов + 3 partials)
+│   │   ├── static/              # CSS + JS
+│   │   └── seed.py              # Тестовые данные
+│   ├── alembic/                 # Миграции
+│   ├── tests/                   # 20 тестов
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── telegram-bot/
-│   ├── bot.py
-│   ├── handlers/
-│   ├── services/
+│   ├── bot.py                   # Stub
+│   ├── handlers/                # (пусто)
+│   ├── services/                # (пусто)
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── docker-compose.yml
-├── .env.example
-├── README.md
-├── ARCHITECTURE.md
-└── REPORT.md
+└── docker-compose.override.yml
 ```
 
 ## Технические ограничения и решения
@@ -142,6 +92,7 @@ chess-tracker/
 3. **Alpine.js только для реактивности клиента**: минимальный JS, без bundler'ов
 4. **FastAPI + Jinja2**: единый сервер для API и HTML, упрощает деплой
 5. **python-telegram-bot**: асинхронная работа, совместимость с asyncio FastAPI
+6. **bcrypt 4.0.1**: зафиксирована версия из-за несовместимости passlib с bcrypt 5.x
 
 ## Зависимости
 
@@ -195,3 +146,18 @@ dependencies = [
 - **Тесты**: `pytest -v` (async через pytest-asyncio)
 - **Миграции**: `alembic revision --autogenerate` / `alembic upgrade head`
 - **Docker**: `docker compose up --build`
+
+## Ссылки на модули
+
+Детальное описание технологии каждого слоя:
+
+- [Core: config, database, security](modules/core-layer.md)
+- [Models: SQLAlchemy ORM](modules/models-layer.md)
+- [Schemas: Pydantic DTO](modules/schemas-layer.md)
+- [Services: business logic](modules/services-layer.md)
+- [API: endpoints & routing](modules/api-layer.md)
+- [Web: templates, CSS, JS](modules/web-layer.md)
+- [Alembic: migrations](modules/alembic.md)
+- [Testing: pytest suite](modules/testing.md)
+- [Telegram bot](modules/telegram-bot.md)
+- [Docker infrastructure](modules/docker-infra.md)

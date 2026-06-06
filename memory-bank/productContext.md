@@ -32,3 +32,18 @@
 - Шахматные болельщики
 - Организаторы турниров
 - Шахматисты, отслеживающие свой рейтинг
+
+## Архитектура модулей
+
+Подробное описание слоёв приложения — в `memory-bank/modules/`:
+
+- [Модуль API (эндпоинты)](modules/api-layer.md)
+- [Модуль Core (конфиг, БД, безопасность)](modules/core-layer.md)
+- [Модуль Models (ORM)](modules/models-layer.md)
+- [Модуль Schemas (Pydantic)](modules/schemas-layer.md)
+- [Модуль Services (бизнес-логика)](modules/services-layer.md)
+- [Модуль Web (фронтенд)](modules/web-layer.md)
+- [Модуль Alembic (миграции)](modules/alembic.md)
+- [Модуль Testing (тесты)](modules/testing.md)
+- [Модуль Telegram-bot](modules/telegram-bot.md)
+- [Модуль Docker/infra](modules/docker-infra.md)

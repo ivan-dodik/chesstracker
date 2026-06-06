@@ -4,14 +4,8 @@
 Завершён **M6: Frontend — базовая структура и навигация**. Созданы все HTML-шаблоны, CSS, JavaScript и веб-роуты. 4 страницы (дашборд, логин, игроки, турниры) возвращают HTTP 200.
 
 ## Последние изменения
-- Создан полный CSS для адаптивной вёрстки (`style.css`): навигация, таблицы, карточки, кнопки, формы, пагинация, badges, flash-сообщения, мобильное меню, дашборд
-- Создан `main.js`: Auth helpers (JWT в localStorage), HTMX config (авто-добавление Authorization header), Alpine.js компоненты (authState, loginForm, pagination)
-- Созданы шаблоны: `base.html`, `login.html`, `index.html`, `players/list.html`, `tournaments/list.html`
-- Созданы partials: `player_row.html`, `tournament_row.html`, `pagination.html`
-- Создан `web.py` — веб-роуты (GET /, /login, /players, /tournaments) с Jinja2 шаблонизацией
-- Интегрирован web router в `main.py`
-- Исправлена ошибка Jinja2: кастомный Environment с cache_size=0 вместо Starlette Jinja2Templates
-- Исправлена ошибка get_flashed_messages: удалена Flask-специфичная функция из шаблона
+- Обновлён Memory Bank: созданы файлы описания модулей в `memory-bank/modules/`
+- Core-файлы Memory Bank дополнены ссылками на module-файлы
 
 ## Следующие шаги (приоритетный порядок)
 1. ✅ **M1: Архитектура и планирование** — выполнено
@@ -35,3 +29,19 @@
 - **ActivityLog**: JSON-поля (old_values, new_values) хранятся как сериализованные строки в SQLite/PostgreSQL
 - **Jinja2**: используется кастомный Environment с cache_size=0 (обход несовместимости Jinja2 3.1.x со Starlette Jinja2Templates)
 - **Шаблоны**: не используют Flask-специфичные функции (get_flashed_messages заменён на JS-управление flash-сообщениями)
+
+## Ссылки на модули
+
+Для быстрого поиска информации:
+
+- [Карта модулей и dependency graph](modules/overview.md)
+- [Core: config, database, security](modules/core-layer.md)
+- [Models: 7 SQLAlchemy моделей](modules/models-layer.md)
+- [Schemas: Pydantic схемы](modules/schemas-layer.md)
+- [Services: бизнес-логика](modules/services-layer.md)
+- [API: все эндпоинты и deps](modules/api-layer.md)
+- [Web: шаблоны, CSS, JS](modules/web-layer.md)
+- [Alembic: миграции](modules/alembic.md)
+- [Testing: тесты и fixtures](modules/testing.md)
+- [Telegram-bot: статус и план](modules/telegram-bot.md)
+- [Docker: инфраструктура](modules/docker-infra.md)

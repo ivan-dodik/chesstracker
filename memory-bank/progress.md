@@ -3,6 +3,8 @@
 ## Текущий статус
 **M6: Frontend — базовая структура и навигация** завершён. Все HTML-шаблоны, CSS, JavaScript и веб-роуты созданы. 4 страницы (дашборд, логин, игроки, турниры) возвращают HTTP 200. Все 20 тестов проходят.
 
+Memory Bank обновлён: созданы файлы описания модулей в `memory-bank/modules/`.
+
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
 - ✅ **M2: Окружение и Docker** — Docker Compose, Dockerfile, pyproject.toml
@@ -73,3 +75,20 @@
 - **2026-06-06 16:40**: M4 завершён — API: auth + CRUD + тесты 8/8
 - **2026-06-06 16:58**: M5 завершён — API: специфичные фичи + тесты 20/20
 - **2026-06-06 20:24**: M6 завершён — Frontend: шаблоны, CSS, JS, веб-роуты
+- **2026-06-06 20:33**: Memory Bank расширен — созданы module-файлы для быстрого поиска информации агентом
+
+## Ссылки на модули
+
+Детальное описание каждого слоя — в соответствующих файлах:
+
+- [Карта модулей](modules/overview.md)
+- [Core: config, database, security](modules/core-layer.md)
+- [Models: SQLAlchemy ORM](modules/models-layer.md)
+- [Schemas: Pydantic DTO](modules/schemas-layer.md)
+- [Services: business logic](modules/services-layer.md)
+- [API: endpoints & routing](modules/api-layer.md)
+- [Web: templates, CSS, JS](modules/web-layer.md)
+- [Alembic: migrations](modules/alembic.md)
+- [Testing: pytest suite](modules/testing.md)
+- [Telegram bot](modules/telegram-bot.md)
+- [Docker infrastructure](modules/docker-infra.md)

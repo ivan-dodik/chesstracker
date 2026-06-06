@@ -134,3 +134,20 @@ User 1──N Favorite N──1 Player
 Player 1──N RatingHistory
 Tournament 1──N Game N──2 Player (white/black)
 User 1──N ActivityLog
+```
+
+## Ссылки на модули
+
+Подробное описание каждого слоя:
+
+- [Overview & dependency graph](modules/overview.md)
+- [Core: config, database, security](modules/core-layer.md)
+- [Models: SQLAlchemy ORM](modules/models-layer.md)
+- [Schemas: Pydantic DTO](modules/schemas-layer.md)
+- [Services: business logic](modules/services-layer.md)
+- [API: endpoints & routing](modules/api-layer.md)
+- [Web: templates, CSS, JS](modules/web-layer.md)
+- [Alembic: migrations](modules/alembic.md)
+- [Testing: pytest suite](modules/testing.md)
+- [Telegram bot](modules/telegram-bot.md)
+- [Docker infrastructure](modules/docker-infra.md)

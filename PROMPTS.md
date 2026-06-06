@@ -299,3 +299,30 @@ initialize memory bank
 - Все 4 страницы (/, /login, /players, /tournaments) возвращают HTTP 200
 - Все 20 тестов проходят
 - Выполнен коммит и пуш
+
+---
+
+## 2026-06-06 20:33 — Обновление Memory Bank: добавлены module-файлы
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Обнови memory-bank по проекту. Добавь файлы, описывающие модули, для облегчения дальнейшей работы агентов. В основные файлы банка вставь ссылки.
+```
+
+**Результат:**
+- Созданы 11 файлов описания модулей в `memory-bank/modules/`:
+  - `overview.md` — карта модулей с dependency graph и quick lookup index
+  - `core-layer.md` — config, database, security (JWT, bcrypt)
+  - `models-layer.md` — 7 SQLAlchemy ORM моделей
+  - `schemas-layer.md` — 7 Pydantic схем
+  - `services-layer.md` — 10 сервисов с таблицами функций
+  - `api-layer.md` — все эндпоинты с методами и уровнями доступа
+  - `web-layer.md` — шаблоны, CSS, JS
+  - `alembic.md` — миграции
+  - `testing.md` — тесты и fixtures
+  - `telegram-bot.md` — статус и план
+  - `docker-infra.md` — Docker Compose
+- Обновлены все 6 core-файлов Memory Bank со ссылками на module-файлы
+- CHANGES.md, PROMPTS.md, REPORT.md обновлены
