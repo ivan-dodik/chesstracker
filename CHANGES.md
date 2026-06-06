@@ -279,3 +279,31 @@
   - Добавлен п.6 (восстановление пропущенных записей до push)
 - **Добавлено примечание** в `.clinerules/implementation_plan.md` к п.4 — перед git push выполнять шаг 2 из git_commit.md
 - Затронутые файлы: `.clinerules/git_commit.md`, `.clinerules/update_prompts.md`, `.clinerules/implementation_plan.md`
+
+## 2026-06-07 09:53 — Реструктуризация Memory Bank: модульная документация для агента
+- **Перемещены** `memory-bank/modules/` → `memory-bank/backend/` (11 файлов)
+- **Созданы новые документы** (20 файлов):
+  - `backend/main.md` — FastAPI entry point (lifespan, CORS, health check)
+  - `backend/seed.md` — seed script (data pools, generated data, key functions)
+  - `frontend/overview.md` — frontend architecture (HTMX + Alpine + Chart.js)
+  - `frontend/templates.md` — all 9 templates (base, index, login, lists, details)
+  - `frontend/css.md` — style.css (681 lines, custom properties, components)
+  - `frontend/js-main.md` — main.js (Auth, HTMX config, Alpine components)
+  - `frontend/js-sse.md` — sse.js (SSEClient, 3 event types, reconnect)
+  - `telegram-bot/overview.md` — bot architecture (moved from modules/)
+  - `testing/overview.md` — test framework (36 tests, structure)
+  - `testing/api-tests.md` — 14 API test files
+  - `testing/service-tests.md` — 8 service test files
+  - `testing/fixtures.md` — conftest.py fixtures (API + service)
+  - `infrastructure/docker.md` — Docker Compose, Dockerfiles, env vars
+  - `infrastructure/ci.md` — GitHub Actions workflow
+  - `infrastructure/pre-commit.md` — pre-commit hooks
+  - `config/backend-pyproject.md` — backend/pyproject.toml
+  - `config/bot-pyproject.md` — telegram-bot/pyproject.toml
+  - `config/env.md` — .env.example
+  - `meta/bugs.md` — BUGS.md summary
+  - `meta/security.md` — SECURITY_AUDIT.md summary
+  - `meta/architecture.md` — ARCHITECTURE.md summary
+- **Создан** `memory-bank/index.md` — полный индекс всех модулей с quick lookup таблицей
+- **Обновлены** `activeContext.md`, `progress.md` — ссылки на новую структуру
+- Затронутые файлы: все файлы в memory-bank/

@@ -774,3 +774,32 @@ initialize memory bank
 - Исправление: добавлена функция `escapeHtml()` в `main.js` (безопасное экранирование через `textContent` + `innerHTML`)
 - Обновлены CHANGES.md, REPORT.md
 - Затронутые файлы: `backend/app/static/js/main.js`
+
+## 2026-06-07 09:38 — Реструктуризация Memory Bank: модульная документация для агента
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Проверь memory-bank на актуальность. Просканируй файлы и добавь отдельную краткую документацию для агента (не для человека) по всем модулям (файлам) проекта также, как ты делал это для бэкенда. Цель - ускорение навигации агента по коду, экономия контекста, повышение эффективности работы агента.
+```
+
+**План (Plan mode):**
+- Просканировать существующие module-файлы в memory-bank/modules/
+- Определить непокрытые файлы проекта (frontend, testing, infrastructure, config, meta)
+- Предложить реструктуризацию: modules/ → backend/, создать подпапки frontend/, testing/, telegram-bot/, infrastructure/, config/, meta/
+- Создать memory-bank/index.md — полный индекс
+
+**Результат:**
+- Перемещены `memory-bank/modules/` → `memory-bank/backend/` (11 файлов)
+- Созданы 20 новых документов в 7 категориях:
+  - `backend/`: main.md, seed.md
+  - `frontend/`: overview.md, templates.md, css.md, js-main.md, js-sse.md
+  - `telegram-bot/`: overview.md
+  - `testing/`: overview.md, api-tests.md, service-tests.md, fixtures.md
+  - `infrastructure/`: docker.md, ci.md, pre-commit.md
+  - `config/`: backend-pyproject.md, bot-pyproject.md, env.md
+  - `meta/`: bugs.md, security.md, architecture.md
+- Создан `memory-bank/index.md` — полный индекс с quick lookup таблицей
+- Обновлены activeContext.md, progress.md, CHANGES.md, PROMPTS.md, REPORT.md
+- Выполнен коммит и пуш

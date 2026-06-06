@@ -42,16 +42,13 @@
 
 ## Ссылки на модули
 
-Для быстрого поиска информации:
+Для быстрого поиска информации используй [полный индекс](index.md).
 
-- [Карта модулей и dependency graph](modules/overview.md)
-- [Core: config, database, security](modules/core-layer.md)
-- [Models: 7 SQLAlchemy моделей](modules/models-layer.md)
-- [Schemas: Pydantic схемы](modules/schemas-layer.md)
-- [Services: бизнес-логика](modules/services-layer.md)
-- [API: все эндпоинты и deps](modules/api-layer.md)
-- [Web: шаблоны, CSS, JS](modules/web-layer.md)
-- [Alembic: миграции](modules/alembic.md)
-- [Testing: тесты и fixtures](modules/testing.md)
-- [Telegram-bot: статус и план](modules/telegram-bot.md)
-- [Docker: инфраструктура](modules/docker-infra.md)
+Ключевые разделы:
+- [Backend: все модули](backend/overview.md)
+- [Frontend: шаблоны, CSS, JS](frontend/overview.md)
+- [Telegram-bot](telegram-bot/overview.md)
+- [Testing: 36 тестов](testing/overview.md)
+- [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
+- [Config: зависимости, env](config/backend-pyproject.md)
+- [Meta: баги, security, архитектура](meta/bugs.md)

@@ -77,15 +77,11 @@
 - **2026-06-07 03:15**: Проверена форма логина через MCP Browser Tools в реальном Chrome — аутентификация работает корректно
 
 ## Ссылки на модули
-Детальное описание каждого слоя — в соответствующих файлах:
-- [Карта модулей](modules/overview.md)
-- [Core: config, database, security](modules/core-layer.md)
-- [Models: SQLAlchemy ORM](modules/models-layer.md)
-- [Schemas: Pydantic DTO](modules/schemas-layer.md)
-- [Services: business logic](modules/services-layer.md)
-- [API: endpoints & routing](modules/api-layer.md)
-- [Web: templates, CSS, JS](modules/web-layer.md)
-- [Alembic: migrations](modules/alembic.md)
-- [Testing: pytest suite](modules/testing.md)
-- [Telegram bot](modules/telegram-bot.md)
-- [Docker infrastructure](modules/docker-infra.md)
+Детальное описание каждого слоя — в соответствующих файлах (см. [полный индекс](index.md)):
+- [Backend: все модули](backend/overview.md)
+- [Frontend: шаблоны, CSS, JS](frontend/overview.md)
+- [Telegram-bot](telegram-bot/overview.md)
+- [Testing: 36 тестов](testing/overview.md)
+- [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
+- [Config: зависимости, env](config/backend-pyproject.md)
+- [Meta: баги, security, архитектура](meta/bugs.md)
