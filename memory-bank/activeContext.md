@@ -1,14 +1,14 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M11: Финальная документация**. Проект полностью реализован согласно IMPLEMENTATION_PLAN.md. Все 11 майлстоунов выполнены.
+Проект полностью реализован. Исправлена ошибка запуска telegram-bot.
 
 ## Последние изменения
-- Создан README.md с полным описанием проекта, стеком, быстрым стартом, API-эндпоинтами, командами для разработки
-- ARCHITECTURE.md дополнен пунктами о pre-commit hook, CI и тестовой инфраструктуре
-- REPORT.md дополнен итогами M2–M5, M9, M11; добавлена пропущенная запись в историю (M3)
-- PROMPTS.md обновлён записью о M11
-- CHANGES.md обновлён записью о M11 и добавлены пропущенные майлстоуны M1–M5
+- Исправлена ошибка `AttributeError: 'NoneType' object has no attribute 'run_repeating'` при запуске telegram-bot
+- В `telegram-bot/pyproject.toml` добавлен extra `[job-queue]` для `python-telegram-bot`
+- Перегенерирован `uv.lock`: добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1
+- Обновлены CHANGES.md, REPORT.md, Memory Bank
+- Выполнен коммит и пуш
 
 ## Следующие шаги
 Все задачи выполнены. Проект готов к сдаче.

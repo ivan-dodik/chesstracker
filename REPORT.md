@@ -86,6 +86,13 @@
 - **Решение:** Все Critical и Important исправлены. Minor задокументированы для будущих итераций.
 - **Результат:** ✅ Создан `SECURITY_AUDIT.md` с полным отчётом. 20/20 тестов проходят. ruff clean.
 
+### 2026-06-06 22:35 — Telegram-bot не стартует: AttributeError: 'NoneType' object has no attribute 'run_repeating'
+
+- **Суть:** При запуске `docker compose up --build` сервис telegram-bot падает с ошибкой `AttributeError: 'NoneType' object has no attribute 'run_repeating'` и бесконечно перезапускается.
+- **Причина:** В `telegram-bot/pyproject.toml` зависимость `python-telegram-bot` указана без extra `[job-queue]`, из-за чего APScheduler (библиотека для JobQueue) не устанавливается. `application.job_queue` возвращает `None`.
+- **Решение:** Добавлен extra `[job-queue]` — `python-telegram-bot[job-queue]>=22.7`. Перегенерирован `uv.lock`.
+- **Результат:** ✅ В `uv.lock` добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1.
+
 ### 2026-06-06 — Установка скиллов не отражена в документации
 
 - **Суть:** После установки 5 пакетов агентских скиллов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills) информация об этом не была внесена в Memory Bank, PROMPTS.md, REPORT.md, .clinerules/ и IMPLEMENTATION_PLAN.md. Запись была сделана только в CHANGES.md.
@@ -325,3 +332,4 @@
 | 2026-06-06 21:49 | **Установка агентских скиллов Cline** — установлены 5 пакетов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills); создан skills-lock.json; обновлён .gitignore |
 | 2026-06-06 21:57 | **Документирование скиллов** — добавлена запись об установке скиллов в PROMPTS.md, REPORT.md, Memory Bank, .clinerules/, IMPLEMENTATION_PLAN.md |
 | | 2026-06-06 22:16 | **Code Review, архитектурный анализ и рефакторинг** — запущен code review subagent и архитектурный анализ через скиллы; исправлены: SECRET_KEY, CORS, CSV import (лимит 10 MB), N+1 запросы, дублирование standings, тесты (temp-файл); ruff clean, 20/20 тестов проходят |
+| 2026-06-06 22:35 | **Исправление запуска telegram-bot** — добавлен extra `[job-queue]` для python-telegram-bot, перегенерирован uv.lock; исправлена ошибка AttributeError: 'NoneType' object has no attribute 'run_repeating' |

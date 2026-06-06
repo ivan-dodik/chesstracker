@@ -113,6 +113,12 @@
 - Обновлён .gitignore для игнорирования .agents/
 - Созданы: .agents/ — директория с установленными скиллами
 
+## 2026-06-06 22:35 — Исправление запуска telegram-bot
+- Исправлена ошибка `AttributeError: 'NoneType' object has no attribute 'run_repeating'` при запуске telegram-bot
+- Добавлен extra `[job-queue]` для зависимости `python-telegram-bot` в `telegram-bot/pyproject.toml`
+- Перегенерирован `uv.lock`: добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1
+- Затронутые файлы: telegram-bot/pyproject.toml, telegram-bot/uv.lock
+
 ## 2026-06-06 22:16 — Code Review, архитектурный анализ и рефакторинг
 - Запущен code review subagent (скилл requesting-code-review) — выявлены критические, важные и минорные issues
 - Запущен архитектурный анализ (скилл improve-codebase-architecture) — сгенерирован HTML-отчёт с 12 находками
