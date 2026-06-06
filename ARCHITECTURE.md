@@ -336,3 +336,6 @@ telegram-bot/
 5. **JWT аутентификация** — два предзаполненных аккаунта (admin, user)
 6. **Управление зависимостями — `uv`** (не pip/poetry)
 7. **Линтер — `ruff`** (flake8 + isort + pyupgrade в одном)
+8. **Pre-commit hook** — автоматический ruff check перед каждым коммитом
+9. **GitHub Actions CI** — lint (ruff) + тесты (pytest с PostgreSQL) на каждый push/PR
+10. **Тестовая инфраструктура** — 20 тестов (pytest-asyncio, SQLite вместо PostgreSQL для изоляции), покрытие auth, CRUD, рейтинга, статистики, избранного

@@ -121,6 +121,70 @@
 
 **Коммит:** `1ad257c (HEAD -> main) docs: add architecture documentation and implementation plan`
 
+## Итоги майлстоуна M2: Окружение и Docker
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- `backend/pyproject.toml` — зависимости FastAPI, SQLAlchemy, Alembic, JWT, bcrypt, SSE, Jinja2 и др.
+- `backend/Dockerfile` — Python 3.12-slim, uv, uvicorn
+- `telegram-bot/pyproject.toml` — зависимости python-telegram-bot, httpx, pydantic-settings
+- `telegram-bot/Dockerfile` — Python 3.12-slim, uv, python bot.py
+- `.env.example` — шаблон переменных окружения
+- `docker-compose.yml` — 3 сервиса: db (PostgreSQL 16), backend, telegram-bot
+- `docker-compose.override.yml` — hot-reload volumes, ports для разработки
+- Полная структура директорий backend (app, core, models, schemas, api, services, templates, static, tests)
+
+**Результат:** `docker compose build` успешен
+
+## Итоги майлстоуна M3: Backend — модели и база данных
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- `backend/app/core/config.py` — Pydantic BaseSettings (DATABASE_URL, SECRET_KEY, DEBUG и др.)
+- `backend/app/core/database.py` — async engine, async sessionmaker, get_db
+- `backend/app/core/security.py` — hash_password/verify_password (bcrypt), create_access_token/decode_access_token (JWT)
+- 7 SQLAlchemy моделей: User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
+- Alembic: async env.py, миграция "initial" (8 таблиц)
+- Pydantic схемы для всех моделей
+- `backend/app/seed.py` — 2 пользователя, 30 игроков, 10 турниров, 225 партий, 180 rating_history, 4 favorites
+
+**Проблемы:**
+- bcrypt 5.x несовместим с passlib 1.7.4 — зафиксирована версия 4.0.1
+
+## Итоги майлстоуна M4: Backend — API: аутентификация и базовые CRUD
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- `backend/app/api/deps.py` — get_db, get_current_user, get_current_admin
+- `backend/app/api/auth.py` — POST /api/auth/login, POST /api/auth/register, GET /api/auth/me
+- `backend/app/services/player_service.py` + `backend/app/api/players.py` — CRUD с пагинацией, поиском
+- `backend/app/services/tournament_service.py` + `backend/app/api/tournaments.py` — CRUD с фильтрацией
+- `backend/app/services/game_service.py` + `backend/app/api/games.py` — CRUD + standings (автоподсчёт очков)
+- `backend/app/api/router.py` — объединение всех роутеров
+- `backend/app/main.py` — FastAPI app с lifespan, CORS, static files, Jinja2, Swagger UI
+- Тесты: `test_auth.py`, `test_players.py` — 8 тестов
+
+**Результат:** 8/8 тестов passed, Swagger UI работает
+
+## Итоги майлстоуна M5: Backend — API: специфичные фичи
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- rating_service + API — история рейтинга с фильтром по дате
+- favorite_service + API — избранное пользователя
+- stats_service + API — head-to-head, top-rated, overall stats
+- sse_service + API — SSE endpoint, события при создании/обновлении партий
+- export_service + API — CSV экспорт турнирной таблицы
+- import_service + API — CSV импорт результатов
+- activity_log_service + API — лог активности с интеграцией во все CRUD
+- 12 новых тестов (ratings, stats, favorites)
+
+**Результат:** 20/20 тестов passed, docker build успешен
+
 ## Итоги майлстоуна M6: Frontend — базовая структура и навигация
 
 **Статус:** ✅ Завершён
@@ -176,6 +240,20 @@
 
 **Примечание:** Избранное, аутентификация, экспорт/импорт CSV были реализованы в рамках M7. В M8 добавлен SSE-клиент и обновлена документация.
 
+## Итоги майлстоуна M9: Telegram-bot
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- `telegram-bot/config.py` — Pydantic BaseSettings (TG_BOT_TOKEN, BACKEND_URL)
+- `telegram-bot/bot.py` — инициализация Application (python-telegram-bot), регистрация хендлеров, job_queue для периодического polling
+- `telegram-bot/handlers/start.py` — /start: приветственное сообщение и инструкция
+- `telegram-bot/handlers/subscribe.py` — /subscribe и /unsubscribe с сохранением подписчиков в subscribers.json
+- `telegram-bot/services/api_client.py` — HTTP-клиент для backend (get_active_tournaments, get_tournament_games)
+- `telegram-bot/services/notifier.py` — периодический опрос активных турниров, отправка уведомлений подписанным чатам
+
+**Результат:** docker compose build telegram-bot успешен
+
 ## Итоги майлстоуна M10: Тестирование и CI
 
 **Статус:** ✅ Завершён
@@ -208,6 +286,7 @@
 | 2026-06-06 13:56 | Создание `ARCHITECTURE.md`, обновление Memory Bank, коммит M1 |
 | 2026-06-06 14:02 | Создание `REPORT.md` (данный файл) — исправление проблемы с отсутствием отчёта |
 | 2026-06-06 14:17 | **M2: Окружение и Docker** — созданы pyproject.toml (backend + bot), Dockerfile, docker-compose.yml, .env.example, структура директорий; сборка docker compose build успешна |
+| 2026-06-06 14:38 | **M3: Backend — модели и база данных** — созданы core (config, database, security), 7 SQLAlchemy моделей, Alembic миграция "initial" (8 таблиц), Pydantic схемы, seed-данные (2 user, 30 players, 10 tournaments, 225 games, 180 rating_history, 4 favorites); зафиксирована версия bcrypt 4.0.1 |
 | 2026-06-06 16:24 | Чекмаки обновления CHANGES.md, PROMPTS.md, REPORT.md добавлены в IMPLEMENTATION_PLAN.md и .clinerules/implementation_plan.md (с ошибкой: в начале майлстоунов) |
 | 2026-06-06 16:30 | Исправление: чекмаки перенесены в конец майлстоунов, дубликат удалён. Проблема зафиксирована в REPORT.md |
 | 2026-06-06 16:40 | **M4: Backend — API: аутентификация и базовые CRUD** — проверены и подтверждены все API эндпоинты, исправлен conftest.py (переопределение DATABASE_URL), 8/8 тестов passed, Docker build и Swagger UI проверены |

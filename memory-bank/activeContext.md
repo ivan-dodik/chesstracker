@@ -1,20 +1,17 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M10: Тестирование и CI**. Исправлены ошибки ruff, созданы pre-commit hook и GitHub Actions CI. ruff check проходит, 20/20 тестов проходят.
+Завершён **M11: Финальная документация**. Проект полностью реализован согласно IMPLEMENTATION_PLAN.md. Все 11 майлстоунов выполнены.
 
 ## Последние изменения
-- Исправлены все ошибки ruff в backend (122 → 0) и telegram-bot (12 → 0)
-- Добавлены per-file-ignores для E501 в pyproject.toml обоих проектов
-- Переименована TemplateResponse → template_response в web.py (N802 fix)
-- Создан .pre-commit-config.yaml с ruff hook для backend и telegram-bot
-- Создан .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
-- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
+- Создан README.md с полным описанием проекта, стеком, быстрым стартом, API-эндпоинтами, командами для разработки
+- ARCHITECTURE.md дополнен пунктами о pre-commit hook, CI и тестовой инфраструктуре
+- REPORT.md дополнен итогами M2–M5, M9, M11; добавлена пропущенная запись в историю (M3)
+- PROMPTS.md обновлён записью о M11
+- CHANGES.md обновлён записью о M11 и добавлены пропущенные майлстоуны M1–M5
 
-## Следующие шаги (приоритетный порядок)
-1. ✅ **M9: Telegram-bot** — выполнено
-2. ✅ **M10: Тестирование и CI** — выполнено
-3. **M11: Финальная документация** (README.md, финальная проверка REPORT.md, PROMPTS.md, CHANGES.md, ARCHITECTURE.md)
+## Следующие шаги
+Все задачи выполнены. Проект готов к сдаче.
 
 ## Активные решения и considerations
 - **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.

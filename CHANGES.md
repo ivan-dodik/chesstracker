@@ -52,3 +52,54 @@
 - Добавлены __init__.py в handlers/ и services/
 - Обновлён Dockerfile: копирование config.py
 - docker compose build telegram-bot успешен
+
+## 2026-06-06 13:56 — M1: Архитектура и планирование
+- Создан project_task.md — полное ТЗ
+- Создан IMPLEMENTATION_PLAN.md — 11 майлстоунов, ~80 шагов
+- Создан ARCHITECTURE.md — архитектура, ERD, API, стек
+- Создан Memory Bank — 6 core-файлов
+- Созданы .clinerules/ — 5 правил
+- Создан LICENSE — MIT
+- Выполнен коммит и пуш
+
+## 2026-06-06 14:17 — M2: Окружение и Docker
+- Созданы pyproject.toml (backend + bot) с зависимостями
+- Созданы Dockerfile (backend + bot)
+- Созданы docker-compose.yml и docker-compose.override.yml
+- Создан .env.example
+- Создана полная структура директорий backend
+- docker compose build успешен
+
+## 2026-06-06 14:38 — M3: Backend — модели и база данных
+- Созданы core: config.py (BaseSettings), database.py (async engine), security.py (JWT, bcrypt)
+- Созданы 7 SQLAlchemy моделей
+- Инициализирован Alembic, создана миграция "initial" (8 таблиц)
+- Созданы Pydantic схемы для всех моделей
+- Создан seed.py (2 user, 30 players, 10 tournaments, 225 games, 180 rating_history, 4 favorites)
+- Зафиксирована версия bcrypt 4.0.1 (совместимость с passlib)
+
+## 2026-06-06 16:40 — M4: Backend — API: аутентификация и базовые CRUD
+- Созданы deps.py (get_db, get_current_user, get_current_admin)
+- Созданы auth API (login, register, me)
+- Созданы CRUD API для игроков, турниров, партий (с пагинацией, поиском, фильтрацией)
+- Созданы standings с автоподсчётом очков
+- Созданы router.py и main.py (FastAPI app, CORS, Swagger UI)
+- Написаны 8 тестов (auth, players)
+- 8/8 тестов passed, Swagger UI работает
+
+## 2026-06-06 16:58 — M5: Backend — API: специфичные фичи
+- Созданы API: rating, favorite, stats, SSE, export/import CSV, activity log
+- ActivityLog интегрирован во все CRUD
+- SSE-события при создании/обновлении партий
+- 12 новых тестов (ratings, stats, favorites)
+- 20/20 тестов passed, docker build успешен
+- Выполнен коммит и пуш: `6f16a94`
+
+## 2026-06-06 21:34 — M11: Финальная документация
+- Создан README.md с описанием проекта, стеком, быстрым стартом, API-эндпоинтами, командами для разработки
+- ARCHITECTURE.md дополнен пунктами о pre-commit hook, CI и тестовой инфраструктуре
+- REPORT.md дополнен итогами M2–M5, M9, M11; добавлена пропущенная запись в историю (M3)
+- PROMPTS.md обновлён записью о M11
+- CHANGES.md обновлён записью о M11
+- Memory Bank обновлён (activeContext.md, progress.md)
+- Выполнен финальный коммит и пуш

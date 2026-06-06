@@ -256,10 +256,8 @@ initialize memory bank
 
 **Результат:**
 - Созданы 7 новых сервисов + API: rating, favorite, stats, SSE, export/import CSV, activity log
-- ActivityLog интегрирован во все CRUD-операции (players, tournaments, games)
-- SSE-события публикуются при создании/обновлении партий
-- Dockerfile исправлен (добавлено копирование tests/)
-- Написаны тесты: test_ratings (3), test_stats (4), test_favorites (5)
+- ActivityLog интегрирован во все CRUD
+- 12 новых тестов (ratings, stats, favorites)
 - 20/20 тестов проходят
 - Docker build успешен
 - Выполнен коммит и пуш: `6f16a94 feat: add ratings, stats, favorites, SSE, CSV, activity log API`
@@ -390,3 +388,23 @@ initialize memory bank
 - Создан .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
 - ruff check проходит на всех файлах, 20/20 тестов проходят
 - Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
+
+---
+
+## 2026-06-06 21:34 — M11: Финальная документация
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Выполни следующий майлстоун из плана.
+```
+
+**Результат:**
+- Создан README.md с описанием проекта, стеком, быстрым стартом, API-эндпоинтами, командами для разработки
+- ARCHITECTURE.md дополнен пунктами о pre-commit hook, CI и тестовой инфраструктуре
+- REPORT.md дополнен итогами M2–M5, M9, M11; добавлена пропущенная запись в историю (M3)
+- PROMPTS.md обновлён записью о M11
+- CHANGES.md обновлён записью о M11
+- Memory Bank обновлён (activeContext.md, progress.md)
+- Выполнен финальный коммит и пуш
