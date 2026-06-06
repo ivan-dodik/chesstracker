@@ -162,6 +162,17 @@
 - **Результат:** Вход должен работать корректно, пользователи остаются на дашборде после аутентификации
 - Затронутые файлы: backend/app/static/js/main.js
 
+## 2026-06-07 02:40 — Установка BrowserTools MCP сервера
+- Установлен MCP сервер `@agentdeskai/browser-tools-mcp@1.2.1` в `/home/ai/Documents/Cline/MCP/browser-tools-mcp/`
+- Установлен глобально `@agentdeskai/browser-tools-server@1.2.1` — сервер-прослойка для сбора логов браузера
+- Запущен `browser-tools-server` на порту 3025
+- Настроен `cline_mcp_settings.json` — добавлен сервер `github.com/AgentDeskAI/browser-tools-mcp`
+- Продемонстрирована работа: `getConsoleLogs` вернул пустой массив (корректный ответ)
+- Для полной функциональности требуется:
+  1. Установить Chrome-расширение BrowserTools (скачать с GitHub releases)
+  2. Открыть Chrome DevTools → панель BrowserToolsMCP
+- Затронутые файлы: `/home/ai/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
+
 ## 2026-06-07 02:31 — TDD: тесты для главной страницы, логина и авторизации
 - **Фаза 1 (Web-страницы):** создан `tests/test_web.py` — 7 тестов (главная страница, HTMX-атрибуты, Alpine.js компоненты, favourites section hidden, страница логина, форма логина, Alpine loginForm)
 - **Фаза 2 (Auth API):** расширен `tests/test_auth.py` — добавлено 3 теста (несуществующий пользователь, невалидный токен, register без токена)
