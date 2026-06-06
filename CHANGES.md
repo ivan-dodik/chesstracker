@@ -18,3 +18,7 @@
 - Обновлён PROMPTS.md — добавлена запись о создании плана и правила
 - Обновлён Memory Bank (activeContext.md, progress.md)
 - Файлы: IMPLEMENTATION_PLAN.md, .clinerules/implementation_plan.md, PROMPTS.md, memory-bank/activeContext.md, memory-bank/progress.md
+
+## 2026-06-06 13:56
+- Создан ARCHITECTURE.md — описание архитектуры, ERD, структура директорий, API endpoints, стек технологий
+- Обновлён Memory Bank (activeContext.md, progress.md) — M1 завершён
