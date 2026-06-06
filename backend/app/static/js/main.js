@@ -55,12 +55,13 @@ const Auth = {
 
 // ============================================================
 // Alpine.js Components — register via alpine:init event
-// main.js (defer) runs BEFORE Alpine.js (defer), so the listener
-// is guaranteed to be registered before Alpine fires the event.
+// Per Alpine docs: extension script (defer) BEFORE alpine CDN (defer) guarantees
+// that alpine:init listener fires before Alpine scans the DOM.
 // ============================================================
 
+// Alpine docs: register extensions inside alpine:init (see https://alpinejs.dev/essentials/lifecycle)
 document.addEventListener('alpine:init', () => {
-  // Auth state component
+  // Auth state (for navbar)
   Alpine.data('authState', () => ({
     isAuth: Auth.isAuthenticated(),
     user: Auth.getUser(),
@@ -76,7 +77,7 @@ document.addEventListener('alpine:init', () => {
     }
   }));
 
-  // Login form component
+  // Login form
   Alpine.data('loginForm', () => ({
     username: '',
     password: '',
@@ -86,6 +87,8 @@ document.addEventListener('alpine:init', () => {
     async submit() {
       this.error = '';
       this.loading = true;
+
+      console.log('[Login] Attempting login for user:', this.username);
 
       try {
         const response = await fetch('/api/auth/login', {
@@ -97,33 +100,54 @@ document.addEventListener('alpine:init', () => {
           })
         });
 
+        console.log('[Login] Login response status:', response.status);
+
         if (!response.ok) {
           const data = await response.json();
+          console.error('[Login] Login failed:', data);
           this.error = data.detail || 'Invalid credentials';
           this.loading = false;
           return;
         }
 
         const data = await response.json();
-        Auth.setToken(data.access_token);
+        console.log('[Login] Login successful, token received');
 
-        const meResponse = await fetch('/api/auth/me', {
-          headers: Auth.getAuthHeaders()
-        });
-        if (meResponse.ok) {
-          const user = await meResponse.json();
-          Auth.setUser(user);
+        // Save token to localStorage
+        Auth.setToken(data.access_token);
+        console.log('[Login] Token saved to localStorage');
+
+        // Try to get user info, but don't block navigation if it fails
+        try {
+          const meResponse = await fetch('/api/auth/me', {
+            headers: Auth.getAuthHeaders()
+          });
+          if (meResponse.ok) {
+            const user = await meResponse.json();
+            Auth.setUser(user);
+            console.log('[Login] User info loaded:', user);
+          } else {
+            console.warn('[Login] Failed to load user info, status:', meResponse.status);
+          }
+        } catch (meErr) {
+          console.warn('[Login] Error fetching user info:', meErr);
+          // Don't fail the login if me endpoint fails
         }
 
-        window.location.href = '/';
+        console.log('[Login] Redirecting to dashboard...');
+        // Use a small delay to ensure localStorage is updated
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 100);
       } catch (err) {
+        console.error('[Login] Network error:', err);
         this.error = 'Network error. Please try again.';
         this.loading = false;
       }
     }
   }));
 
-  // Pagination component
+  // Pagination
   Alpine.data('pagination', () => ({
     page: 1,
     total: 0,
@@ -159,34 +183,24 @@ document.addEventListener('alpine:init', () => {
     }
   }));
 
-  // ============================================================
-  // Dashboard chart components
-  // ============================================================
-
-  // Load players list for selectors
-  let playersCache = [];
-
-  async function loadPlayers() {
-    try {
-      const resp = await fetch('/api/players?per_page=100');
-      const data = await resp.json();
-      playersCache = data.items || [];
-    } catch(e) {
-      playersCache = [];
-    }
-  }
-  loadPlayers();
-
-  // Rating chart component
+  // Rating chart
   Alpine.data('ratingChart', () => ({
     selectedPlayerId: '',
-    players: playersCache,
+    players: [],
     chart: null,
 
     init() {
-      this.$nextTick(() => loadPlayers().then(() => {
-        this.players = playersCache;
-      }));
+      this.loadPlayers();
+    },
+
+    async loadPlayers() {
+      try {
+        const resp = await fetch('/api/players?per_page=100');
+        const data = await resp.json();
+        this.players = data.items || [];
+      } catch(e) {
+        this.players = [];
+      }
     },
 
     async loadChart() {
@@ -250,13 +264,21 @@ document.addEventListener('alpine:init', () => {
   // Overall stats doughnut chart
   Alpine.data('overallStatsChart', () => ({
     selectedPlayerId: '',
-    players: playersCache,
+    players: [],
     chart: null,
 
     init() {
-      this.$nextTick(() => loadPlayers().then(() => {
-        this.players = playersCache;
-      }));
+      this.loadPlayers();
+    },
+
+    async loadPlayers() {
+      try {
+        const resp = await fetch('/api/players?per_page=100');
+        const data = await resp.json();
+        this.players = data.items || [];
+      } catch(e) {
+        this.players = [];
+      }
     },
 
     async loadStats() {
@@ -324,9 +346,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Handle HTMX errors globally
   document.body.addEventListener('htmx:responseError', (e) => {
-    if (e.detail.xhr.status === 401) {
-      Auth.clearToken();
-      window.location.href = '/login';
+    const status = e.detail.xhr.status;
+    const path = e.detail.requestConfig.path;
+
+    console.log(`[HTMX] Error ${status} for ${path}`);
+
+    if (status === 401) {
+      // Check if we have a token - if not, just ignore (user is not logged in)
+      const hasToken = Auth.getToken();
+
+      if (hasToken) {
+        // We have a token but got 401 - token might be invalid
+        console.warn('[HTMX] 401 with token present, clearing and redirecting');
+        Auth.clearToken();
+        window.location.href = '/login';
+      } else {
+        // No token - this is expected for public users
+        console.log('[HTMX] 401 without token - ignoring (public access)');
+      }
+    } else if (status === 403) {
+      console.warn('[HTMX] 403 Forbidden - insufficient permissions');
     }
   });
 

@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="/static/css/style.css">
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-  <!-- main.js (defer) runs BEFORE Alpine.js (defer) — registers alpine:init listener -->
+  <!-- Alpine docs: extension (main.js) defer BEFORE Alpine, guaranteed order -->
   <script defer src="/static/js/main.js"></script>
   <script defer src="https://unpkg.com/alpinejs@3.14.8"></script>
+  <script defer src="/static/js/sse.js"></script>
   {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -47,7 +48,5 @@
   <footer class="footer">
     Chess Tracker &copy; 2026 &mdash; Open Source Project
   </footer>
-
-  <script defer src="/static/js/sse.js"></script>
 </body>
 </html>
