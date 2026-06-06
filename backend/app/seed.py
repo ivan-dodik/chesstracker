@@ -4,9 +4,9 @@ import asyncio
 import datetime
 import random
 
-from app.core.database import Base, async_session_factory, engine
+from app.core.database import async_session_factory, engine, Base
 from app.core.security import hash_password
-from app.models import ActivityLog, Favorite, Game, Player, RatingHistory, Tournament, User
+from app.models import User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
 
 # --- Data pools ---
 
@@ -197,23 +197,24 @@ async def seed() -> None:
         session.add_all(favorites)
 
         # --- ActivityLog ---
-        activity_logs = [
-            ActivityLog(user_id=admin.id, action="create", entity_type="tournament", entity_id=tournaments[0].id),
-            ActivityLog(user_id=admin.id, action="create", entity_type="player", entity_id=players[0].id),
-            ActivityLog(user_id=user.id, action="add_favorite", entity_type="player", entity_id=players[0].id),
-        ]
-        session.add_all(activity_logs)
+        log1 = ActivityLog(user_id=admin.id, action="create", entity_type="tournament", entity_id=tournaments[0].id)
+        log1.set_new_values({"name": tournaments[0].name})
+        log2 = ActivityLog(user_id=admin.id, action="create", entity_type="player", entity_id=players[0].id)
+        log2.set_new_values({"name": players[0].name})
+        log3 = ActivityLog(user_id=user.id, action="add_favorite", entity_type="player", entity_id=players[0].id)
+        log3.set_new_values({"player_id": players[0].id})
+        session.add_all([log1, log2, log3])
 
         await session.commit()
 
-        print("✅ Seed completed:")
-        print("   - 2 users (admin/admin123, user/user123)")
+        print(f"✅ Seed completed:")
+        print(f"   - 2 users (admin/admin123, user/user123)")
         print(f"   - {len(players)} players")
         print(f"   - {len(tournaments)} tournaments ({len([t for t in tournaments if t.status == 'completed'])} completed, {len([t for t in tournaments if t.status == 'active'])} active)")
         print(f"   - {len(games)} games")
         print(f"   - {len(rating_history)} rating history entries")
         print(f"   - {len(favorites)} favorites")
-        print(f"   - {len(activity_logs)} activity logs")
+        print(f"   - 3 activity logs")
 
 
 if __name__ == "__main__":

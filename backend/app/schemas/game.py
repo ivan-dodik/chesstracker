@@ -1,6 +1,7 @@
 """Game schemas."""
 
 from datetime import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,8 +12,8 @@ class GameCreate(BaseModel):
     round: int
     white_player_id: int
     black_player_id: int
-    result: str | None = None
-    played_at: datetime | None = None
+    result: Optional[str] = None
+    played_at: Optional[datetime] = None
 
 
 class GameRead(BaseModel):
@@ -22,11 +23,19 @@ class GameRead(BaseModel):
     round: int
     white_player_id: int
     black_player_id: int
-    result: str | None = None
-    played_at: datetime | None = None
+    result: Optional[str] = None
+    played_at: Optional[datetime] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class GameList(BaseModel):
+    """Schema for listing games (paginated)."""
+    items: list[GameRead]
+    total: int
+    page: int
+    per_page: int
 
 
 class GameResult(BaseModel):

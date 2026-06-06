@@ -5,6 +5,12 @@ from datetime import datetime
 from pydantic import BaseModel
 
 
+class LoginRequest(BaseModel):
+    """Schema for login request."""
+    username: str
+    password: str
+
+
 class UserCreate(BaseModel):
     """Schema for creating a new user."""
     username: str

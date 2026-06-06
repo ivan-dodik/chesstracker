@@ -1,5 +1,6 @@
 """Application configuration via pydantic-settings."""
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings
 
 
@@ -19,6 +20,14 @@ class Settings(BaseSettings):
     # Backend
     BACKEND_URL: str = "http://backend:8000"
     DEBUG: bool = True
+
+    @field_validator("DEBUG", mode="before")
+    @classmethod
+    def parse_debug(cls, v: str | bool) -> bool:
+        """Allow DEBUG to be set as string 'true'/'false' or any truthy/falsy value."""
+        if isinstance(v, bool):
+            return v
+        return v.lower() in ("true", "1", "yes")
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 
