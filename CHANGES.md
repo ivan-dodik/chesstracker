@@ -58,3 +58,20 @@
 - В IMPLEMENTATION_PLAN.md чекмаки «Обновить CHANGES.md, PROMPTS.md, REPORT.md» перенесены из начала каждого майлстоуна M2–M10 в конец (перед «Обновить Memory Bank»)
 - Удалён дублирующийся чекмак в M2
 - Файлы: IMPLEMENTATION_PLAN.md
+
+## 2026-06-06 16:40
+### M4: Backend — API: аутентификация и базовые CRUD — выполнено
+- Исправлена проблема с тестами: `conftest.py` переписан — `settings.DATABASE_URL` переопределяется до импорта `database.py`, что предотвращает подключение к PostgreSQL во время тестов; добавлена вспомогательная функция `_create_user_in_test_db`
+- Проверены все API эндпоинты через Docker Compose:
+  - `GET /health` — OK
+  - `POST /api/auth/login` — JWT токен
+  - `GET /api/auth/me` — текущий пользователь (admin)
+  - `GET /api/players` — 30 игроков с пагинацией
+  - `GET /api/tournaments` — 10 турниров с фильтрацией
+  - `GET /api/tournaments/{id}/standings` — турнирная таблица с очками
+  - `GET /api/tournaments/{id}/games` — партии турнира (35 для турнира 1)
+  - CRUD (POST/PUT/DELETE) для players, tournaments, games — admin only
+- Тесты: 8/8 passed (test_auth.py: 4, test_players.py: 4)
+- Docker build: успешен (backend + telegram-bot)
+- Все созданные ранее файлы M4 (deps.py, auth.py, players.py, tournaments.py, games.py, router.py, main.py, сервисы, схемы) прошли проверку
+- Файлы: backend/tests/conftest.py

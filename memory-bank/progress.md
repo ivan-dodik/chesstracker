@@ -1,7 +1,7 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-**M3: Backend — модели и база данных** завершён. Все модели, миграции, схемы и seed-данные созданы.
+**M4: Backend — API: аутентификация и базовые CRUD** завершён. Все API эндпоинты проверены и работают.
 
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
@@ -13,17 +13,17 @@
   - ✅ Pydantic схемы: User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
   - ✅ Seed: 2 user, 30 players, 10 tournaments, 258 games, 180 rating_history, 4 favorites, 3 activity_logs
   - ✅ bcrypt зафиксирован на 4.0.1 (совместимость с passlib)
+- ✅ **M4: Backend — API: аутентификация и базовые CRUD**
+  - ✅ deps.py: get_db, get_current_user, get_current_admin
+  - ✅ auth.py: POST /api/auth/login, /register, /me
+  - ✅ players.py: CRUD + поиск/фильтрация/пагинация
+  - ✅ tournaments.py: CRUD + поиск/фильтрация + standings
+  - ✅ games.py: CRUD по турам + подсчёт очков
+  - ✅ router.py + main.py
+  - ✅ Тесты: 8/8 passed (test_auth.py: 4, test_players.py: 4)
+  - ✅ Docker build успешен, все эндпоинты проверены через curl
 
 ## Что осталось сделать (в порядке приоритета)
-
-### M4: Backend — API: аутентификация и базовые CRUD
-- ⬜ deps.py: get_db, get_current_user, get_current_admin
-- ⬜ auth.py: POST /api/auth/login, /register, /me
-- ⬜ players.py: CRUD + поиск/фильтрация/пагинация
-- ⬜ tournaments.py: CRUD + поиск/фильтрация + standings
-- ⬜ games.py: CRUD по турам + подсчёт очков
-- ⬜ router.py + main.py (обновление)
-- ⬜ Тесты (3–4)
 
 ### M5: Backend — API: специфичные фичи
 - ⬜ Ratings, Favorites, Stats, Export/Import CSV, SSE, ActivityLog
@@ -49,10 +49,11 @@
 
 ## Известные проблемы
 - **bcrypt 5.x** несовместим с passlib 1.7.4 — зафиксирована версия 4.0.1
-- **ruff** выдаёт 37 ошибок в app/ (преимущественно в seed.py и моделях) — будут исправлены в M10 при настройке CI
+- **ruff** выдаёт ошибки в app/ (преимущественно в seed.py и моделях) — будут исправлены в M10 при настройке CI
 
 ## Эволюция проектных решений
 - **2026-06-06**: Инициализация
 - **2026-06-06 13:35**: IMPLEMENTATION_PLAN, архитектурные решения
 - **2026-06-06 14:17**: M2 завершён — Docker-инфраструктура
 - **2026-06-06 14:38**: M3 завершён — модели, миграции, схемы, seed
+- **2026-06-06 16:40**: M4 завершён — API: auth + CRUD + тесты 8/8
