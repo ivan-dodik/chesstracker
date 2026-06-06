@@ -1,0 +1,20 @@
+/* Chess Tracker — main stylesheet */
+
+:root {
+  --color-primary: #2c3e50;
+  --color-primary-light: #34495e;
+  --color-accent: #e74c3c;
+  --color-accent-hover: #c0392b;
+  --color-success: #27ae60;
+  --color-warning: #f39c12;
+  --color-info: #3498db;
+  --color-bg: #f5f6fa;
+  --color-card: #ffffff;
+  --color-text: #2c3e50;
+  --color-text-light: #7f8c8d;
+  --color-border: #dcdde1;
+  --color-nav-bg: #2c3e50;
+  --color-nav-text: #ecf0f1;
+  --color-nav-hover: #34495e;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);

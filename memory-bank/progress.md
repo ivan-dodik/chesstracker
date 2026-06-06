@@ -1,7 +1,7 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-**M4: Backend — API: аутентификация и базовые CRUD** завершён. Все API эндпоинты проверены и работают.
+**M5: Backend — API: специфичные фичи** завершён. Все специфичные API эндпоинты созданы, протестированы (20/20 passed) и запушены.
 
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
@@ -22,15 +22,24 @@
   - ✅ router.py + main.py
   - ✅ Тесты: 8/8 passed (test_auth.py: 4, test_players.py: 4)
   - ✅ Docker build успешен, все эндпоинты проверены через curl
+- ✅ **M5: Backend — API: специфичные фичи**
+  - ✅ rating_service + API: история рейтинга с фильтром по дате
+  - ✅ favorite_service + API: CRUD избранного
+  - ✅ stats_service + API: head-to-head, top-rated, overall stats
+  - ✅ sse_service + API: Server-Sent Events с keepalive
+  - ✅ export_service + API: CSV экспорт турнирной таблицы
+  - ✅ import_service + API: CSV импорт (2 формата)
+  - ✅ activity_log_service + API: лог активности с фильтрацией
+  - ✅ Интеграция ActivityLog во все CRUD (players, tournaments, games)
+  - ✅ Интеграция SSE-событий при создании/обновлении партий
+  - ✅ Тесты: 20/20 passed (test_ratings: 3, test_stats: 4, test_favorites: 5)
+  - ✅ Docker build успешен
 
 ## Что осталось сделать (в порядке приоритета)
 
-### M5: Backend — API: специфичные фичи
-- ⬜ Ratings, Favorites, Stats, Export/Import CSV, SSE, ActivityLog
-- ⬜ Тесты (3–4)
-
 ### M6: Frontend — базовая структура и навигация
 - ⬜ Шаблоны, CSS, JS, HTMX-фрагменты, web-роуты
+- ⬜ Проверить, что все страницы открываются
 
 ### M7: Frontend — дашборд и детальные страницы
 - ⬜ Chart.js, Alpine.js, профили, детали турниров

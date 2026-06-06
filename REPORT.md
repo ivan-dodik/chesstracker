@@ -112,3 +112,4 @@
 | 2026-06-06 16:24 | Чекмаки обновления CHANGES.md, PROMPTS.md, REPORT.md добавлены в IMPLEMENTATION_PLAN.md и .clinerules/implementation_plan.md (с ошибкой: в начале майлстоунов) |
 | 2026-06-06 16:30 | Исправление: чекмаки перенесены в конец майлстоунов, дубликат удалён. Проблема зафиксирована в REPORT.md |
 | 2026-06-06 16:40 | **M4: Backend — API: аутентификация и базовые CRUD** — проверены и подтверждены все API эндпоинты, исправлен conftest.py (переопределение DATABASE_URL), 8/8 тестов passed, Docker build и Swagger UI проверены |
+| 2026-06-06 16:58 | **M5: Backend — API: специфичные фичи** — rating, favorite, stats, SSE, export/import CSV, activity log сервисы и API; ActivityLog интегрирован во все CRUD; SSE-события при создании/обновлении партий; Dockerfile исправлен; 12 новых тестов; 20/20 passed; коммит `6f16a94` |
