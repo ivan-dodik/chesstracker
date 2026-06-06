@@ -133,6 +133,22 @@
 
 ---
 
+### 2026-06-07 00:00 — Alpine-компоненты не регистрировались из-за порядка загрузки скриптов
+
+- **Суть:** После запуска проекта Alpine-компоненты на дашборде (графики рейтинга, статистика) не работали. В консоли — 0 ошибок, но компоненты не инициализировались. Также на страницах players и tournaments были ошибки `TypeError: Cannot read properties of null (reading 'addEventListener')` — скрипты в `<head>` обращались к `document.body`, который ещё не создан.
+- **Причина:**
+  1. Alpine.js загружался синхронно в `<head>`, а main.js с `alpine:init` слушателем — в конце `<body>`. Alpine инициализировался ДО main.js, событие `alpine:init` уже прошло, компоненты не регистрировались.
+  2. Инлайн-скрипты в `{% block extra_head %}` выполнялись до создания `<body>`, но использовали `document.body.addEventListener`.
+  3. База данных не была инициализирована (миграции + seed не выполнялись после `docker compose up`).
+- **Решение:**
+  1. Оба скрипта (main.js + Alpine.js) вынесены в `<head>` с `defer`. Defer-скрипты выполняются строго по порядку: main.js (подписывается на `alpine:init`) → Alpine.js (генерирует `alpine:init`).
+  2. Все Alpine-компоненты перенесены в main.js, регистрация через `document.addEventListener('alpine:init', ...)`.
+  3. Заменено `document.body.addEventListener` на `document.addEventListener` в 3 шаблонах (index.html, players/list.html, tournaments/list.html).
+  4. Выполнены `alembic upgrade head` и `python -m app.seed`.
+- **Результат:** ✅ 0 ошибок, 0 предупреждений на всех страницах.
+
+---
+
 ## Удачные и неудачные шаги
 
 ### ✅ Удачно
@@ -362,3 +378,4 @@
 | 2026-06-06 22:45 | **Исправление root-файлов в Docker volumes** — добавлен `user: "${UID:-1000}:${GID:-1000}"` в docker-compose.override.yml для backend и telegram-bot; добавлены UID/GID в .env.example |
 | 2026-06-06 22:53 | **Graceful shutdown бота при фейковом токене** — добавлен `is_token_valid()` в config.py; изменён bot.py на graceful exit; `restart: "no"` в docker-compose.yml; обновлён .env.example; создан TELEGRAM_BOT_SETUP.md |
 | 2026-06-06 23:16 | **Исправление ошибки uv cache (Permission denied) в Docker** — добавлен пользователь `appuser` в backend/Dockerfile и telegram-bot/Dockerfile; установлен `UV_CACHE_DIR=/home/appuser/.cache/uv`; docker compose build успешен |
+| 2026-06-07 00:00 | **Исправление фронтенд-ошибок Alpine.js и инициализация БД** — установлен скилл alpinejs; исправлен порядок загрузки скриптов (defer → Alpine); Alpine-компоненты перенесены в main.js; исправлены document.body.addEventListener в 3 шаблонах; применены миграции и seed; 0 ошибок на всех страницах |

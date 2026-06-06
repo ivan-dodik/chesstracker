@@ -141,3 +141,12 @@
 - **Проблема:** `uv` при запуске от root пытался создать `/.cache/uv` — доступ запрещён (ошибка 13)
 - **Решение:** создан отдельный пользователь, вся работа выполняется от него
 - Затронутые файлы: backend/Dockerfile, telegram-bot/Dockerfile
+
+## 2026-06-07 00:00 — Исправление фронтенд-ошибок Alpine.js и инициализации БД
+- Установлен скилл `alpinejs` (brettatoms/agent-skills@alpinejs)
+- Исправлен порядок загрузки скриптов: main.js (defer) → Alpine.js (defer) в `<head>`
+- Все Alpine-компоненты перенесены в main.js, регистрация через `document.addEventListener('alpine:init', ...)`
+- Исправлены ошибки `document.body.addEventListener` → `document.addEventListener` в шаблонах (index.html, players/list.html, tournaments/list.html) — скрипты в `<head>` обращались к несуществующему body
+- Применены миграции (`alembic upgrade head`) и seed-данные (`python -m app.seed`)
+- **Результат:** 0 ошибок, 0 предупреждений на всех страницах (верифицировано через Playwright)
+- Затронутые файлы: backend/app/static/js/main.js, backend/app/templates/base.html, backend/app/templates/index.html, backend/app/templates/players/list.html, backend/app/templates/tournaments/list.html, skills-lock.json
