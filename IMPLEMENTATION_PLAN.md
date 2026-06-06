@@ -414,3 +414,87 @@
 - .clinerules/memory-bank.md — правило «Установка агентских скиллов»
 - CHANGES.md — запись уже была добавлена при установке
 - `skills-lock.json` — закоммичен в репозиторий
+
+---
+
+## M12: TDD-инфраструктура и правила
+**Коммит:** `test: add TDD rules, pytest-cov, pre-commit hooks`
+
+- [ ] Установить `pytest-cov` в dev-зависимости backend
+- [ ] Создать `.clinerules/tdd.md`:
+  - Red-Green-Refactor (обязателен для нового кода)
+  - Таблица соответствия «файл → какие тесты запускать»
+  - Критерии завершения задачи: перед attempt_completion → полный прогон pytest + ruff check
+  - Pre-commit: ruff check + pytest
+- [ ] Обновить `.pre-commit-config.yaml` — добавить hook pytest для backend
+- [ ] Обновить `pyproject.toml` — testpaths, addopts
+- [ ] Обновить `.github/workflows/ci.yml`:
+  - pytest с `--cov` флагом
+  - Добавить job `test-telegram-bot`
+- [ ] Обновить `IMPLEMENTATION_PLAN.md` (этот файл) — добавить M12–M17
+- [ ] **Документирование и коммит**:
+  - CHANGES.md, PROMPTS.md, REPORT.md
+  - Memory Bank (activeContext.md, progress.md)
+  - `git add -A && git commit -m "test: add TDD infrastructure and test rules" && git push`
+
+## M13: API-тесты — Турниры, Игры, Export, Import
+**Коммит:** `test: add API tests for tournaments, games, export, import`
+
+Пишем по TDD: один тест → минимальный код (если не хватает) → зелёный.
+
+- [ ] `test_tournaments.py` — 7 тестов (List, Create admin/403, Get, Update, Delete, Standings, empty list)
+- [ ] `test_games.py` — 6 тестов (List by tournament, Create admin/401, Update result, Delete, nonexistent 404)
+- [ ] `test_export.py` — 3 теста (Export CSV 200, nonexistent 404, empty tournament)
+- [ ] `test_import_route.py` — 4 теста (Import success admin, 401 unauth, invalid CSV, missing file)
+- [ ] `test_players.py` — +2 теста (Update player admin, Delete player admin)
+- [ ] `test_auth.py` — +2 теста (Register by admin 201, Register by non-admin 403)
+- [ ] **Документирование и коммит**
+
+## M14: API-тесты — Activity Log, Health, краевые случаи
+**Коммит:** `test: add tests for activity log, health, auth edge cases`
+
+- [ ] `test_activity_log.py` — 4 теста (Get log admin OK, user=403, unauth=401, pagination)
+- [ ] `test_health.py` — 2 теста (GET /health → {"status":"ok"}, GET /docs → 200)
+- [ ] `test_ratings.py` — +2 теста (Nonexistent player 404, empty date range)
+- [ ] `test_stats.py` — +2 теста (Head-to-head nonexistent 404, player with no games)
+- [ ] `test_favorites.py` — +2 теста (Add favorite to nonexistent player 404, double delete 404)
+- [ ] **Документирование и коммит**
+
+## M15: Unit-тесты сервисов
+**Коммит:** `test: add unit tests for all service modules`
+
+Создать `backend/tests/services/`. Тестируем бизнес-логику через SQLite (без моков).
+
+- [ ] Создать `backend/tests/services/__init__.py`
+- [ ] `test_player_service.py` — 3 теста (CRUD, search/filter)
+- [ ] `test_tournament_service.py` — 3 теста (CRUD, standings calculation)
+- [ ] `test_game_service.py` — 3 теста (CRUD, standings update)
+- [ ] `test_rating_service.py` — 2 теста (History, date filter)
+- [ ] `test_stats_service.py` — 3 теста (Top-rated ties, overall, head-to-head)
+- [ ] `test_favorite_service.py` — 2 теста (Add/remove, duplicate)
+- [ ] `test_activity_log_service.py` — 2 теста (Create, get paginated)
+- [ ] `test_export_service.py` — 2 теста (Export CSV, empty tournament)
+- [ ] **Документирование и коммит**
+
+## M16: Telegram-bot тесты и CI
+**Коммит:** `test: add telegram-bot tests and CI job`
+
+- [ ] Добавить `pytest`, `pytest-asyncio`, `pytest-httpx` в dev-зависимости telegram-bot
+- [ ] Создать `telegram-bot/tests/__init__.py`
+- [ ] Создать `telegram-bot/tests/conftest.py` (mock backend server)
+- [ ] `test_api_client.py` — 3 теста (get tournaments, get games, error/retry)
+- [ ] `test_notifier.py` — 3 теста (notify subscribers, skip if no new, error recovery)
+- [ ] Обновить `.github/workflows/ci.yml` — job `test-telegram-bot`
+- [ ] Обновить `.pre-commit-config.yaml` — ruff hook для telegram-bot tests
+- [ ] **Документирование и коммит**
+
+## M17: E2E тесты (Playwright)
+**Коммит:** `test: add E2E browser tests with Playwright`
+
+- [ ] Установить Playwright: `pip install playwright && playwright install chromium`
+- [ ] Создать `backend/tests/e2e/`:
+  - `test_login.py` — логин admin/admin123, проверка дашборда
+  - `test_login_fail.py` — неверный пароль, сообщение об ошибке
+  - `test_navigation.py` — навигация по страницам
+- [ ] Создать `scripts/run_e2e.py` — запуск backend через `with_server.py` + Playwright
+- [ ] Обновить `.github/workflows/ci.yml` — добавить job `e2e` (с PostgreSQL)

@@ -204,6 +204,18 @@
 - **Примечание:** Предыдущая проверка через Playwright (headless webkit) также показала положительный результат
 - **Вывод:** Форма логина и процесс аутентификации полностью работоспособны в реальном Chrome
 
+## 2026-06-07 03:37 — M12: TDD-инфраструктура и правила
+- Установлен `pytest-cov` в dev-зависимости backend
+- Создан `.clinerules/tdd.md` — TDD-правила (Red-Green-Refactor, маппинг файлов→тесты, критерии завершения, pre-commit)
+- Обновлён `pyproject.toml` — testpaths, addopts "-v --tb=short"
+- Обновлён `.pre-commit-config.yaml` — добавлен hook pytest для backend
+- Обновлён `.github/workflows/ci.yml`:
+  - pytest с `--cov` флагом в job `test-backend`
+  - Добавлен job `test-telegram-bot` (заглушка, пока без тестов)
+- Обновлён `IMPLEMENTATION_PLAN.md` — добавлены майлстоуны M12–M17
+- 36/36 тестов проходят
+- Затронутые файлы: .clinerules/tdd.md, .pre-commit-config.yaml, .github/workflows/ci.yml, backend/pyproject.toml, IMPLEMENTATION_PLAN.md
+
 ## 2026-06-07 02:20 — Документирование проблемы аутентификации в BUGS.md
 - **Создан BUGS.md** — полный документ с описанием проблемы циклического редиректа после логина
 - **Содержание BUGS.md:**

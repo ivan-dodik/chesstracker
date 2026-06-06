@@ -10,7 +10,7 @@ jobs:
         with:
           src: backend telegram-bot
 
-  test:
+  test-backend:
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -32,6 +32,18 @@ jobs:
         run: |
           cd backend
           uv sync
-          uv run pytest
+          uv run pytest -v --tb=short --cov
         env:
           DATABASE_URL: postgresql+asyncpg://ct_user:ct_password@localhost/ct_test
+
+  test-telegram-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+      - name: Run tests
+        run: |
+          cd telegram-bot
+          uv sync
+          uv run pytest -v --tb=short

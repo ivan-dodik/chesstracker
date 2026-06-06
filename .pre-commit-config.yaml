@@ -10,3 +10,14 @@ repos:
         name: ruff check (telegram-bot)
         args: [--fix]
         files: ^telegram-bot/
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest (backend)
+        entry: >
+          bash -c '
+            cd backend && uv run pytest -v --tb=short
+          '
+        language: system
+        files: ^backend/
+        pass_filenames: false
