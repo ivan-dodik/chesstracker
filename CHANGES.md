@@ -94,3 +94,20 @@
 - Итоговый результат: 20/20 тестов проходят
 - Docker build: успешен
 - Файлы: backend/app/services/rating_service.py, backend/app/api/ratings.py, backend/app/services/favorite_service.py, backend/app/api/favorites.py, backend/app/services/stats_service.py, backend/app/api/stats.py, backend/app/services/sse_service.py, backend/app/api/sse.py, backend/app/services/export_service.py, backend/app/api/export.py, backend/app/services/import_service.py, backend/app/api/import_route.py, backend/app/services/activity_log_service.py, backend/app/api/activity_log.py, backend/app/services/__init__.py, backend/app/api/router.py, backend/Dockerfile, backend/tests/test_ratings.py, backend/tests/test_stats.py, backend/tests/test_favorites.py
+
+## 2026-06-06 20:24
+### M6: Frontend — базовая структура и навигация — выполнено
+- Обновлён `style.css` — полный CSS для адаптивной вёрстки: навигация, таблицы, карточки, кнопки, формы, пагинация, badges, flash-сообщения, мобильное меню, дашборд
+- Создан `main.js` — Auth helpers (JWT в localStorage), HTMX конфигурация (авто-добавление Authorization header, обработка 401), Alpine.js компоненты (authState, loginForm, pagination), flash-сообщения, утилиты
+- Создан `base.html` — базовый шаблон: навигация (логотип, ссылки дашборд/игроки/турниры, логин/логаут), flash-контейнер, footer, подключение HTMX + Alpine.js + main.js
+- Создан `login.html` — форма входа (Alpine.js loginForm), демо-данные (admin/admin123, user/user123)
+- Создан `index.html` — дашборд: топ-10 игроков, избранное, активные турниры (данные загружаются через HTMX из API)
+- Создан `players/list.html` — список игроков с поиском по имени, фильтрацией по рейтингу/городу, пагинацией (HTMX + fetch)
+- Создан `tournaments/list.html` — список турниров с фильтрацией по статусу/городу, пагинацией
+- Созданы partials: `player_row.html`, `tournament_row.html`, `pagination.html`
+- Создан `web.py` — веб-роуты (GET /, /login, /players, /tournaments) с Jinja2 шаблонизацией
+- Интегрирован web router в `main.py`
+- Исправлена ошибка Jinja2: создан собственный Environment с cache_size=0, заменён Starlette Jinja2Templates из-за несовместимости с Jinja2 3.1.x
+- Исправлена ошибка `get_flashed_messages` не определён — удалена зависимость от Flask-специфичной функции
+- Все 4 страницы возвращают HTTP 200, 20/20 тестов проходят
+- Файлы: backend/app/static/css/style.css, backend/app/static/js/main.js, backend/app/templates/base.html, backend/app/templates/login.html, backend/app/templates/index.html, backend/app/templates/players/list.html, backend/app/templates/tournaments/list.html, backend/app/templates/partials/player_row.html, backend/app/templates/partials/tournament_row.html, backend/app/templates/partials/pagination.html, backend/app/api/web.py, backend/app/main.py

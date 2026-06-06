@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+
+{% block title %}Дашборд — Chess Tracker{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>Дашборд</h1>
+</div>
+
+<div class="dashboard-grid">
+  <!-- Top 10 Players -->
+  <div class="dashboard-card">
+    <h3>🏆 Топ-10 игроков</h3>
+    <div id="top-rated" hx-get="/api/stats/top-rated" hx-trigger="load" hx-swap="innerHTML">
+      <div style="text-align:center;padding:2rem;">
+        <div class="spinner"></div>
+        <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Favorites (if authenticated) -->
+  <div class="dashboard-card" id="favorites-section" x-data="{ isAuth: Auth.isAuthenticated() }" x-show="isAuth">
+    <h3>⭐ Избранные игроки</h3>
+    <div id="favorites-list" hx-get="/api/favorites" hx-trigger="load" hx-swap="innerHTML">
+      <div style="text-align:center;padding:2rem;">
+        <div class="spinner"></div>
+        <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Tournaments -->
+  <div class="dashboard-card">
+    <h3>🏟 Активные турниры</h3>
+    <div id="active-tournaments" hx-get="/api/tournaments?status=active&per_page=5" hx-trigger="load" hx-swap="innerHTML" hx-target="this">
+      <div style="text-align:center;padding:2rem;">
+        <div class="spinner"></div>
+        <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Results -->
+  <div class="dashboard-card">
+    <h3>📋 Последние результаты</h3>
+    <p style="color:var(--color-text-light);">Будет доступно в следующем обновлении.</p>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<script>
+  // HTMX response handling for favorites and top-rated
+  document.body.addEventListener('htmx:afterSwap', function(evt) {
+    // Process top-rated response
+    if (evt.detail.target && evt.detail.target.id === 'top-rated') {
+      try {
+        const data = JSON.parse(evt.detail.xhr.responseText);
+        let html = '<table><thead><tr><th>#</th><th>Имя</th><th>Рейтинг</th><th>Город</th></tr></thead><tbody>';
+        data.forEach(function(p, i) {
+          html += `<tr>
+            <td>${i + 1}</td>
+            <td><a href="/players/${p.id}">${p.name}</a></td>
+            <td><strong>${p.rating}</strong></td>
+            <td>${p.city || '—'}</td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        evt.detail.target.innerHTML = html;
+      } catch(e) {
+        evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет данных</p>';
+      }
+    }
+
+    // Process favorites response
+    if (evt.detail.target && evt.detail.target.id === 'favorites-list') {
+      try {
+        const data = JSON.parse(evt.detail.xhr.responseText);
+        if (data.length === 0) {
+          evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет избранных игроков.</p>';
+          return;
+        }
+        let html = '<table><thead><tr><th>Имя</th><th>Рейтинг</th></tr></thead><tbody>';
+        data.forEach(function(fav) {
+          const p = fav.player || {};
+          html += `<tr>
+            <td><a href="/players/${p.id}">${p.name || '—'}</a></td>
+            <td>${p.rating || '—'}</td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        evt.detail.target.innerHTML = html;
+      } catch(e) {
+        evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет данных</p>';
+      }
+    }
+
+    // Process tournaments response
+    if (evt.detail.target && evt.detail.target.id === 'active-tournaments') {
+      try {
+        const data = JSON.parse(evt.detail.xhr.responseText);
+        if (!data.items || data.items.length === 0) {
+          evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет активных турниров.</p>';
+          return;
+        }
+        let html = '<table><thead><tr><th>Название</th><th>Дата</th><th>Тип</th></tr></thead><tbody>';
+        data.items.forEach(function(t) {
+          html += `<tr>
+            <td><a href="/tournaments/${t.id}">${t.name}</a></td>
+            <td>${formatDate(t.start_date)}</td>
+            <td><span class="badge badge-active">${t.type}</span></td>
+          </tr>`;
+        });
+        html += '</tbody></table>';
+        evt.detail.target.innerHTML = html;
+      } catch(e) {
+        evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет данных</p>';
+      }
+    }
+  });
+</script>
+{% endblock %}

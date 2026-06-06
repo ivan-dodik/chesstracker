@@ -1,0 +1,13 @@
+<div class="pagination">
+  {% if page > 1 %}
+    <button class="page-btn" hx-get="{{ base_url }}&page={{ page - 1 }}" hx-target="{{ target }}" hx-swap="innerHTML">‹</button>
+  {% else %}
+    <button class="page-btn" disabled>‹</button>
+  {% endif %}
+  <span class="page-info">{{ page }} / {{ total_pages }}</span>
+  {% if page < total_pages %}
+    <button class="page-btn" hx-get="{{ base_url }}&page={{ page + 1 }}" hx-target="{{ target }}" hx-swap="innerHTML">›</button>
+  {% else %}
+    <button class="page-btn" disabled>›</button>
+  {% endif %}
+</div>

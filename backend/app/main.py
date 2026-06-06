@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.router import api_router
+from app.api.web import router as web_router
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,9 @@ app.add_middleware(
 static_dir = BASE_DIR / "static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Web page router (Jinja2 templates)
+app.include_router(web_router)
 
 # API router
 app.include_router(api_router)

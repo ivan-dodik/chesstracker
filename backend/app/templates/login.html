@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Вход — Chess Tracker{% endblock %}
+
+{% block content %}
+<div class="login-page">
+  <div class="card login-card" x-data="loginForm()">
+    <h1>Вход в Chess Tracker</h1>
+
+    <form @submit.prevent="submit()">
+      <div class="form-group">
+        <label for="username">Имя пользователя</label>
+        <input
+          type="text"
+          id="username"
+          class="form-control"
+          x-model="username"
+          placeholder="Введите имя пользователя"
+          required
+          autocomplete="username"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input
+          type="password"
+          id="password"
+          class="form-control"
+          x-model="password"
+          placeholder="Введите пароль"
+          required
+          autocomplete="current-password"
+        >
+      </div>
+
+      <div class="form-group" x-show="error" x-cloak>
+        <p style="color: var(--color-accent); font-size: 0.875rem;" x-text="error"></p>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;" :disabled="loading">
+          <span x-show="!loading">Войти</span>
+          <span x-show="loading" class="spinner"></span>
+        </button>
+      </div>
+    </form>
+
+    <p style="text-align:center;margin-top:1rem;font-size:0.8125rem;color:var(--color-text-light);">
+      Демо: admin/admin123 или user/user123
+    </p>
+  </div>
+</div>
+{% endblock %}

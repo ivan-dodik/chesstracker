@@ -51,6 +51,20 @@
 - **Решение:** Выбран localStorage + Bearer Authorization header (проще для реализации с HTMX/Alpine.js). HttpOnly cookies потребовали бы CSRF-защиты и усложнили HTMX-интеграцию.
 - **Результат:** ✅ Решение принято, зафиксировано в архитектуре.
 
+### 2026-06-06 — Jinja2 cache error (TypeError: unhashable type: 'dict')
+
+- **Суть:** При загрузке любой Jinja2-страницы возвращается HTTP 500 с ошибкой `TypeError: unhashable type: 'dict'` в Jinja2 кэше.
+- **Причина:** `Starlette Jinja2Templates` передаёт `dict` как глобальную переменную, а `Jinja2 >= 3.1.x` использует LRUCache с изменённым API, несовместимым со Starlette.
+- **Решение:** Создан собственный `Environment` с `cache_size=0` и кастомная функция `TemplateResponse`, не использующая `Jinja2Templates` из Starlette.
+- **Результат:** ✅ Страницы загружаются (HTTP 200).
+
+### 2026-06-06 — get_flashed_messages undefined
+
+- **Суть:** Jinja2 шаблон `base.html` использовал `get_flashed_messages()`, которая является Flask-специфичной функцией и не определена в FastAPI.
+- **Причина:** Перенос Flask-концепции flash-сообщений в FastAPI без замены на FastAPI-совместимый механизм.
+- **Решение:** Удалён блок `{% with messages = get_flashed_messages() %}` из `base.html`. Flash-сообщения теперь управляются исключительно через JavaScript (`showFlash()` в `main.js`).
+- **Результат:** ✅ Шаблоны рендерятся без ошибок.
+
 ## Удачные и неудачные шаги
 
 ### ✅ Удачно
@@ -94,6 +108,27 @@
 
 **Коммит:** `1ad257c (HEAD -> main) docs: add architecture documentation and implementation plan`
 
+## Итоги майлстоуна M6: Frontend — базовая структура и навигация
+
+**Статус:** ✅ Завершён
+
+**Создано:**
+- `backend/app/static/css/style.css` — полный CSS для адаптивной вёрстки (навигация, таблицы, карточки, кнопки, формы, пагинация, badges, flash-сообщения, дашборд, мобильное меню)
+- `backend/app/static/js/main.js` — Auth helpers (JWT в localStorage), HTMX config (авто-добавление Authorization header, обработка 401), Alpine.js компоненты (authState, loginForm, pagination), flash-сообщения, утилиты
+- `backend/app/templates/base.html` — базовый шаблон: навигация (логотип, ссылки дашборд/игроки/турниры, логин/логаут), flash-контейнер, footer, подключение HTMX + Alpine.js + main.js
+- `backend/app/templates/login.html` — форма входа с Alpine.js loginForm, демо-данные
+- `backend/app/templates/index.html` — дашборд: топ-10 игроков, избранное, активные турниры (HTMX-загрузка из API)
+- `backend/app/templates/players/list.html` — список игроков с поиском, фильтрацией, пагинацией
+- `backend/app/templates/tournaments/list.html` — список турниров с фильтрацией по статусу/городу
+- `backend/app/templates/partials/player_row.html`, `tournament_row.html`, `pagination.html`
+- `backend/app/api/web.py` — веб-роуты (GET /, /login, /players, /tournaments) с Jinja2
+
+**Исправлено:**
+- Jinja2 cache error — кастомный Environment с cache_size=0
+- get_flashed_messages undefined — удалена Flask-специфичная функция
+
+**Результат:** 4 страницы возвращают HTTP 200, 20/20 тестов проходят
+
 ## История работы
 
 | Дата/Время | Событие |
@@ -113,3 +148,4 @@
 | 2026-06-06 16:30 | Исправление: чекмаки перенесены в конец майлстоунов, дубликат удалён. Проблема зафиксирована в REPORT.md |
 | 2026-06-06 16:40 | **M4: Backend — API: аутентификация и базовые CRUD** — проверены и подтверждены все API эндпоинты, исправлен conftest.py (переопределение DATABASE_URL), 8/8 тестов passed, Docker build и Swagger UI проверены |
 | 2026-06-06 16:58 | **M5: Backend — API: специфичные фичи** — rating, favorite, stats, SSE, export/import CSV, activity log сервисы и API; ActivityLog интегрирован во все CRUD; SSE-события при создании/обновлении партий; Dockerfile исправлен; 12 новых тестов; 20/20 passed; коммит `6f16a94` |
+| 2026-06-06 20:24 | **M6: Frontend — базовая структура и навигация** — style.css, main.js, base.html, login.html, index.html, players/list.html, tournaments/list.html, partials, web.py; исправлены Jinja2 cache issue и get_flashed_messages; 4 страницы HTTP 200; 20/20 тестов passed |

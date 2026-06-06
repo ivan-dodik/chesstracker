@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Chess Tracker{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <script src="https://unpkg.com/alpinejs@3.14.8" defer></script>
+  <script src="/static/js/main.js"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <!-- Flash Messages Container (populated by JavaScript) -->
+  <div class="flash-messages" id="flash-messages"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar" x-data="authState()">
+    <div class="navbar-inner">
+      <a href="/" class="navbar-logo">
+        ♟ Chess Tracker
+      </a>
+      <button class="navbar-toggle" aria-label="Toggle menu">☰</button>
+      <ul class="navbar-links">
+        <li><a href="/">Дашборд</a></li>
+        <li><a href="/players">Игроки</a></li>
+        <li><a href="/tournaments">Турниры</a></li>
+        <li class="navbar-user" x-show="isAuth">
+          <span class="username" x-text="user?.username || ''"></span>
+          <button class="btn btn-sm btn-outline" style="color:white;border-color:rgba(255,255,255,0.3);" @click="logout()">Выйти</button>
+        </li>
+        <li class="navbar-user" x-show="!isAuth">
+          <a href="/login" class="btn btn-sm btn-primary">Войти</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    Chess Tracker &copy; 2026 &mdash; Open Source Project
+  </footer>
+</body>
+</html>

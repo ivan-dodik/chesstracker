@@ -280,3 +280,22 @@ initialize memory bank
 - Дублирующийся чекмак в M2 удалён
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
 - Выполнен коммит и пуш
+
+---
+
+## 2026-06-06 20:24 — M6: Frontend — базовая структура и навигация
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Выполни следующий майлстоун из плана.
+```
+
+**Результат:**
+- Создан полный фронтенд: style.css, main.js, base.html, login.html, index.html, players/list.html, tournaments/list.html, partials
+- Создан web.py с Jinja2 шаблонизацией
+- Исправлены ошибки: Jinja2 cache (unhashable type), get_flashed_messages undefined
+- Все 4 страницы (/, /login, /players, /tournaments) возвращают HTTP 200
+- Все 20 тестов проходят
+- Выполнен коммит и пуш
