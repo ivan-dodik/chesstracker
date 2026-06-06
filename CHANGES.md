@@ -252,6 +252,12 @@
 - 36/36 тестов проходят
 - Затронутые файлы: .clinerules/tdd.md, .pre-commit-config.yaml, .github/workflows/ci.yml, backend/pyproject.toml, IMPLEMENTATION_PLAN.md
 
+## 2026-06-07 09:18 — Исправление ошибки "Ошибка загрузки данных" на странице турниров
+- **Проблема:** На странице `/tournaments` вместо таблицы с турнирами отображалось "Ошибка загрузки данных"
+- **Причина:** Функция `renderTournamentsTable` в `tournaments/list.html` вызывала несуществующую функцию `escapeHtml()`, что приводило к `ReferenceError` и перехвату ошибки catch-блоком
+- **Решение:** Добавлена функция `escapeHtml()` в `main.js` — безопасное экранирование через `textContent` + `innerHTML`
+- Затронутые файлы: `backend/app/static/js/main.js`
+
 ## 2026-06-07 02:20 — Документирование проблемы аутентификации в BUGS.md
 - **Создан BUGS.md** — полный документ с описанием проблемы циклического редиректа после логина
 - **Содержание BUGS.md:**
