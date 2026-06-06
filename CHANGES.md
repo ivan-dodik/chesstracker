@@ -162,6 +162,14 @@
 - **Результат:** Вход должен работать корректно, пользователи остаются на дашборде после аутентификации
 - Затронутые файлы: backend/app/static/js/main.js
 
+## 2026-06-07 02:31 — TDD: тесты для главной страницы, логина и авторизации
+- **Фаза 1 (Web-страницы):** создан `tests/test_web.py` — 7 тестов (главная страница, HTMX-атрибуты, Alpine.js компоненты, favourites section hidden, страница логина, форма логина, Alpine loginForm)
+- **Фаза 2 (Auth API):** расширен `tests/test_auth.py` — добавлено 3 теста (несуществующий пользователь, невалидный токен, register без токена)
+- **Фаза 3 (Auth flow):** создан `tests/test_auth_flow.py` — 6 тестов (логин → /me, protected endpoint, unauthorized, register as admin, duplicate username, non-admin register)
+- **Итого:** с 20 до 36 тестов (+16)
+- **Результат:** 36/36 тестов проходят, 0 ошибок ruff
+- Затронутые файлы: backend/tests/test_auth.py, backend/tests/test_web.py, backend/tests/test_auth_flow.py
+
 ## 2026-06-07 02:20 — Документирование проблемы аутентификации в BUGS.md
 - **Создан BUGS.md** — полный документ с описанием проблемы циклического редиректа после логина
 - **Содержание BUGS.md:**

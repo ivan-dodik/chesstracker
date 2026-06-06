@@ -41,6 +41,13 @@ async def test_login_invalid_password(client: AsyncClient):
 
 
 @pytest.mark.asyncio
+async def test_login_nonexistent_user(client: AsyncClient):
+    """Test login with non-existent username returns 401."""
+    response = await client.post("/api/auth/login", json={"username": "nonexistent", "password": "somepass"})
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_me_endpoint(client: AsyncClient, admin_token: str):
     """Test GET /me returns current user."""
     response = await client.get("/api/auth/me", headers={"Authorization": f"Bearer {admin_token}"})
@@ -54,4 +61,21 @@ async def test_me_endpoint(client: AsyncClient, admin_token: str):
 async def test_me_unauthorized(client: AsyncClient):
     """Test GET /me without token returns 401."""
     response = await client.get("/api/auth/me")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_me_invalid_token(client: AsyncClient):
+    """Test GET /me with invalid token returns 401."""
+    response = await client.get("/api/auth/me", headers={"Authorization": "Bearer invalid_token_here"})
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_register_without_token_returns_401(client: AsyncClient):
+    """Test POST /register without auth token returns 401."""
+    response = await client.post(
+        "/api/auth/register",
+        json={"username": "newuser", "password": "newpass", "role": "user"},
+    )
     assert response.status_code == 401

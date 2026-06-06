@@ -585,3 +585,39 @@ initialize memory bank
 - Обновлён `PROMPTS.md` — запись о текущем промпте
 - Обновлён Memory Bank (activeContext.md, progress.md)
 - Статус: частично исправлено, гонка HTMX/Alpine остаётся потенциальной проблемой
+
+---
+
+## 2026-06-07 02:31 — TDD: тесты для главной страницы, логина и авторизации
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Используй методику TDD и соответствующие скиллы (фронтенд, используемые библиотеки). Подробный пошаговый план по подготовке тестов для главной страницы, формы логина и процесса авторизации.
+```
+
+**План (Plan mode):**
+- Изучить Memory Bank, IMPLEMENTATION_PLAN.md, существующие тесты и архитектуру
+- Загрузить скилл TDD (test-driven-development)
+- Составить план из 4 фаз:
+  - Фаза 1: Web-страницы (HTML rendering — тесты index и login)
+  - Фаза 2: Auth API (расширение coverage)
+  - Фаза 3: Интеграционный user flow (логин → защищённые запросы → register)
+  - Фаза 4: Browser тесты (Playwright, приоритет ниже)
+
+**Уточнение пользователя:**
+```
+0. Загрузи скилл tdd
+1. Начни с серверных
+2. На твоё усмотрение, исходя из best practices
+3. Процесс логина.
+```
+
+**Результат (Act mode):**
+- Скилл TDD уже загружен (активирован в Plan mode), использован Red-Green-Refactor
+- **Фаза 2 (Auth API):** расширен `tests/test_auth.py` — +3 теста (несуществующий пользователь → 401, невалидный токен → 401, register без токена → 401)
+- **Фаза 1 (Web-страницы):** создан `tests/test_web.py` — 7 тестов (главная страница 200, HTMX-атрибуты, Alpine.js компоненты, favorites hidden для unauthenticated, страница логина 200, форма, loginForm Alpine)
+- **Фаза 3 (Auth flow):** создан `tests/test_auth_flow.py` — 6 тестов (логин → /me → user data, protected endpoint, unauthorized, register as admin 201, duplicate username 400, non-admin register 403)
+- **Итого:** 36/36 тестов проходят (было 20, добавлено 16)
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
