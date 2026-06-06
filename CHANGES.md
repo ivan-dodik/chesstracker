@@ -133,3 +133,11 @@
 - Обновлён `.env.example` — TG_BOT_TOKEN закомментирован с пометкой о необходимости реального токена
 - Создан `TELEGRAM_BOT_SETUP.md` — инструкция по созданию токена через @BotFather
 - Затронутые файлы: telegram-bot/config.py, telegram-bot/bot.py, docker-compose.yml, .env.example, TELEGRAM_BOT_SETUP.md
+
+## 2026-06-06 23:16 — Исправление ошибки uv cache (Permission denied) в Docker
+- Добавлен непривилегированный пользователь `appuser` в `backend/Dockerfile` и `telegram-bot/Dockerfile`
+- Установлена переменная `UV_CACHE_DIR=/home/appuser/.cache/uv` для обоих контейнеров
+- Назначены права на `/app` пользователю `appuser` через `chown -R appuser:appuser /app`
+- **Проблема:** `uv` при запуске от root пытался создать `/.cache/uv` — доступ запрещён (ошибка 13)
+- **Решение:** создан отдельный пользователь, вся работа выполняется от него
+- Затронутые файлы: backend/Dockerfile, telegram-bot/Dockerfile

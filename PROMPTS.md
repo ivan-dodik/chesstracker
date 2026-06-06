@@ -494,3 +494,34 @@ initialize memory bank
 - Обновлён `.env.example` — TG_BOT_TOKEN закомментирован
 - Создан `TELEGRAM_BOT_SETUP.md` — инструкция по созданию токена через @BotFather
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
+
+---
+
+## 2026-06-06 23:16 — Исправление ошибки uv cache (Permission denied) в Docker
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Я удалил все контейнеры и запустил проект в чистой среде. И снова ошибка, вот лог:
+... (логи docker compose с Failed to initialize cache at /.cache/uv: Permission denied (os error 13))
+
+Исправь, пожалуйста.
+
+Также объясни, почему выдаётся предупреждение WARN[0026] Docker Compose is configured to build using Bake, but buildx isn't installed...
+...
+Ещё вопрос: сейчас согласно инструкции надо запускать так: docker compose up --build. Можно ли обойтись без ключа --build командой docker compose up?
+```
+
+**План (Plan mode):**
+- Проанализировать проблему: `uv` при запуске от root пытается создать `/.cache/uv` → Permission denied
+- Добавить непривилегированного пользователя `appuser` в оба Dockerfile
+- Установить `UV_CACHE_DIR` в `/home/appuser/.cache/uv`
+- Назначить права на `/app` пользователю `appuser`
+- Объяснить предупреждение про Bake (buildx не установлен, но сборка работает)
+- Объяснить про флаг `--build` (на чистой системе `docker compose up` сам соберёт образы, `--build` гарантирует пересборку)
+
+**Результат:**
+- В `backend/Dockerfile` и `telegram-bot/Dockerfile` добавлен: создание пользователя `appuser`, `chown -R appuser:appuser /app`, `USER appuser`, `ENV UV_CACHE_DIR=/home/appuser/.cache/uv`
+- Сборка `docker compose build` прошла успешно, ошибки Permission denied больше нет
+- CHANGES.md, PROMPTS.md, REPORT.md обновлены
