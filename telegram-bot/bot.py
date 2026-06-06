@@ -22,8 +22,11 @@ logger = logging.getLogger(__name__)
 
 def main() -> None:
     """Start the bot with long-polling and background notification task."""
-    if not settings.TG_BOT_TOKEN:
-        logger.warning("TG_BOT_TOKEN is not set. Bot will not start.")
+    if not settings.is_token_valid():
+        logger.warning(
+            "TG_BOT_TOKEN is not set or is a placeholder. "
+            "Bot will not start. Set a real token in .env to enable the bot."
+        )
         return
 
     application = Application.builder().token(settings.TG_BOT_TOKEN).build()

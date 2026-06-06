@@ -465,3 +465,32 @@ initialize memory bank
 - В `.env.example` добавлены UID/GID
 - Теперь процессы внутри контейнеров запускаются от текущего пользователя, и все создаваемые файлы принадлежат ему
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
+
+---
+
+## 2026-06-06 22:53 — Graceful shutdown бота при фейковом токене
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Проект снова не стартует: ... (логи docker compose с InvalidToken для telegram-bot)
+
+Похоже это из-за телеграм токена, которого нет. Исправь так, чтобы проект определял, что указан фейковый/нерабочий токен и отключал запуск бота. Также напиши инструкцию, как создать токен.
+```
+
+**План (Plan mode):**
+- Проанализировать проблему: `TG_BOT_TOKEN=your-telegram-bot-token` — не пустая строка, поэтому проверка `if not settings.TG_BOT_TOKEN` не срабатывает
+- Добавить `is_token_valid()` в config.py с проверкой на заглушку и форматом токена
+- Изменить bot.py на graceful exit (код 0) при невалидном токене
+- Изменить docker-compose.yml: `restart: "no"` для telegram-bot
+- Обновить .env.example: закомментировать TG_BOT_TOKEN
+- Создать TELEGRAM_BOT_SETUP.md с инструкцией
+
+**Результат:**
+- Добавлен метод `is_token_valid()` в `telegram-bot/config.py` — проверяет пустой токен, заглушки и формат `123456:ABC...`
+- Изменён `telegram-bot/bot.py` — используется `is_token_valid()`, graceful exit (код 0)
+- Изменён `docker-compose.yml` — `restart: "no"` для telegram-bot
+- Обновлён `.env.example` — TG_BOT_TOKEN закомментирован
+- Создан `TELEGRAM_BOT_SETUP.md` — инструкция по созданию токена через @BotFather
+- CHANGES.md, PROMPTS.md, REPORT.md обновлены

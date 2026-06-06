@@ -105,6 +105,20 @@
 
 ---
 
+### 2026-06-06 22:53 — Бот падает с InvalidToken при фейковом токене в .env
+
+- **Суть:** При `cp .env.example .env` в `.env` попадает токен-заглушка `your-telegram-bot-token`. Бот пытается его использовать, получает `InvalidToken` от Telegram API, падает с `exit code 1`, и Docker бесконечно перезапускает контейнер из-за `restart: unless-stopped`. Backend и база данных работают нормально, но логи забиты ошибками бота.
+- **Причина:** Проверка `if not settings.TG_BOT_TOKEN` в `bot.py` не срабатывает, потому что `your-telegram-bot-token` — не пустая строка. Нет проверки на токен-заглушку.
+- **Решение:**
+  1. Добавлен метод `is_token_valid()` в `telegram-bot/config.py` — проверяет, что токен не пустой, не равен известным заглушкам и соответствует формату Telegram (`123456:ABC...`).
+  2. Изменён `telegram-bot/bot.py` — используется `is_token_valid()`, graceful exit (код 0) вместо падения с ошибкой.
+  3. Изменён `docker-compose.yml` — `restart: "no"` для telegram-bot (контейнер не перезапускается при graceful shutdown).
+  4. Обновлён `.env.example` — TG_BOT_TOKEN закомментирован с пометкой о необходимости реального токена.
+  5. Создан `TELEGRAM_BOT_SETUP.md` — инструкция по созданию токена через @BotFather.
+- **Результат:** ✅ При фейковом токене бот завершается с кодом 0, контейнер не перезапускается, backend работает нормально.
+
+---
+
 ### 2026-06-06 — Установка скиллов не отражена в документации
 
 - **Суть:** После установки 5 пакетов агентских скиллов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills) информация об этом не была внесена в Memory Bank, PROMPTS.md, REPORT.md, .clinerules/ и IMPLEMENTATION_PLAN.md. Запись была сделана только в CHANGES.md.
@@ -346,3 +360,4 @@
 | | 2026-06-06 22:16 | **Code Review, архитектурный анализ и рефакторинг** — запущен code review subagent и архитектурный анализ через скиллы; исправлены: SECRET_KEY, CORS, CSV import (лимит 10 MB), N+1 запросы, дублирование standings, тесты (temp-файл); ruff clean, 20/20 тестов проходят |
 | 2026-06-06 22:35 | **Исправление запуска telegram-bot** — добавлен extra `[job-queue]` для python-telegram-bot, перегенерирован uv.lock; исправлена ошибка AttributeError: 'NoneType' object has no attribute 'run_repeating' |
 | 2026-06-06 22:45 | **Исправление root-файлов в Docker volumes** — добавлен `user: "${UID:-1000}:${GID:-1000}"` в docker-compose.override.yml для backend и telegram-bot; добавлены UID/GID в .env.example |
+| 2026-06-06 22:53 | **Graceful shutdown бота при фейковом токене** — добавлен `is_token_valid()` в config.py; изменён bot.py на graceful exit; `restart: "no"` в docker-compose.yml; обновлён .env.example; создан TELEGRAM_BOT_SETUP.md |

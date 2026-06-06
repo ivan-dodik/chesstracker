@@ -125,3 +125,11 @@
 - **Проблема:** `__pycache__` внутри контейнера создавались от root → недоступны для удаления пользователем ai без sudo
 - **Решение:** процессы внутри контейнера теперь запускаются от UID/GID текущего пользователя
 - Затронутые файлы: docker-compose.override.yml, .env.example
+
+## 2026-06-06 22:53 — Graceful shutdown бота при фейковом токене
+- Добавлен метод `is_token_valid()` в `telegram-bot/config.py` — проверяет, что токен не пустой, не равен заглушке и соответствует формату Telegram
+- Изменён `telegram-bot/bot.py` — используется `is_token_valid()`, graceful exit (код 0) вместо падения с ошибкой
+- Изменён `docker-compose.yml` — `restart: "no"` для telegram-bot (контейнер не перезапускается при graceful shutdown)
+- Обновлён `.env.example` — TG_BOT_TOKEN закомментирован с пометкой о необходимости реального токена
+- Создан `TELEGRAM_BOT_SETUP.md` — инструкция по созданию токена через @BotFather
+- Затронутые файлы: telegram-bot/config.py, telegram-bot/bot.py, docker-compose.yml, .env.example, TELEGRAM_BOT_SETUP.md
