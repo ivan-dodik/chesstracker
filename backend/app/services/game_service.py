@@ -2,8 +2,9 @@
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.models import Game, Player
+from app.models import Game
 from app.schemas.game import GameCreate, GameResult
 from app.services.activity_log_service import log_activity
 from app.services.sse_service import publish_event
@@ -15,13 +16,19 @@ async def get_games_by_tournament(
     page: int = 1,
     per_page: int = 50,
 ) -> tuple[list[dict], int]:
-    """Get paginated list of games for a tournament."""
+    """Get paginated list of games for a tournament with player names."""
     count_query = select(func.count(Game.id)).where(Game.tournament_id == tournament_id)
     total_result = await db.execute(count_query)
     total = total_result.scalar() or 0
 
+    # Use joined loading to avoid N+1 queries for player names
     query = (
         select(Game)
+        .options(
+            # Eagerly load related players
+            selectinload(Game.white_player),
+            selectinload(Game.black_player),
+        )
         .where(Game.tournament_id == tournament_id)
         .order_by(Game.round, Game.id)
         .offset((page - 1) * per_page)
@@ -30,27 +37,17 @@ async def get_games_by_tournament(
     result = await db.execute(query)
     games = list(result.scalars().all())
 
-    # Enrich with player names
+    # Enrich with player names (no extra queries needed)
     enriched = []
     for g in games:
-        white_name = None
-        black_name = None
-        if g.white_player_id:
-            wp = await db.execute(select(Player).where(Player.id == g.white_player_id))
-            w = wp.scalar_one_or_none()
-            white_name = w.name if w else None
-        if g.black_player_id:
-            bp = await db.execute(select(Player).where(Player.id == g.black_player_id))
-            b = bp.scalar_one_or_none()
-            black_name = b.name if b else None
         enriched.append({
             "id": g.id,
             "tournament_id": g.tournament_id,
             "round": g.round,
             "white_player_id": g.white_player_id,
             "black_player_id": g.black_player_id,
-            "white_player_name": white_name,
-            "black_player_name": black_name,
+            "white_player_name": g.white_player.name if g.white_player else None,
+            "black_player_name": g.black_player.name if g.black_player else None,
             "result": g.result,
             "played_at": g.played_at,
             "created_at": g.created_at,

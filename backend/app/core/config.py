@@ -14,6 +14,19 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me-to-a-random-secret-key"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
 
+    @field_validator("SECRET_KEY", mode="after")
+    @classmethod
+    def warn_default_secret_key(cls, v: str) -> str:
+        """Warn if SECRET_KEY is still the default value."""
+        if v == "change-me-to-a-random-secret-key":
+            import warnings
+            warnings.warn(
+                "SECRET_KEY is set to the default value! "
+                "Change it in .env or environment variables for production.",
+                stacklevel=2,
+            )
+        return v
+
     # Telegram
     TG_BOT_TOKEN: str = ""
 

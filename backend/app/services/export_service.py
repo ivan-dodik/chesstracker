@@ -6,7 +6,8 @@ import io
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Game, Player, Tournament
+from app.models import Tournament
+from app.services.standings_service import calculate_standings
 
 
 async def export_tournament_csv(
@@ -20,53 +21,14 @@ async def export_tournament_csv(
     if not tournament:
         return None
 
-    # Get all games for the tournament
-    games_result = await db.execute(
-        select(Game).where(Game.tournament_id == tournament_id)
-    )
-    games = list(games_result.scalars().all())
-
-    # Get all unique player IDs from games
-    player_ids: set[int] = set()
-    for game in games:
-        player_ids.add(game.white_player_id)
-        player_ids.add(game.black_player_id)
-
-    # Get player info
-    players_result = await db.execute(
-        select(Player).where(Player.id.in_(player_ids))
-    )
-    players = {p.id: p for p in players_result.scalars().all()}
-
-    # Calculate points for each player
-    points: dict[int, float] = {}
-    for game in games:
-        if game.result:
-            if game.result == "1-0":
-                points[game.white_player_id] = points.get(game.white_player_id, 0) + 1
-            elif game.result == "0-1":
-                points[game.black_player_id] = points.get(game.black_player_id, 0) + 1
-            else:  # ½-½
-                points[game.white_player_id] = points.get(game.white_player_id, 0) + 0.5
-                points[game.black_player_id] = points.get(game.black_player_id, 0) + 0.5
-
-    # Build standings
-    standings = []
-    for pid in sorted(player_ids, key=lambda p: points.get(p, 0), reverse=True):
-        player = players.get(pid)
-        if player:
-            standings.append({
-                "player_id": pid,
-                "player_name": player.name,
-                "rating": player.rating,
-                "points": points.get(pid, 0),
-            })
+    # Use shared standings calculation
+    standings = await calculate_standings(db, tournament_id)
 
     # Generate CSV
     output = io.StringIO()
     writer = csv.DictWriter(
         output,
-        fieldnames=["player_id", "player_name", "rating", "points"],
+        fieldnames=["player_id", "player_name", "rating", "points", "games_played", "wins", "draws", "losses"],
     )
     writer.writeheader()
     writer.writerows(standings)

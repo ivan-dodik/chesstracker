@@ -313,3 +313,4 @@
 | 2026-06-06 21:27 | **M10: Тестирование и CI** — исправлены ошибки ruff в backend (122→0) и telegram-bot (12→0); созданы .pre-commit-config.yaml и .github/workflows/ci.yml; ruff check + pytest (20/20) проходят |
 | 2026-06-06 21:49 | **Установка агентских скиллов Cline** — установлены 5 пакетов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills); создан skills-lock.json; обновлён .gitignore |
 | 2026-06-06 21:57 | **Документирование скиллов** — добавлена запись об установке скиллов в PROMPTS.md, REPORT.md, Memory Bank, .clinerules/, IMPLEMENTATION_PLAN.md |
+| | 2026-06-06 22:16 | **Code Review, архитектурный анализ и рефакторинг** — запущен code review subagent и архитектурный анализ через скиллы; исправлены: SECRET_KEY, CORS, CSV import (лимит 10 MB), N+1 запросы, дублирование standings, тесты (temp-файл); ruff clean, 20/20 тестов проходят |

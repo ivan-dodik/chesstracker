@@ -425,3 +425,21 @@ initialize memory bank
 - CHANGES.md обновлён записью о M11
 - Memory Bank обновлён (activeContext.md, progress.md)
 - Выполнен финальный коммит и пуш
+
+---
+
+## 2026-06-06 22:16 — Code Review, архитектурный анализ и рефакторинг
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Проанализируй стек проекта, задание, требования к ДЗ, лучшие практики по разработке. Составь план по ревью проекта, поиску уязвимостей, рефакторингу. Используй скиллы. Не забудь про обновление prompts, changes, report (проверь, что там есть инфа о скиллах).
+```
+
+**Результат:**
+- Запущен code review subagent (скилл requesting-code-review) — выявлены критические, важные и минорные issues
+- Запущен архитектурный анализ (скилл improve-codebase-architecture) — HTML-отчёт с 12 находками
+- Исправлены: SECRET_KEY (field_validator с предупреждением), CORS (комментарий о production), CSV import (лимит 10 MB), N+1 запросы (selectinload), дублирование standings (вынесено в общий сервис), тесты (temp-файл вместо test.db)
+- ruff clean, 20/20 тестов проходят
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank

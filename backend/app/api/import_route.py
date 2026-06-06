@@ -10,6 +10,9 @@ from app.services.import_service import import_tournament_csv
 router = APIRouter(prefix="/api/tournaments", tags=["import"])
 
 
+MAX_CSV_SIZE = 10 * 1024 * 1024  # 10 MB
+
+
 @router.post("/{tournament_id}/import/csv")
 async def import_csv(
     tournament_id: int,
@@ -24,7 +27,14 @@ async def import_csv(
             detail="Only CSV files are supported",
         )
 
-    content = (await file.read()).decode("utf-8")
+    # Read file with size limit to prevent DoS
+    raw_data = await file.read()
+    if len(raw_data) > MAX_CSV_SIZE:
+        raise HTTPException(
+            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            detail=f"File too large. Maximum size is {MAX_CSV_SIZE // (1024 * 1024)} MB",
+        )
+    content = raw_data.decode("utf-8")
     result = await import_tournament_csv(db, tournament_id, content)
 
     if not result["success"]:

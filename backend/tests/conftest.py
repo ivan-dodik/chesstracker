@@ -6,6 +6,8 @@ at module load time to prevent asyncpg from being used during tests.
 """
 
 import asyncio
+import os
+import tempfile
 from collections.abc import AsyncGenerator
 
 import pytest
@@ -16,15 +18,16 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 # Override settings BEFORE any app modules are loaded
 import app.core.config
 
-app.core.config.settings.DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+# Use a temporary file for SQLite to avoid in-memory isolation issues
+_test_db_fd, _test_db_path = tempfile.mkstemp(suffix=".db", prefix="chess_tracker_test_")
+app.core.config.settings.DATABASE_URL = f"sqlite+aiosqlite:///{_test_db_path}"
 
 from app.core.database import Base, get_db  # noqa: E402
 from app.core.security import hash_password  # noqa: E402
 from app.main import app  # noqa: E402
 from app.models import User  # noqa: E402
 
-# Use SQLite for tests
-TEST_DATABASE_URL = "sqlite+aiosqlite:///./test.db"
+TEST_DATABASE_URL = f"sqlite+aiosqlite:///{_test_db_path}"
 
 engine = create_async_engine(TEST_DATABASE_URL, echo=False)
 TestSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
@@ -36,6 +39,15 @@ def event_loop():
     loop = asyncio.new_event_loop()
     yield loop
     loop.close()
+
+
+def _cleanup_test_db() -> None:
+    """Remove the temporary test database file."""
+    try:
+        os.close(_test_db_fd)
+        os.unlink(_test_db_path)
+    except OSError:
+        pass
 
 
 @pytest_asyncio.fixture(autouse=True)

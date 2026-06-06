@@ -112,3 +112,16 @@
 - Установлен пакет xixu-me/skills (12 скиллов: GitHub Actions, безопасность, хостинг)
 - Обновлён .gitignore для игнорирования .agents/
 - Созданы: .agents/ — директория с установленными скиллами
+
+## 2026-06-06 22:16 — Code Review, архитектурный анализ и рефакторинг
+- Запущен code review subagent (скилл requesting-code-review) — выявлены критические, важные и минорные issues
+- Запущен архитектурный анализ (скилл improve-codebase-architecture) — сгенерирован HTML-отчёт с 12 находками
+- **Исправлено:**
+  - SECRET_KEY: добавлен field_validator с предупреждением о дефолтном значении (config.py)
+  - CORS: добавлен комментарий о необходимости ограничения origins в production (main.py)
+  - CSV import: добавлен лимит размера файла 10 MB (import_route.py)
+  - N+1 запросы: заменены на selectinload в game_service.get_games_by_tournament() (game_service.py)
+  - Дублирование логики подсчёта очков: вынесено в общий standings_service.py, tournament_service и export_service переписаны на его использование
+  - Тесты: test.db заменён на временный файл с уникальным именем (conftest.py)
+- ruff clean, 20/20 тестов проходят
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
