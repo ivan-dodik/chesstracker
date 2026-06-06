@@ -30,3 +30,18 @@
 - В .clinerules/implementation_plan.md добавлено явное указание обновлять REPORT.md после каждого майлстоуна (история работы, проблемы и решения, удачные/неудачные шаги)
 - Обновлён PROMPTS.md — добавлена запись о текущей задаче
 - Файлы: REPORT.md, IMPLEMENTATION_PLAN.md, .clinerules/implementation_plan.md, PROMPTS.md
+
+## 2026-06-06 14:17
+### M2: Окружение и Docker — выполнено
+- Создан `backend/pyproject.toml`: dependencies (fastapi, uvicorn, sqlalchemy, asyncpg, alembic, pydantic-settings, python-jose, passlib, python-multipart, httpx, jinja2, aiofiles, sse-starlette), dev-dependencies (pytest, pytest-asyncio, ruff)
+- Настроен ruff: line-length=100, target-version=py312
+- Создан `backend/Dockerfile`: python:3.12-slim, uv, multi-stage copy для кэширования
+- Создан `telegram-bot/pyproject.toml`: dependencies (python-telegram-bot, httpx, pydantic-settings), dev-dependencies (ruff)
+- Создан `telegram-bot/Dockerfile`: python:3.12-slim, uv
+- Создан `.env.example` с переменными: DATABASE_URL, SECRET_KEY, TG_BOT_TOKEN, BACKEND_URL, DEBUG
+- Создан `docker-compose.yml`: 3 сервиса (db: postgres:16, backend, telegram-bot) с healthcheck и depends_on
+- Создан `docker-compose.override.yml`: volumes для hot-reload, порт 5432 для db
+- Создана структура директорий backend: `__init__.py` во всех пакетах (app, core, models, schemas, api, services, tests)
+- Созданы заглушки: `backend/app/main.py` (FastAPI с /health), `telegram-bot/bot.py`
+- Проверена сборка: `docker compose build` успешен (backend + telegram-bot образы построены)
+- Файлы: backend/pyproject.toml, backend/Dockerfile, backend/app/main.py, backend/app/__init__.py, backend/app/core/__init__.py, backend/app/models/__init__.py, backend/app/schemas/__init__.py, backend/app/api/__init__.py, backend/app/services/__init__.py, backend/tests/__init__.py, telegram-bot/pyproject.toml, telegram-bot/Dockerfile, telegram-bot/bot.py, .env.example, .env, docker-compose.yml, docker-compose.override.yml

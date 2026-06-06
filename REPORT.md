@@ -105,3 +105,4 @@
 | 2026-06-06 13:35 | Создание `IMPLEMENTATION_PLAN.md` (11 майлстоунов) и `.clinerules/implementation_plan.md` |
 | 2026-06-06 13:56 | Создание `ARCHITECTURE.md`, обновление Memory Bank, коммит M1 |
 | 2026-06-06 14:02 | Создание `REPORT.md` (данный файл) — исправление проблемы с отсутствием отчёта |
+| 2026-06-06 14:17 | **M2: Окружение и Docker** — созданы pyproject.toml (backend + bot), Dockerfile, docker-compose.yml, .env.example, структура директорий; сборка docker compose build успешна |

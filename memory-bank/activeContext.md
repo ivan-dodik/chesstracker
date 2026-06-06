@@ -1,23 +1,24 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M1: Архитектура и планирование**. Создана полная документация:
-- `project_task.md` — полное техническое задание
-- `IMPLEMENTATION_PLAN.md` — детальный план реализации (11 майлстоунов, ~80 шагов)
-- `ARCHITECTURE.md` — архитектура, ERD, API endpoints, стек технологий
-- `.clinerules/` — правила: report.md, update_prompts.md, git_commit.md, implementation_plan.md, memory-bank.md
-- `Memory Bank` — инициализирован, все 6 core-файлов актуальны
-
-Код приложения отсутствует. CHANGES.md и PROMPTS.md содержат полную историю.
+Завершён **M2: Окружение и Docker**. Создана вся инфраструктура для контейнеризации и управления зависимостями.
 
 ## Последние изменения
-- Создан `ARCHITECTURE.md` — описание архитектуры, ERD, структура директорий, API endpoints, стек технологий
-- Обновлён Memory Bank (activeContext.md, progress.md) — M1 завершён
-- Выполнен коммит M1: `docs: add architecture documentation and implementation plan`
+- Создан `backend/pyproject.toml` — все зависимости (fastapi, uvicorn, sqlalchemy, asyncpg, alembic, pydantic-settings, python-jose, passlib, python-multipart, httpx, jinja2, aiofiles, sse-starlette) + dev (pytest, pytest-asyncio, ruff)
+- Настроен ruff: line-length=100, target-version=py312
+- Создан `backend/Dockerfile` — python:3.12-slim, uv, multi-stage copy
+- Создан `telegram-bot/pyproject.toml` — зависимости (python-telegram-bot, httpx, pydantic-settings) + dev (ruff)
+- Создан `telegram-bot/Dockerfile` — python:3.12-slim, uv
+- Создан `.env.example` — шаблон переменных окружения
+- Создан `docker-compose.yml` — 3 сервиса (db: postgres:16, backend, telegram-bot)
+- Создан `docker-compose.override.yml` — hot-reload для backend, порт 5432 для db
+- Создана структура директорий backend (__init__.py во всех пакетах)
+- Созданы заглушки: `backend/app/main.py` (FastAPI с /health), `telegram-bot/bot.py`
+- Проверена сборка: `docker compose build` успешен (backend + telegram-bot образы построены)
 
 ## Следующие шаги (приоритетный порядок)
 1. ✅ **M1: Архитектура и планирование** — выполнено
-2. **M2: Окружение и Docker** — docker-compose.yml, Dockerfile, pyproject.toml, структура директорий
+2. ✅ **M2: Окружение и Docker** — выполнено
 3. **M3: Backend — модели и БД** — SQLAlchemy модели, Alembic, seed-данные
 4. **M4: Backend — API: аутентификация и базовые CRUD**
 5. **M5: Backend — API: специфичные фичи** (рейтинг, статистика, SSE, CSV, лог)
@@ -35,6 +36,8 @@
 - **Telegram-bot**: отдельный микросервис в том же compose-файле, long-polling (не webhook)
 - **Аутентификация**: JWT токены в localStorage, два предзаполненных аккаунта (admin, user)
 - **Pre-commit hook**: ruff (будет настроен в M10)
+- **Dockerfile**: alembic/ и alembic.ini не копируются на этапе M2 (будут созданы в M3)
+- **docker-compose.override.yml**: для разработки монтирует ./backend/app:/app/app для hot-reload
 
 ## Изученные паттерны и предпочтения
 - Управление зависимостями через `uv` (не pip/poetry)

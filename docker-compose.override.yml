@@ -1,0 +1,16 @@
+services:
+  backend:
+    volumes:
+      - ./backend/app:/app/app
+    command: >
+      uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    ports:
+      - "5432:5432"
+
+  telegram-bot:
+    volumes:
+      - ./telegram-bot:/app
+    command: >
+      uv run python bot.py

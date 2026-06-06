@@ -1,44 +1,34 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-Завершён **M1: Архитектура и планирование**. Создана полная архитектурная документация. Код ещё не написан.
+**M2: Окружение и Docker** завершён. Инфраструктура контейнеризации создана, сборка проходит успешно.
 
 ## Что работает
-- ✅ Репозиторий инициализирован (git init + удалённый origin)
-- ✅ Базовая документация: `project_task.md` с полным ТЗ
-- ✅ Настроены dotfiles: `.gitignore`, `.clineignore`
-- ✅ Настроены правила: `.clinerules/report.md`, `.clinerules/update_prompts.md`, `.clinerules/memory-bank.md`, `.clinerules/git_commit.md`, `.clinerules/implementation_plan.md`
-- ✅ Лицензия: `LICENSE`
-- ✅ Memory Bank инициализирован (все 6 core-файлов)
-- ✅ `IMPLEMENTATION_PLAN.md` — детальный план реализации (11 майлстоунов, ~80 шагов)
-- ✅ `.clinerules/implementation_plan.md` — правило для Cline по отслеживанию прогресса
-- ✅ `ARCHITECTURE.md` — описание архитектуры, ERD, API endpoints, стек технологий
+- ✅ **M1: Архитектура и планирование** — полная документация, Memory Bank, правила агента
+- ✅ **M2: Окружение и Docker**
+  - ✅ `backend/pyproject.toml` — все зависимости через uv (fastapi, uvicorn, sqlalchemy[asyncio], asyncpg, alembic, pydantic-settings, python-jose, passlib, python-multipart, httpx, jinja2, aiofiles, sse-starlette)
+  - ✅ Dev-зависимости: pytest, pytest-asyncio, ruff
+  - ✅ Настроен ruff: line-length=100, target-version=py312
+  - ✅ `backend/Dockerfile` — python:3.12-slim + uv
+  - ✅ `telegram-bot/pyproject.toml` — зависимости (python-telegram-bot, httpx, pydantic-settings) + ruff
+  - ✅ `telegram-bot/Dockerfile` — python:3.12-slim + uv
+  - ✅ `.env.example` — шаблон переменных окружения
+  - ✅ `docker-compose.yml` — 3 сервиса (db: postgres:16, backend, telegram-bot)
+  - ✅ `docker-compose.override.yml` — hot-reload, порт 5432 для db
+  - ✅ Структура директорий backend: __init__.py во всех пакетах
+  - ✅ Заглушки: `backend/app/main.py` (FastAPI с /health), `telegram-bot/bot.py`
+  - ✅ `docker compose build` — успешен
 
 ## Что осталось сделать (в порядке приоритета)
 
-### M1: Архитектура и планирование ✅
-- ✅ **ARCHITECTURE.md** — описание архитектуры, ERD, план разработки
-- ✅ Убедиться, что IMPLEMENTATION_PLAN.md актуален
-
-### M2: Окружение и Docker
-- ⬜ `backend/pyproject.toml` — зависимости через uv
-- ⬜ `backend/Dockerfile` — контейнеризация backend
-- ⬜ `telegram-bot/pyproject.toml`
-- ⬜ `telegram-bot/Dockerfile`
-- ⬜ `.env.example` — шаблон переменных окружения
-- ⬜ `docker-compose.yml` — оркестрация сервисов
-- ⬜ `docker-compose.override.yml` для разработки
-- ⬜ Структура директорий backend
-- ⬜ Проверить `docker compose build`
-
 ### M3: Backend — модели и миграции
-- ⬜ `backend/app/core/config.py` — конфигурация
-- ⬜ `backend/app/core/database.py` — подключение к БД
-- ⬜ `backend/app/core/security.py` — JWT, хеширование
+- ⬜ `backend/app/core/config.py` — конфигурация (pydantic-settings)
+- ⬜ `backend/app/core/database.py` — async engine, sessionmaker, get_db
+- ⬜ `backend/app/core/security.py` — hash_password, create_access_token, decode
 - ⬜ SQLAlchemy модели: User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
 - ⬜ Alembic: инициализация, первая миграция
 - ⬜ Seed-данные: скрипт наполнения БД
-- ⬜ Pydantic схемы
+- ⬜ Pydantic схемы: UserCreate, PlayerRead, TournamentCreate, GameCreate и т.д.
 
 ### M4: Backend — API: аутентификация и базовые CRUD
 - ⬜ Auth: регистрация, логин, JWT
@@ -95,9 +85,10 @@
 - ⬜ Финальная проверка REPORT.md, PROMPTS.md, CHANGES.md
 
 ## Известные проблемы
-- На данный момент нет известных проблем — проект в начальной стадии
+- На данный момент нет известных проблем
 
 ## Эволюция проектных решений
 - **2026-06-06**: Инициализация репозитория, создание ТЗ, Memory Bank
 - **2026-06-06 13:35**: Создан IMPLEMENTATION_PLAN.md (11 майлстоунов) и .clinerules/implementation_plan.md
 - **2026-06-06 13:35**: Приняты решения: Telegram-bot — long-polling, JWT — localStorage, pre-commit hook — ruff
+- **2026-06-06 14:17**: M2 завершён — создана Docker-инфраструктура
