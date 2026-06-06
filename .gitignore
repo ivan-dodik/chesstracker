@@ -22,3 +22,6 @@ Thumbs.db
 # Project specific
 homework_requirements.md
 backend/test.db
+
+.gigacode/
+.agents/

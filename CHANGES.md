@@ -103,3 +103,12 @@
 - CHANGES.md обновлён записью о M11
 - Memory Bank обновлён (activeContext.md, progress.md)
 - Выполнен финальный коммит и пуш
+
+## 2026-06-06 21:49 — Подключены скиллы для Cline
+- Установлен пакет mattpocock/skills (29 скиллов: улучшение архитектуры, code review, TDD, диагностика, планирование)
+- Установлен пакет anthropics/skills (18 скиллов: фронтенд-дизайн, документы, тестирование)
+- Установлен пакет obra/superpowers (14 скиллов: процессы разработки, дебаггинг, code review)
+- Установлен пакет supabase/agent-skills (2 скилла: PostgreSQL best practices)
+- Установлен пакет xixu-me/skills (12 скиллов: GitHub Actions, безопасность, хостинг)
+- Обновлён .gitignore для игнорирования .agents/
+- Созданы: .agents/ — директория с установленными скиллами
