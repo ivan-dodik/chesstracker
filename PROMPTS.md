@@ -732,7 +732,29 @@ initialize memory bank
 
 ---
 
-## 2026-06-07 09:15 — Исправление ошибки "Ошибка загрузки данных" на странице турниров
+## 2026-06-07 09:30 — Усиление требований обновления документации перед каждым пушем
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Усиль требования обновления перед каждым пушем
+```
+
+**План (Plan mode):**
+- Проверить текущие правила: .clinerules/git_commit.md, .clinerules/update_prompts.md, .clinerules/implementation_plan.md
+- Добавить в .clinerules/git_commit.md шаг проверки документации перед коммитом
+- Усилить .clinerules/update_prompts.md — явное упоминание проверки перед git push
+- Усилить .clinerules/implementation_plan.md — ссылка на git_commit.md перед push
+
+**Результат:**
+- `.clinerules/git_commit.md` — добавлен шаг 2 (проверка CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank перед коммитом)
+- `.clinerules/update_prompts.md` — добавлен п.5 (перед каждым git push — проверка), п.6 (восстановление пропущенных записей), явное упоминание REPORT.md
+- `.clinerules/implementation_plan.md` — добавлено примечание: перед git push выполнять шаг 2 из git_commit.md
+
+---
+
+## 2026-06-07 09:18 — Исправление ошибки "Ошибка загрузки данных" на странице турниров
 
 **Режим:** Plan → Act
 

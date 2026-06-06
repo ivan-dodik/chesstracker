@@ -270,3 +270,12 @@
 - **Обновлён REPORT.md** — добавлена запись о проблеме в «Ключевые проблемы и решения»; добавлена строка в «История работы»
 - **Обновлены PROMPTS.md, Memory Bank** — зафиксирована текущая сессия
 - Затронутые файлы: BUGS.md, REPORT.md, PROMPTS.md, memory-bank/activeContext.md, memory-bank/progress.md
+
+## 2026-06-07 09:33 — Усиление правил обновления документации перед пушем
+- **Добавлен шаг 2** в `.clinerules/git_commit.md` — проверка актуальности CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank перед каждым коммитом
+- **Усилен `.clinerules/update_prompts.md`**:
+  - Добавлено явное упоминание REPORT.md в список обязательных к обновлению файлов
+  - Добавлен п.5 (перед каждым `git push` — повторная проверка всех трёх файлов и Memory Bank)
+  - Добавлен п.6 (восстановление пропущенных записей до push)
+- **Добавлено примечание** в `.clinerules/implementation_plan.md` к п.4 — перед git push выполнять шаг 2 из git_commit.md
+- Затронутые файлы: `.clinerules/git_commit.md`, `.clinerules/update_prompts.md`, `.clinerules/implementation_plan.md`
