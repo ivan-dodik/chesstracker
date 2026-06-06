@@ -1,0 +1,26 @@
+"""Application configuration via pydantic-settings."""
+
+from pydantic_settings import BaseSettings
+
+
+class Settings(BaseSettings):
+    """Application settings loaded from environment variables."""
+
+    # Database
+    DATABASE_URL: str = "postgresql+asyncpg://ct_user:ct_password@localhost:5432/ct_database"
+
+    # Security
+    SECRET_KEY: str = "change-me-to-a-random-secret-key"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
+
+    # Telegram
+    TG_BOT_TOKEN: str = ""
+
+    # Backend
+    BACKEND_URL: str = "http://backend:8000"
+    DEBUG: bool = True
+
+    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+
+
+settings = Settings()
