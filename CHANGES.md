@@ -204,6 +204,29 @@
 - **Примечание:** Предыдущая проверка через Playwright (headless webkit) также показала положительный результат
 - **Вывод:** Форма логина и процесс аутентификации полностью работоспособны в реальном Chrome
 
+## 2026-06-07 04:16 — M15: Unit-тесты сервисов
+- Создана директория `tests/services/` с conftest.py (SQLite fixtures: db_session, sample_player, sample_tournament, sample_user, sample_admin)
+- Создан `test_player_service.py` — 3 теста (CRUD, pagination/search, update/delete)
+- Создан `test_tournament_service.py` — 3 теста (CRUD, pagination/filter, standings calculation)
+- Создан `test_game_service.py` — 3 теста (CRUD, update result, delete)
+- Создан `test_rating_service.py` — 2 теста (date filter, empty history)
+- Создан `test_stats_service.py` — 3 теста (top-rated ties, overall stats, head-to-head)
+- Создан `test_favorite_service.py` — 2 теста (add/remove, duplicate/nonexistent)
+- Создан `test_activity_log_service.py` — 2 теста (create/get, pagination/filter)
+- Создан `test_export_service.py` — 3 теста (CSV success, empty tournament, nonexistent)
+- **Итого: 74 → 95 тестов (+21)**
+- Исправлены ошибки ruff в новых тестовых файлах (20 fixable errors)
+- Затронутые файлы: backend/tests/services/*.py
+
+## 2026-06-07 03:57 — M14: API-тесты — Activity Log, Health, краевые случаи
+- Создан `test_activity_log.py` — 4 теста (admin access, user forbidden, unauth, pagination)
+- Создан `test_health.py` — 2 теста (health endpoint, docs Swagger UI)
+- Расширен `test_ratings.py` — +2 теста (nonexistent player, empty date range)
+- Расширен `test_stats.py` — +2 теста (head-to-head nonexistent, overall stats empty)
+- Расширен `test_favorites.py` — +2 теста (add nonexistent player, double delete)
+- **Итого: 62 → 74 теста (+12)**
+- Затронутые файлы: backend/tests/test_activity_log.py, test_health.py, test_ratings.py, test_stats.py, test_favorites.py
+
 ## 2026-06-07 03:45 — M13: API-тесты — Турниры, Игры, Export, Import
 - Создан `test_tournaments.py` — 9 тестов (list, create, get, update, delete, standings, empty list, 404)
 - Создан `test_games.py` — 6 тестов (list, create, update, delete, unauthorized, nonexistent)

@@ -713,3 +713,19 @@ initialize memory bank
 - **Фаза 3 (Auth flow):** создан `tests/test_auth_flow.py` — 6 тестов (логин → /me → user data, protected endpoint, unauthorized, register as admin 201, duplicate username 400, non-admin register 403)
 - **Итого:** 36/36 тестов проходят (было 20, добавлено 16)
 - Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
+
+---
+
+## 2026-06-07 04:16 — M15: Unit-тесты сервисов
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Продолжи выполнение плана.
+```
+
+**Результат:**
+- Создана директория tests/services/ с conftest.py (SQLite fixtures: db_session, sample_player, sample_tournament, sample_user, sample_admin)
+- Созданы 8 тестовых файлов: test_player_service.py, test_tournament_service.py, test_game_service.py, test_rating_service.py, test_stats_service.py, test_favorite_service.py, test_activity_log_service.py, test_export_service.py
+- 21 тест: coverage всех основных сервисных функций

@@ -30,16 +30,16 @@ async def test_import_csv_success(client: AsyncClient, admin_token: str):
     )
     tourn_id = tourn.json()["id"]
 
-    p1 = await client.post(
+    await client.post(
         "/api/players", json={"name": "Alice", "rating": 2500, "city": "City"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
-    p2 = await client.post(
+    await client.post(
         "/api/players", json={"name": "Bob", "rating": 2400, "city": "City"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
 
-    csv_content = f"player,round,opponent,result\nAlice,1,Bob,1-0\nBob,1,Alice,0-1\n"
+    csv_content = "player,round,opponent,result\nAlice,1,Bob,1-0\nBob,1,Alice,0-1\n"
     files = _make_csv_file(csv_content)
 
     response = await client.post(
