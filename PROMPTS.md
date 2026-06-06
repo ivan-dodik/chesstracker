@@ -279,7 +279,28 @@ initialize memory bank
 - Чекмаки перенесены в конец каждого майлстоуна M2–M10 (перед «Обновить Memory Bank»)
 - Дублирующийся чекмак в M2 удалён
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
-- Выполнен коммит и пуш
+
+---
+
+## 2026-06-06 21:06 — M8: Frontend — фичи
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Выполни следующий майлстоун.
+```
+
+**Результат:**
+- Создан SSE-клиент (backend/app/static/js/sse.js): EventSource к /api/events, toast-уведомления о новых партиях, изменении результатов, обновлении рейтинга
+- SSE-клиент подключён в base.html
+- Добавлен CSS-стиль flash-warning
+- Защита роутов: 401 → редирект на /login через htmx:responseError, Alpine.js Auth.isAuthenticated()
+- Аутентификация на фронте: форма логина, JWT в localStorage, Authorization header через htmx:configRequest
+- Избранное: кнопка ★ на профиле, список на дашборде
+- Экспорт CSV: кнопка на странице турнира
+- Импорт CSV: форма для админа на странице турнира
+- CHANGES.md, PROMPTS.md, REPORT.md обновлены
 
 ---
 

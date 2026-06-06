@@ -22,3 +22,13 @@
 - Обновлён tournament_service: подсчёт wins/draws/losses в standings
 - Добавлены CSS-стили для страниц игрока, турнира, графиков, h2h
 - 20/20 тестов проходят, docker build успешен
+
+## 2026-06-06 21:06 — M8: Frontend — фичи
+- Создан SSE-клиент (backend/app/static/js/sse.js): EventSource подключение к /api/events, toast-уведомления о новых партиях, изменении результатов, обновлении рейтинга
+- SSE-клиент подключён в base.html
+- Добавлен CSS-стиль flash-warning (для уведомлений об изменении результатов)
+- Защита роутов через htmx:responseError (401 → редирект на /login) и Alpine.js Auth.isAuthenticated()
+- Аутентификация на фронте: форма логина, JWT в localStorage, Authorization header через htmx:configRequest
+- Избранное: кнопка ★ на профиле, список на дашборде
+- Экспорт CSV: кнопка на странице турнира
+- Импорт CSV: форма для админа на странице турнира

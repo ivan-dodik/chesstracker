@@ -160,6 +160,22 @@
 
 **Результат:** 20/20 тестов проходят, docker build успешен
 
+## Итоги майлстоуна M8: Frontend — фичи
+
+**Статус:** ✅ Завершён
+
+**Создано/изменено:**
+- Создан SSE-клиент (`backend/app/static/js/sse.js`): EventSource подключение к `/api/events`, toast-уведомления о новых партиях, изменении результатов, обновлении рейтинга
+- SSE-клиент подключён в `base.html`
+- Добавлен CSS-стиль flash-warning
+- Защита роутов: 401 → редирект на `/login` через htmx:responseError, Alpine.js Auth.isAuthenticated()
+- Аутентификация на фронте: форма логина, JWT в localStorage, Authorization header через htmx:configRequest
+- Избранное: кнопка ★ на профиле, список на дашборде
+- Экспорт CSV: кнопка на странице турнира
+- Импорт CSV: форма для админа на странице турнира
+
+**Примечание:** Избранное, аутентификация, экспорт/импорт CSV были реализованы в рамках M7. В M8 добавлен SSE-клиент и обновлена документация.
+
 ## История работы
 
 | Дата/Время | Событие |
@@ -182,3 +198,4 @@
 | 2026-06-06 20:24 | **M6: Frontend — базовая структура и навигация** — style.css, main.js, base.html, login.html, index.html, players/list.html, tournaments/list.html, partials, web.py; исправлены Jinja2 cache issue и get_flashed_messages; 4 страницы HTTP 200; 20/20 тестов passed |
 | 2026-06-06 20:42 | **Memory Bank расширен module-файлами** — созданы 11 файлов описания модулей в `memory-bank/modules/` для быстрого поиска информации агентом; обновлены core-файлы со ссылками |
 | 2026-06-06 20:58 | **M7: Frontend — дашборд и детальные страницы** — Chart.js дашборд, профили игроков, детали турниров, head-to-head, аккордеон партий, CSV импорт/экспорт; обновлены схемы GameRead и TournamentStandings; 20/20 тестов passed; docker build успешен |
+| 2026-06-06 21:06 | **M8: Frontend — фичи** — SSE-клиент (sse.js), toast-уведомления, CSS flash-warning; защита роутов (401 → /login); аутентификация, избранное, CSV импорт/экспорт (реализованы в M7); обновлены CHANGES.md, PROMPTS.md, REPORT.md |

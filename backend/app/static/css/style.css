@@ -393,6 +393,11 @@ select.form-control {
   color: white;
 }
 
+.flash-warning {
+  background: var(--color-warning);
+  color: black;
+}
+
 @keyframes slideIn {
   from {
     transform: translateX(100%);
