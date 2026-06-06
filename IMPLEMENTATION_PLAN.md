@@ -33,9 +33,6 @@
 ### M2: Окружение и Docker
 **Коммит:** `chore: setup docker environment and project scaffolding`
 
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M2
-- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M2, зафиксировать проблемы/решения
-
 - [ ] Создать `backend/pyproject.toml` через `uv init`:
   - Зависимости: fastapi, uvicorn, sqlalchemy[asyncio], asyncpg, alembic, pydantic-settings, python-jose[cryptography], passlib[bcrypt], python-multipart, httpx, jinja2, aiofiles, sse-starlette
   - Dev-зависимости: pytest, pytest-asyncio, httpx, ruff
@@ -75,12 +72,11 @@
   - `backend/app/static/js/`
   - `backend/tests/`
 - [ ] Проверить: `docker compose build` успешен
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M2
 - [ ] Обновить Memory Bank
 
 ### M3: Backend — модели и база данных
 **Коммит:** `feat: add SQLAlchemy models and initial migration`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M3
 
 - [ ] Создать `backend/app/core/config.py`:
   - Pydantic BaseSettings: DATABASE_URL, SECRET_KEY, TG_BOT_TOKEN, DEBUG, и т.д.
@@ -118,12 +114,11 @@
   - FavoriteRead
   - ActivityLogRead
 - [ ] Проверить seed: запустить скрипт через `docker compose run --rm backend python -m app.seed`
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M3
 - [ ] Обновить Memory Bank
 
 ### M4: Backend — API: аутентификация и базовые CRUD
 **Коммит:** `feat: implement auth and basic CRUD API`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M4
 
 - [ ] Создать `backend/app/api/deps.py`:
   - `get_db` — async session
@@ -162,12 +157,11 @@
   - Swagger UI по /docs
 - [ ] Написать тесты (3–4): `backend/tests/test_auth.py`, `backend/tests/test_players.py`
 - [ ] Проверить Swagger UI: открыть /docs, протестировать эндпоинты
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M4
 - [ ] Обновить Memory Bank
 
 ### M5: Backend — API: специфичные фичи
 **Коммит:** `feat: add ratings, stats, favorites, SSE, CSV, activity log`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M5
 
 - [ ] Создать `backend/app/services/rating_service.py` + `backend/app/api/ratings.py`:
   - `GET /api/players/{id}/rating-history` — история рейтинга с фильтром по дате
@@ -190,12 +184,11 @@
   - `GET /api/activity-log` — лог активности с пагинацией
   - Интегрировать логирование во все CRUD-операции (создание/редактирование/удаление)
 - [ ] Написать тесты (3–4): `backend/tests/test_ratings.py`, `backend/tests/test_stats.py`, `backend/tests/test_favorites.py`
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M5
 - [ ] Обновить Memory Bank
 
 ### M6: Frontend — базовая структура и навигация
 **Коммит:** `feat: add base frontend with Jinja2 templates and HTMX`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M6
 
 - [ ] Создать `backend/app/static/css/style.css`:
   - Адаптивная вёрстка (desktop + mobile)
@@ -233,12 +226,11 @@
   - `tournament_row.html` — строка таблицы турнира
   - `pagination.html` — компонент пагинации
 - [ ] Проверить, что все страницы открываются (дашборд, списки, логин)
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M6
 - [ ] Обновить Memory Bank
 
 ### M7: Frontend — дашборд и детальные страницы
 **Коммит:** `feat: add dashboard with Chart.js and detail pages`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M7
 
 - [ ] Реализовать дашборд (`templates/index.html`):
   - График рейтинга топ-игрока (Chart.js, line chart) — `GET /api/players/{id}/rating-history`
@@ -263,12 +255,11 @@
   - Head-to-head селектор
 - [ ] Создать дополнительный CSS для компонентов дашборда
 - [ ] Проверить адаптивную вёрстку на мобильном разрешении (Chrome DevTools)
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M7
 - [ ] Обновить Memory Bank
 
 ### M8: Frontend — фичи (избранное, SSE, CSV, аутентификация)
 **Коммит:** `feat: add favorites UI, SSE client, CSV import/export, auth UI`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M8
 
 - [ ] Реализовать избранное на фронте:
   - Кнопка "★" на профиле игрока (Alpine.js, hx-post/hx-delete)
@@ -290,12 +281,11 @@
   - Неавторизованный: просмотр дашборда, списков, профилей
   - Авторизованный (user): избранное, уведомления
   - Админ: создание/редактирование турниров, партий, импорт CSV
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M8
 - [ ] Обновить Memory Bank
 
 ### M9: Telegram-bot
 **Коммит:** `feat: add Telegram bot for notifications`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M9
 
 - [ ] Создать `telegram-bot/bot.py`:
   - Инициализация Application (python-telegram-bot)
@@ -319,12 +309,11 @@
   - При создании партии backend отправляет HTTP-запрос к telegram-bot (или telegram-bot сам polling'ит)
   - Выбран вариант: telegram-bot сам polling'ит backend по REST
 - [ ] Проверить: `docker compose up` → бот отвечает на команды
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M9
 - [ ] Обновить Memory Bank
 
 ### M10: Тестирование и CI
 **Коммит:** `ci: add GitHub Actions with ruff lint and pytest`
-
-- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M10
 
 - [ ] Дописать тесты до минимум 10:
   - unit-тесты: сервисы (изолированные, с mock БД)
@@ -376,6 +365,7 @@
             DATABASE_URL: postgresql+asyncpg://ct_user:ct_password@localhost/ct_test
   ```
 - [ ] Проверить CI локально (запуск ruff, pytest)
+- [ ] Обновить `CHANGES.md`, `PROMPTS.md`, `REPORT.md` — зафиксировать изменения, промпты и историю работы по M10
 - [ ] Обновить Memory Bank
 
 ### M11: Финальная документация

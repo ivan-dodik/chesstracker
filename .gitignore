@@ -20,4 +20,5 @@ __pycache__/
 Thumbs.db
 
 # Project specific
-homework_requirements.mdbackend/test.db
+homework_requirements.md
+backend/test.db

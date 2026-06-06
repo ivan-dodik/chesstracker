@@ -52,3 +52,9 @@
 - В IMPLEMENTATION_PLAN.md в каждом майлстоуне M2–M10 добавлен отдельный чекмак: «Обновить CHANGES.md, PROMPTS.md, REPORT.md — зафиксировать изменения, промпты и историю работы по M*»
 - Исправлено форматирование M11: проверка PROMPTS.md и CHANGES.md вынесена из вложенности REPORT.md на верхний уровень
 - Файлы: .clinerules/implementation_plan.md, IMPLEMENTATION_PLAN.md
+
+## 2026-06-06 16:30
+### Исправление: чекмаки обновления файлов перенесены в конец майлстоунов
+- В IMPLEMENTATION_PLAN.md чекмаки «Обновить CHANGES.md, PROMPTS.md, REPORT.md» перенесены из начала каждого майлстоуна M2–M10 в конец (перед «Обновить Memory Bank»)
+- Удалён дублирующийся чекмак в M2
+- Файлы: IMPLEMENTATION_PLAN.md
