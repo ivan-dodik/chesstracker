@@ -1,8 +1,16 @@
 """ActivityLog service — logging and reading activity log entries."""
 
 import json
-from datetime import datetime
+from datetime import date, datetime
 from typing import Any
+
+
+class _DateTimeEncoder(json.JSONEncoder):
+    """JSON encoder that supports datetime and date objects."""
+    def default(self, obj: Any) -> str:
+        if isinstance(obj, (datetime, date)):
+            return obj.isoformat()
+        return super().default(obj)
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,8 +33,8 @@ async def log_activity(
         action=action,
         entity_type=entity_type,
         entity_id=entity_id,
-        old_values=json.dumps(old_values) if old_values else None,
-        new_values=json.dumps(new_values) if new_values else None,
+        old_values=json.dumps(old_values, cls=_DateTimeEncoder) if old_values else None,
+        new_values=json.dumps(new_values, cls=_DateTimeEncoder) if new_values else None,
     )
     db.add(log_entry)
     await db.flush()

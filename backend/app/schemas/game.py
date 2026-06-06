@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 class GameCreate(BaseModel):
     """Schema for creating a new game."""
-    tournament_id: int
+    tournament_id: int | None = None
     round: int
     white_player_id: int
     black_player_id: int

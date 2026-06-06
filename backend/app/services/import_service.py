@@ -96,7 +96,7 @@ async def import_tournament_csv(
                 black_id = black_player.id
 
             # Parse result
-            result_value = parse_result(row.get("result", ""))
+            result_value = await parse_result(row.get("result", ""))
             if result_value is None:
                 errors.append(f"Row {row_idx}: Invalid result format: {row.get('result', '')}")
                 games_skipped += 1

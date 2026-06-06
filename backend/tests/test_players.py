@@ -71,3 +71,72 @@ async def test_get_player_by_id(client: AsyncClient, admin_token: str):
     )
     assert response.status_code == 200
     assert response.json()["name"] == "Detail Player"
+
+
+@pytest.mark.asyncio
+async def test_update_player_admin(client: AsyncClient, admin_token: str):
+    """Test admin can update a player."""
+    # Create player
+    create_resp = await client.post(
+        "/api/players",
+        json={"name": "Old Name", "rating": 2000, "city": "City"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert create_resp.status_code == 201
+    player_id = create_resp.json()["id"]
+
+    # Update
+    response = await client.put(
+        f"/api/players/{player_id}",
+        json={"name": "Updated Name", "rating": 2500, "city": "New City"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == "Updated Name"
+    assert data["rating"] == 2500
+
+
+@pytest.mark.asyncio
+async def test_delete_player_admin(client: AsyncClient, admin_token: str):
+    """Test admin can delete a player."""
+    # Create player
+    create_resp = await client.post(
+        "/api/players",
+        json={"name": "To Delete", "rating": 1800, "city": "City"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert create_resp.status_code == 201
+    player_id = create_resp.json()["id"]
+
+    # Delete
+    response = await client.delete(
+        f"/api/players/{player_id}",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 204
+
+    # Verify deleted
+    get_resp = await client.get(f"/api/players/{player_id}")
+    assert get_resp.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_update_player_not_found(client: AsyncClient, admin_token: str):
+    """Test updating nonexistent player returns 404."""
+    response = await client.put(
+        "/api/players/999999",
+        json={"name": "Ghost", "rating": 1000, "city": "Nowhere"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_delete_player_not_found(client: AsyncClient, admin_token: str):
+    """Test deleting nonexistent player returns 404."""
+    response = await client.delete(
+        "/api/players/999999",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 404
