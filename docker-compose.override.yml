@@ -1,5 +1,6 @@
 services:
   backend:
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./backend/app:/app/app
     command: >
@@ -10,6 +11,7 @@ services:
       - "5432:5432"
 
   telegram-bot:
+    user: "${UID:-1000}:${GID:-1000}"
     volumes:
       - ./telegram-bot:/app
     command: >

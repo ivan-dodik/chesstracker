@@ -93,6 +93,18 @@
 - **Решение:** Добавлен extra `[job-queue]` — `python-telegram-bot[job-queue]>=22.7`. Перегенерирован `uv.lock`.
 - **Результат:** ✅ В `uv.lock` добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1.
 
+### 2026-06-06 22:45 — Файлы __pycache__ создаются от root внутри Docker-контейнера
+
+- **Суть:** После запуска и остановки проекта через Docker Compose файлы `__pycache__` в `backend/app/` и, возможно, в `telegram-bot/` принадлежат root (UID 0). Пользователь `ai` не может их удалить без sudo, который недоступен.
+- **Причина:** В `docker-compose.override.yml` для сервисов backend и telegram-bot не был указан параметр `user:`. По умолчанию процессы внутри контейнера запускаются от root, поэтому все создаваемые файлы (включая `__pycache__`) принадлежат root.
+- **Решение:**
+  1. В `docker-compose.override.yml` добавлен `user: "${UID:-1000}:${GID:-1000}"` для backend и telegram-bot.
+  2. В `.env.example` добавлены `UID=1000`, `GID=1000`.
+  3. Теперь контейнеры запускаются от UID/GID текущего пользователя, и все создаваемые файлы ему принадлежат.
+- **Результат:** ✅ Проблема предотвращена на будущее.
+
+---
+
 ### 2026-06-06 — Установка скиллов не отражена в документации
 
 - **Суть:** После установки 5 пакетов агентских скиллов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills) информация об этом не была внесена в Memory Bank, PROMPTS.md, REPORT.md, .clinerules/ и IMPLEMENTATION_PLAN.md. Запись была сделана только в CHANGES.md.
@@ -333,3 +345,4 @@
 | 2026-06-06 21:57 | **Документирование скиллов** — добавлена запись об установке скиллов в PROMPTS.md, REPORT.md, Memory Bank, .clinerules/, IMPLEMENTATION_PLAN.md |
 | | 2026-06-06 22:16 | **Code Review, архитектурный анализ и рефакторинг** — запущен code review subagent и архитектурный анализ через скиллы; исправлены: SECRET_KEY, CORS, CSV import (лимит 10 MB), N+1 запросы, дублирование standings, тесты (temp-файл); ruff clean, 20/20 тестов проходят |
 | 2026-06-06 22:35 | **Исправление запуска telegram-bot** — добавлен extra `[job-queue]` для python-telegram-bot, перегенерирован uv.lock; исправлена ошибка AttributeError: 'NoneType' object has no attribute 'run_repeating' |
+| 2026-06-06 22:45 | **Исправление root-файлов в Docker volumes** — добавлен `user: "${UID:-1000}:${GID:-1000}"` в docker-compose.override.yml для backend и telegram-bot; добавлены UID/GID в .env.example |

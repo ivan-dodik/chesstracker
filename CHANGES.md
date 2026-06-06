@@ -119,15 +119,9 @@
 - Перегенерирован `uv.lock`: добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1
 - Затронутые файлы: telegram-bot/pyproject.toml, telegram-bot/uv.lock
 
-## 2026-06-06 22:16 — Code Review, архитектурный анализ и рефакторинг
-- Запущен code review subagent (скилл requesting-code-review) — выявлены критические, важные и минорные issues
-- Запущен архитектурный анализ (скилл improve-codebase-architecture) — сгенерирован HTML-отчёт с 12 находками
-- **Исправлено:**
-  - SECRET_KEY: добавлен field_validator с предупреждением о дефолтном значении (config.py)
-  - CORS: добавлен комментарий о необходимости ограничения origins в production (main.py)
-  - CSV import: добавлен лимит размера файла 10 MB (import_route.py)
-  - N+1 запросы: заменены на selectinload в game_service.get_games_by_tournament() (game_service.py)
-  - Дублирование логики подсчёта очков: вынесено в общий standings_service.py, tournament_service и export_service переписаны на его использование
-  - Тесты: test.db заменён на временный файл с уникальным именем (conftest.py)
-- ruff clean, 20/20 тестов проходят
-- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
+## 2026-06-06 22:45 — Исправление проблемы root-файлов в Docker volumes
+- Добавлен `user: "${UID:-1000}:${GID:-1000}"` в docker-compose.override.yml для сервисов backend и telegram-bot
+- Добавлены `UID=1000`, `GID=1000` в .env.example
+- **Проблема:** `__pycache__` внутри контейнера создавались от root → недоступны для удаления пользователем ai без sudo
+- **Решение:** процессы внутри контейнера теперь запускаются от UID/GID текущего пользователя
+- Затронутые файлы: docker-compose.override.yml, .env.example
