@@ -27,10 +27,13 @@
   - Стек технологий
   - Структура директорий
 - [ ] Убедиться, что `IMPLEMENTATION_PLAN.md` (этот файл) содержит все актуальные чекмаки
+- [ ] Создать `REPORT.md` — начальная структура отчёта (AI-инструменты, примеры промптов, ключевые проблемы и решения, удачные/неудачные шаги, история работы за M1)
 - [ ] Обновить Memory Bank (activeContext.md, progress.md)
 
 ### M2: Окружение и Docker
 **Коммит:** `chore: setup docker environment and project scaffolding`
+
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M2, зафиксировать проблемы/решения
 
 - [ ] Создать `backend/pyproject.toml` через `uv init`:
   - Зависимости: fastapi, uvicorn, sqlalchemy[asyncio], asyncpg, alembic, pydantic-settings, python-jose[cryptography], passlib[bcrypt], python-multipart, httpx, jinja2, aiofiles, sse-starlette
@@ -76,6 +79,8 @@
 ### M3: Backend — модели и база данных
 **Коммит:** `feat: add SQLAlchemy models and initial migration`
 
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M3, зафиксировать проблемы/решения
+
 - [ ] Создать `backend/app/core/config.py`:
   - Pydantic BaseSettings: DATABASE_URL, SECRET_KEY, TG_BOT_TOKEN, DEBUG, и т.д.
 - [ ] Создать `backend/app/core/database.py`:
@@ -116,6 +121,8 @@
 
 ### M4: Backend — API: аутентификация и базовые CRUD
 **Коммит:** `feat: implement auth and basic CRUD API`
+
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M4, зафиксировать проблемы/решения
 
 - [ ] Создать `backend/app/api/deps.py`:
   - `get_db` — async session
@@ -159,6 +166,8 @@
 ### M5: Backend — API: специфичные фичи
 **Коммит:** `feat: add ratings, stats, favorites, SSE, CSV, activity log`
 
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M5, зафиксировать проблемы/решения
+
 - [ ] Создать `backend/app/services/rating_service.py` + `backend/app/api/ratings.py`:
   - `GET /api/players/{id}/rating-history` — история рейтинга с фильтром по дате
 - [ ] Создать `backend/app/services/favorite_service.py` + `backend/app/api/favorites.py`:
@@ -184,6 +193,8 @@
 
 ### M6: Frontend — базовая структура и навигация
 **Коммит:** `feat: add base frontend with Jinja2 templates and HTMX`
+
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M6, зафиксировать проблемы/решения
 
 - [ ] Создать `backend/app/static/css/style.css`:
   - Адаптивная вёрстка (desktop + mobile)
@@ -226,6 +237,8 @@
 ### M7: Frontend — дашборд и детальные страницы
 **Коммит:** `feat: add dashboard with Chart.js and detail pages`
 
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M7, зафиксировать проблемы/решения
+
 - [ ] Реализовать дашборд (`templates/index.html`):
   - График рейтинга топ-игрока (Chart.js, line chart) — `GET /api/players/{id}/rating-history`
   - Круговая диаграмма результатов (Chart.js, doughnut) — `GET /api/stats/overall/{id}`
@@ -254,6 +267,8 @@
 ### M8: Frontend — фичи (избранное, SSE, CSV, аутентификация)
 **Коммит:** `feat: add favorites UI, SSE client, CSV import/export, auth UI`
 
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M8, зафиксировать проблемы/решения
+
 - [ ] Реализовать избранное на фронте:
   - Кнопка "★" на профиле игрока (Alpine.js, hx-post/hx-delete)
   - Список избранных на дашборде
@@ -278,6 +293,8 @@
 
 ### M9: Telegram-bot
 **Коммит:** `feat: add Telegram bot for notifications`
+
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M9, зафиксировать проблемы/решения
 
 - [ ] Создать `telegram-bot/bot.py`:
   - Инициализация Application (python-telegram-bot)
@@ -305,6 +322,8 @@
 
 ### M10: Тестирование и CI
 **Коммит:** `ci: add GitHub Actions with ruff lint and pytest`
+
+- [ ] Обновить `REPORT.md` — добавить запись в «Историю работы» о шагах M10, зафиксировать проблемы/решения
 
 - [ ] Дописать тесты до минимум 10:
   - unit-тесты: сервисы (изолированные, с mock БД)
@@ -373,11 +392,12 @@
 - [ ] Финально проверить и дополнить `ARCHITECTURE.md`:
   - Соответствие реализованной архитектуре
   - Обновить ERD, если были изменения
-- [ ] Проверить `REPORT.md`:
-  - Все ключевые события зафиксированы
+- [ ] Проверить и дополнить `REPORT.md`:
+  - Все ключевые события зафиксированы за все майлстоуны
   - Проблемы и решения описаны
-  - Примеры промптов
-  - История работы
+  - Примеры промптов добавлены при необходимости
+  - История работы охватывает весь проект
+  - Раздел «Удачные и неудачные шаги» покрывает весь проект
 - [ ] Проверить `PROMPTS.md`:
   - Все промпты записаны с датами
 - [ ] Проверить `CHANGES.md`:
