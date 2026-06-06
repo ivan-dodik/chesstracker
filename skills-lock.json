@@ -7,6 +7,12 @@
       "skillPath": "skills/algorithmic-art/SKILL.md",
       "computedHash": "b2ca295de7f9c86c444f1fa21239e22e0eb7013ced1c652169b9402cc96ff744"
     },
+    "alpinejs": {
+      "source": "brettatoms/agent-skills",
+      "sourceType": "github",
+      "skillPath": "alpinejs/SKILL.md",
+      "computedHash": "4952716ebe84faa812f6dcb3f921a85e84327891a2767ecea9601bc23e06e01c"
+    },
     "brainstorming": {
       "source": "obra/superpowers",
       "sourceType": "github",

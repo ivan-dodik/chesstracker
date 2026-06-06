@@ -54,6 +54,262 @@ const Auth = {
 };
 
 // ============================================================
+// Alpine.js Components — register via alpine:init event
+// main.js (defer) runs BEFORE Alpine.js (defer), so the listener
+// is guaranteed to be registered before Alpine fires the event.
+// ============================================================
+
+document.addEventListener('alpine:init', () => {
+  // Auth state component
+  Alpine.data('authState', () => ({
+    isAuth: Auth.isAuthenticated(),
+    user: Auth.getUser(),
+
+    init() {
+      this.$watch('isAuth', () => {
+        this.user = Auth.getUser();
+      });
+    },
+
+    logout() {
+      Auth.logout();
+    }
+  }));
+
+  // Login form component
+  Alpine.data('loginForm', () => ({
+    username: '',
+    password: '',
+    error: '',
+    loading: false,
+
+    async submit() {
+      this.error = '';
+      this.loading = true;
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: this.username,
+            password: this.password
+          })
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          this.error = data.detail || 'Invalid credentials';
+          this.loading = false;
+          return;
+        }
+
+        const data = await response.json();
+        Auth.setToken(data.access_token);
+
+        const meResponse = await fetch('/api/auth/me', {
+          headers: Auth.getAuthHeaders()
+        });
+        if (meResponse.ok) {
+          const user = await meResponse.json();
+          Auth.setUser(user);
+        }
+
+        window.location.href = '/';
+      } catch (err) {
+        this.error = 'Network error. Please try again.';
+        this.loading = false;
+      }
+    }
+  }));
+
+  // Pagination component
+  Alpine.data('pagination', () => ({
+    page: 1,
+    total: 0,
+    perPage: 20,
+
+    get totalPages() {
+      return Math.ceil(this.total / this.perPage) || 1;
+    },
+
+    get pages() {
+      const pages = [];
+      const total = this.totalPages;
+      const current = this.page;
+
+      pages.push(1);
+
+      let start = Math.max(2, current - 1);
+      let end = Math.min(total - 1, current + 1);
+
+      if (start > 2) pages.push('...');
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < total - 1) pages.push('...');
+
+      if (total > 1) pages.push(total);
+
+      return pages;
+    },
+
+    goTo(page) {
+      if (page < 1 || page > this.totalPages) return;
+      this.page = page;
+      this.$dispatch('page-change', { page });
+    }
+  }));
+
+  // ============================================================
+  // Dashboard chart components
+  // ============================================================
+
+  // Load players list for selectors
+  let playersCache = [];
+
+  async function loadPlayers() {
+    try {
+      const resp = await fetch('/api/players?per_page=100');
+      const data = await resp.json();
+      playersCache = data.items || [];
+    } catch(e) {
+      playersCache = [];
+    }
+  }
+  loadPlayers();
+
+  // Rating chart component
+  Alpine.data('ratingChart', () => ({
+    selectedPlayerId: '',
+    players: playersCache,
+    chart: null,
+
+    init() {
+      this.$nextTick(() => loadPlayers().then(() => {
+        this.players = playersCache;
+      }));
+    },
+
+    async loadChart() {
+      if (!this.selectedPlayerId) return;
+      this.destroyChart();
+      try {
+        const resp = await fetch(`/api/players/${this.selectedPlayerId}/rating-history`);
+        const data = await resp.json();
+        this.renderChart(data);
+      } catch(e) {
+        console.error('Failed to load rating history', e);
+      }
+    },
+
+    renderChart(data) {
+      const canvas = this.$refs.ratingCanvas;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const labels = data.map(r => new Date(r.date).toLocaleDateString('ru-RU'));
+      const ratings = data.map(r => r.rating);
+
+      this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Рейтинг',
+            data: ratings,
+            borderColor: '#3498db',
+            backgroundColor: 'rgba(52,152,219,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+            pointHoverRadius: 5,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: { precision: 0 }
+            }
+          }
+        }
+      });
+    },
+
+    destroyChart() {
+      if (this.chart) {
+        this.chart.destroy();
+        this.chart = null;
+      }
+    }
+  }));
+
+  // Overall stats doughnut chart
+  Alpine.data('overallStatsChart', () => ({
+    selectedPlayerId: '',
+    players: playersCache,
+    chart: null,
+
+    init() {
+      this.$nextTick(() => loadPlayers().then(() => {
+        this.players = playersCache;
+      }));
+    },
+
+    async loadStats() {
+      if (!this.selectedPlayerId) return;
+      this.destroyChart();
+      try {
+        const resp = await fetch(`/api/stats/overall/${this.selectedPlayerId}`);
+        const data = await resp.json();
+        this.renderChart(data);
+      } catch(e) {
+        console.error('Failed to load stats', e);
+      }
+    },
+
+    renderChart(data) {
+      const canvas = this.$refs.statsCanvas;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      this.chart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Победы', 'Поражения', 'Ничьи'],
+          datasets: [{
+            data: [data.wins, data.losses, data.draws],
+            backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+            borderWidth: 2,
+            borderColor: '#fff',
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { font: { size: 11 } }
+            }
+          }
+        }
+      });
+    },
+
+    destroyChart() {
+      if (this.chart) {
+        this.chart.destroy();
+        this.chart = null;
+      }
+    }
+  }));
+});
+
+// ============================================================
 // HTMX Configuration
 // ============================================================
 
@@ -117,112 +373,6 @@ function initMobileMenu() {
       links.classList.toggle('open');
     });
   }
-}
-
-// ============================================================
-// Alpine.js Components (if Alpine is loaded)
-// ============================================================
-
-if (typeof Alpine !== 'undefined') {
-  // Auth state component
-  Alpine.data('authState', () => ({
-    isAuth: Auth.isAuthenticated(),
-    user: Auth.getUser(),
-
-    init() {
-      this.$watch('isAuth', () => {
-        this.user = Auth.getUser();
-      });
-    },
-
-    logout() {
-      Auth.logout();
-    }
-  }));
-
-  // Login form component
-  Alpine.data('loginForm', () => ({
-    username: '',
-    password: '',
-    error: '',
-    loading: false,
-
-    async submit() {
-      this.error = '';
-      this.loading = true;
-
-      try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            username: this.username,
-            password: this.password
-          })
-        });
-
-        if (!response.ok) {
-          const data = await response.json();
-          this.error = data.detail || 'Invalid credentials';
-          this.loading = false;
-          return;
-        }
-
-        const data = await response.json();
-        Auth.setToken(data.access_token);
-
-        // Fetch user info
-        const meResponse = await fetch('/api/auth/me', {
-          headers: Auth.getAuthHeaders()
-        });
-        if (meResponse.ok) {
-          const user = await meResponse.json();
-          Auth.setUser(user);
-        }
-
-        window.location.href = '/';
-      } catch (err) {
-        this.error = 'Network error. Please try again.';
-        this.loading = false;
-      }
-    }
-  }));
-
-  // Pagination component
-  Alpine.data('pagination', () => ({
-    page: 1,
-    total: 0,
-    perPage: 20,
-
-    get totalPages() {
-      return Math.ceil(this.total / this.perPage) || 1;
-    },
-
-    get pages() {
-      const pages = [];
-      const total = this.totalPages;
-      const current = this.page;
-
-      pages.push(1);
-
-      let start = Math.max(2, current - 1);
-      let end = Math.min(total - 1, current + 1);
-
-      if (start > 2) pages.push('...');
-      for (let i = start; i <= end; i++) pages.push(i);
-      if (end < total - 1) pages.push('...');
-
-      if (total > 1) pages.push(total);
-
-      return pages;
-    },
-
-    goTo(page) {
-      if (page < 1 || page > this.totalPages) return;
-      this.page = page;
-      this.$dispatch('page-change', { page });
-    }
-  }));
 }
 
 // ============================================================

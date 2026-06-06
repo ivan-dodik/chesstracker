@@ -58,7 +58,7 @@
 
 {% block extra_head %}
 <script>
-document.body.addEventListener('htmx:afterSwap', function(evt) {
+document.addEventListener('htmx:afterSwap', function(evt) {
   if (evt.detail.target && evt.detail.target.id === 'players-table') {
     try {
       const data = JSON.parse(evt.detail.xhr.responseText);
