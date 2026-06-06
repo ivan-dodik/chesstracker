@@ -4,20 +4,17 @@
 Проект полностью реализован. Задокументирована проблема с циклическим редиректом после логина (см. BUGS.md).
 
 ## Последние изменения
-- Исправлена ошибка `AttributeError: 'NoneType' object has no attribute 'run_repeating'` при запуске telegram-bot
-- Добавлен extra `[job-queue]` для `python-telegram-bot`
-- Перегенерирован `uv.lock`: добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1
-- Исправлена проблема root-файлов в Docker volumes (user: UID/GID)
-- Graceful shutdown бота при фейковом токене (is_token_valid, restart: "no")
-- Исправлена ошибка uv cache (Permission denied) — добавлен appuser в Dockerfile
+- **Установлен MCP Browser Tools (02:40)**: `@agentdeskai/browser-tools-mcp@1.2.1`, `@agentdeskai/browser-tools-server@1.2.1`, порт 3025
+- **Проверена форма логина через MCP Browser Tools (03:15)**: в реальном Chrome — логин admin/admin123 → редирект на дашборд → все API 200 OK → 0 ошибок → аудит доступности 80/100
 - Исправлены фронтенд-ошибки Alpine.js (порядок загрузки скриптов, defer, alpine:init)
 - **Исправлена проблема аутентификации (01:24)**: обработчик `htmx:responseError` теперь проверяет наличие токена, добавлено логирование
 - **Создан BUGS.md (02:20)**: полная документация проблемы циклического редиректа после логина с хронологией исправлений, анализом корневой причины и приоритетом дальнейших работ
 
 ## Следующие шаги
+- Исправить контрастность цветов CSS (цвет ссылок `#3498db`, placeholder-текст `#7f8c8d`) — результат аудита доступности Score 80/100
+- Добавить `<label>` к select элементам на дашборде
 - Устранить гонку между HTMX `hx-trigger="load"` и Alpine.js `x-show` на дашборде (защищённые эндпоинты отправляют запросы до того, как Alpine скрыл секции для неаутентифицированных пользователей)
 - Альтернатива: заменить `hx-trigger="load"` на Alpine-управляемую загрузку для защищённых секций
-- Увеличить задержку перед редиректом после логина (100ms → 300ms) или перейти на Promise-based подход
 
 ## Активные решения и considerations
 - **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.
@@ -33,6 +30,7 @@
 - **GameRead**: расширен полями white_player_name, black_player_name
 - **TournamentStandings**: расширен полями wins, draws, losses
 - **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
+- **MCP Browser Tools**: установлен `@agentdeskai/browser-tools-mcp@1.2.1` с Chrome-расширением. Инструменты: `takeScreenshot`, `getConsoleLogs`, `getConsoleErrors`, `getNetworkErrors`, `getNetworkLogs`, `runAccessibilityAudit`. Сервер работает на порту 3025.
 - **Проблема аутентификации**: Частично исправлена. Корневая причина — гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. Создан BUGS.md с полным анализом.
 
 ## Ссылки на модули

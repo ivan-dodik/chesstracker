@@ -181,6 +181,29 @@
 - **Результат:** 36/36 тестов проходят, 0 ошибок ruff
 - Затронутые файлы: backend/tests/test_auth.py, backend/tests/test_web.py, backend/tests/test_auth_flow.py
 
+## 2026-06-07 02:40 — Установка BrowserTools MCP сервера
+- Установлен MCP сервер `@agentdeskai/browser-tools-mcp@1.2.1` в `/home/ai/Documents/Cline/MCP/browser-tools-mcp/`
+- Установлен глобально `@agentdeskai/browser-tools-server@1.2.1` — сервер-прослойка для сбора логов браузера
+- Запущен `browser-tools-server` на порту 3025
+- Настроен `cline_mcp_settings.json` — добавлен сервер `github.com/AgentDeskAI/browser-tools-mcp`
+- Продемонстрирована работа: `getConsoleLogs` вернул пустой массив (корректный ответ)
+- Для полной функциональности требуется Chrome-расширение BrowserTools
+- Затронутые файлы: `/home/ai/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
+
+## 2026-06-07 03:15 — Проверка формы логина через MCP Browser Tools (реальный Chrome)
+- **Цель:** Проверить работоспособность формы логина и процесса аутентификации через реальный Chrome с расширением Browser Tools
+- **Инструменты:** MCP Browser Tools (`takeScreenshot`, `getConsoleLogs`, `getConsoleErrors`, `getNetworkErrors`, `getNetworkLogs`, `runAccessibilityAudit`)
+- **Результаты проверки:**
+  - Страница `/login` загружается корректно
+  - Форма логина: поля username/password, кнопка "Войти"
+  - Ввод admin/admin123 → успешная аутентификация → редирект на `/` (дашборд)
+  - Console ошибки: 0
+  - Network ошибки: 0
+  - Все сетевые запросы на дашборде вернули 200 OK (players, tournaments, stats, favorites)
+  - Аудит доступности: Score 80/100 (замечания по контрастности CSS — не влияют на логин)
+- **Примечание:** Предыдущая проверка через Playwright (headless webkit) также показала положительный результат
+- **Вывод:** Форма логина и процесс аутентификации полностью работоспособны в реальном Chrome
+
 ## 2026-06-07 02:20 — Документирование проблемы аутентификации в BUGS.md
 - **Создан BUGS.md** — полный документ с описанием проблемы циклического редиректа после логина
 - **Содержание BUGS.md:**
