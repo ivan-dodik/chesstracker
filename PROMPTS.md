@@ -557,3 +557,31 @@ initialize memory bank
 - В `backend/Dockerfile` и `telegram-bot/Dockerfile` добавлен: создание пользователя `appuser`, `chown -R appuser:appuser /app`, `USER appuser`, `ENV UV_CACHE_DIR=/home/appuser/.cache/uv`
 - Сборка `docker compose build` прошла успешно, ошибки Permission denied больше нет
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
+
+---
+
+## 2026-06-07 02:20 — Документирование проблемы циклического редиректа после логина
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Просмотри последние задачи (сессии CLine) и задокументируй проблему с редиректом после логина, версии и правки которые пробовал, их результаты и изменения которые вносил. Рекап проблемы. Информацию внеси в файл BUGS.md и в остальные файлы, которые ты должен обновлять.
+```
+
+**План (Plan mode):**
+- Проанализировать историю изменений (CHANGES.md, PROMPTS.md, REPORT.md)
+- Прочитать main.js (frontend-логика аутентификации)
+- Прочитать base.html (HTMX обработчики: htmx:configRequest, htmx:responseError)
+- Прочитать login.html (форма входа)
+- Прочитать index.html (дашборд с HTMX hx-trigger="load" и Alpine.js x-show)
+- Изучить screenshots для визуальной диагностики
+- Составить полную хронику проблемы
+
+**Результат:**
+- Создан `BUGS.md` — полный документ с описанием проблемы, хронологией двух попыток исправлений, анализом корневой причины (гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`), приоритетом дальнейших исправлений (Critical, Important, Minor)
+- Обновлён `REPORT.md` — добавлена запись о проблеме в раздел «Ключевые проблемы и решения», добавлена строка в «История работы»
+- Обновлён `CHANGES.md` — запись о создании BUGS.md и анализе
+- Обновлён `PROMPTS.md` — запись о текущем промпте
+- Обновлён Memory Bank (activeContext.md, progress.md)
+- Статус: частично исправлено, гонка HTMX/Alpine остаётся потенциальной проблемой

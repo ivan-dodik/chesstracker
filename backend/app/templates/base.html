@@ -5,6 +5,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}Chess Tracker{% endblock %}</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <!-- CRITICAL: Register htmx:configRequest handler BEFORE htmx loads.
+       HTMX processes hx-trigger="load" elements via MutationObserver as the DOM is parsed.
+       If this handler isn't registered before HTMX loads, the Authorization header
+       won't be added to early HTMX requests (like favorites, top-rated on the dashboard). -->
+  <script>
+    document.addEventListener('htmx:configRequest', function(e) {
+      var token = localStorage.getItem('jwt_token');
+      if (token) {
+        e.detail.headers['Authorization'] = 'Bearer ' + token;
+      }
+    });
+    document.addEventListener('htmx:responseError', function(e) {
+      if (e.detail.xhr.status === 401 && localStorage.getItem('jwt_token')) {
+        localStorage.removeItem('jwt_token');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    });
+  </script>
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <!-- Alpine docs: extension (main.js) defer BEFORE Alpine, guaranteed order -->

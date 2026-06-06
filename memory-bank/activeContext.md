@@ -1,17 +1,23 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Проект полностью реализован. Исправлена ошибка запуска telegram-bot.
+Проект полностью реализован. Задокументирована проблема с циклическим редиректом после логина (см. BUGS.md).
 
 ## Последние изменения
 - Исправлена ошибка `AttributeError: 'NoneType' object has no attribute 'run_repeating'` при запуске telegram-bot
-- В `telegram-bot/pyproject.toml` добавлен extra `[job-queue]` для `python-telegram-bot`
+- Добавлен extra `[job-queue]` для `python-telegram-bot`
 - Перегенерирован `uv.lock`: добавлены apscheduler v3.11.2, tzdata v2026.2, tzlocal v5.3.1
-- Обновлены CHANGES.md, REPORT.md, Memory Bank
-- Выполнен коммит и пуш
+- Исправлена проблема root-файлов в Docker volumes (user: UID/GID)
+- Graceful shutdown бота при фейковом токене (is_token_valid, restart: "no")
+- Исправлена ошибка uv cache (Permission denied) — добавлен appuser в Dockerfile
+- Исправлены фронтенд-ошибки Alpine.js (порядок загрузки скриптов, defer, alpine:init)
+- **Исправлена проблема аутентификации (01:24)**: обработчик `htmx:responseError` теперь проверяет наличие токена, добавлено логирование
+- **Создан BUGS.md (02:20)**: полная документация проблемы циклического редиректа после логина с хронологией исправлений, анализом корневой причины и приоритетом дальнейших работ
 
 ## Следующие шаги
-Все задачи выполнены. Проект готов к сдаче.
+- Устранить гонку между HTMX `hx-trigger="load"` и Alpine.js `x-show` на дашборде (защищённые эндпоинты отправляют запросы до того, как Alpine скрыл секции для неаутентифицированных пользователей)
+- Альтернатива: заменить `hx-trigger="load"` на Alpine-управляемую загрузку для защищённых секций
+- Увеличить задержку перед редиректом после логина (100ms → 300ms) или перейти на Promise-based подход
 
 ## Активные решения и considerations
 - **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.
@@ -27,6 +33,7 @@
 - **GameRead**: расширен полями white_player_name, black_player_name
 - **TournamentStandings**: расширен полями wins, draws, losses
 - **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
+- **Проблема аутентификации**: Частично исправлена. Корневая причина — гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. Создан BUGS.md с полным анализом.
 
 ## Ссылки на модули
 

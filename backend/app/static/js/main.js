@@ -333,48 +333,18 @@ document.addEventListener('alpine:init', () => {
 
 // ============================================================
 // HTMX Configuration
+// NOTE: htmx:configRequest and htmx:responseError handlers are registered
+// in base.html BEFORE htmx loads, to ensure the Authorization header is added
+// to early HTMX requests (hx-trigger="load" elements processed via MutationObserver).
 // ============================================================
 
+// After HTMX swap, reinitialize components
+document.addEventListener('htmx:afterSwap', () => {
+  initComponents();
+});
+
+// Initial component init on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
-  // Auto-add Authorization header to all HTMX requests
-  document.body.addEventListener('htmx:configRequest', (e) => {
-    const token = Auth.getToken();
-    if (token) {
-      e.detail.headers['Authorization'] = `Bearer ${token}`;
-    }
-  });
-
-  // Handle HTMX errors globally
-  document.body.addEventListener('htmx:responseError', (e) => {
-    const status = e.detail.xhr.status;
-    const path = e.detail.requestConfig.path;
-
-    console.log(`[HTMX] Error ${status} for ${path}`);
-
-    if (status === 401) {
-      // Check if we have a token - if not, just ignore (user is not logged in)
-      const hasToken = Auth.getToken();
-
-      if (hasToken) {
-        // We have a token but got 401 - token might be invalid
-        console.warn('[HTMX] 401 with token present, clearing and redirecting');
-        Auth.clearToken();
-        window.location.href = '/login';
-      } else {
-        // No token - this is expected for public users
-        console.log('[HTMX] 401 without token - ignoring (public access)');
-      }
-    } else if (status === 403) {
-      console.warn('[HTMX] 403 Forbidden - insufficient permissions');
-    }
-  });
-
-  // After HTMX swap, reinitialize components
-  document.body.addEventListener('htmx:afterSwap', () => {
-    initComponents();
-  });
-
-  // Initial component init
   initComponents();
 });
 
