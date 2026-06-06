@@ -347,3 +347,26 @@ initialize memory bank
   - `docker-infra.md` — Docker Compose
 - Обновлены все 6 core-файлов Memory Bank со ссылками на module-файлы
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
+
+---
+
+## 2026-06-06 21:16 — M9: Telegram-bot
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Выполни следующий майлстоун из плана.
+```
+
+**Результат:**
+- Создан config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
+- Реализован bot.py: инициализация Application, регистрация хендлеров, job_queue для периодического polling
+- Созданы handlers/start.py: /start — приветственное сообщение и инструкция
+- Созданы handlers/subscribe.py: /subscribe и /unsubscribe с сохранением подписчиков в subscribers.json
+- Созданы services/api_client.py: HTTP-клиент для backend (get_active_tournaments, get_tournament_games)
+- Созданы services/notifier.py: периодический опрос активных турниров, отправка уведомлений подписанным чатам
+- Добавлены __init__.py в handlers/ и services/
+- Обновлён Dockerfile: копирование config.py
+- docker compose build telegram-bot успешен
+- CHANGES.md, PROMPTS.md, REPORT.md обновлены

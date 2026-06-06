@@ -1,7 +1,7 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-**M8: Frontend — фичи** завершён. Добавлен SSE-клиент с toast-уведомлениями. Аутентификация, избранное, CSV импорт/экспорт реализованы в M7. 20/20 тестов проходят, docker build успешен.
+**M9: Telegram-bot** завершён. Создан полноценный long-polling бот с командами /start, /subscribe, /unsubscribe и фоновым опросом активных турниров. Docker build успешен.
 
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
@@ -35,11 +35,17 @@
   - ✅ Избранное: кнопка ★ на профиле, список на дашборде
   - ✅ Экспорт CSV: кнопка на странице турнира
   - ✅ Импорт CSV: форма для админа на странице турнира
+- ✅ **M9: Telegram-bot**
+  - ✅ config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
+  - ✅ bot.py: инициализация Application, регистрация хендлеров, job_queue для polling
+  - ✅ handlers/start.py (/start — приветствие)
+  - ✅ handlers/subscribe.py (/subscribe, /unsubscribe с subscribers.json)
+  - ✅ services/api_client.py (HTTP-клиент для backend)
+  - ✅ services/notifier.py (периодический опрос, уведомления подписчикам)
+  - ✅ Dockerfile: копирование config.py
+  - ✅ docker compose build telegram-bot успешен
 
 ## Что осталось сделать (в порядке приоритета)
-
-### M9: Telegram-bot
-- ⬜ bot.py, handlers, api_client, notifier
 
 ### M10: Тестирование и CI
 - ⬜ GitHub Actions, pre-commit hook

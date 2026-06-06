@@ -1,20 +1,24 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M8: Frontend — фичи**. Добавлен SSE-клиент с toast-уведомлениями, flash-warning CSS. Аутентификация, избранное, CSV импорт/экспорт были реализованы в M7. 20/20 тестов проходят, docker build успешен.
+Завершён **M9: Telegram-bot**. Создан полноценный long-polling бот с командами /start, /subscribe, /unsubscribe и фоновым опросом активных турниров. Docker build успешен.
 
 ## Последние изменения
-- Создан SSE-клиент (`backend/app/static/js/sse.js`): EventSource к `/api/events`, уведомления о новых партиях, изменении результатов, обновлении рейтинга
-- SSE-клиент подключён в `base.html`
-- Добавлен CSS-стиль flash-warning
-- Защита роутов: 401 → редирект на `/login` через htmx:responseError
+- Создан config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
+- Реализован bot.py: инициализация Application, регистрация хендлеров, job_queue для периодического polling
+- Созданы handlers/start.py (/start — приветственное сообщение)
+- Созданы handlers/subscribe.py (/subscribe и /unsubscribe с subscribers.json)
+- Созданы services/api_client.py (HTTP-клиент для backend)
+- Созданы services/notifier.py (периодический опрос, уведомления подписчикам)
+- Обновлён Dockerfile: копирование config.py
+- docker compose build telegram-bot успешен
 - Обновлены CHANGES.md, PROMPTS.md, REPORT.md
 
 ## Следующие шаги (приоритетный порядок)
 1. ✅ **M7: Frontend — дашборд и детальные страницы** — выполнено
 2. ✅ **M8: Frontend — фичи** — выполнено
-3. **M9: Telegram-bot** (long-polling)
-4. **M10: Тестирование и CI** (GitHub Actions, ruff, pytest)
+3. ✅ **M9: Telegram-bot** — выполнено
+4. **M10: Тестирование и CI** (GitHub Actions, ruff, pytest, pre-commit hook)
 5. **M11: Финальная документация** (README.md, REPORT.md)
 
 ## Активные решения и considerations

@@ -13,7 +13,7 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev
 
 # Copy application code
-COPY bot.py ./
+COPY bot.py config.py ./
 COPY handlers/ ./handlers/
 COPY services/ ./services/
 

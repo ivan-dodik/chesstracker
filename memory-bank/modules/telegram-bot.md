@@ -1,40 +1,57 @@
 # Telegram Bot (`telegram-bot/`)
 
-## Status: **STUB** — not implemented yet (planned for M9)
+## Status: **IMPLEMENTED** — M9 completed
 
-## Current state
-- `bot.py` — entry point with `main()` that only logs "starting..."
-- `handlers/` — empty directory
-- `services/` — empty directory
-
-## Planned architecture (from IMPLEMENTATION_PLAN.md)
+## Architecture
 
 ### Entry point (`bot.py`)
-- Initialize `Application` (python-telegram-bot)
-- Register command handlers
-- Long-polling via `application.run_polling()` (not webhook)
+- Initializes `Application` (python-telegram-bot) with `TG_BOT_TOKEN`
+- Registers command handlers: `/start`, `/subscribe`, `/unsubscribe`
+- Sets up `job_queue` with `Notifier.check_for_updates` every 60 seconds
+- Runs long-polling via `application.run_polling()`
+
+### Configuration (`config.py`)
+- `Settings` class via pydantic-settings
+- `TG_BOT_TOKEN: str` — Telegram bot token (from .env)
+- `BACKEND_URL: str` — default `http://backend:8000`
 
 ### Handlers (`handlers/`)
-- `start.py` — `/start` command: welcome message
-- `subscribe.py` — `/subscribe`/`/unsubscribe`: manage chat subscriptions
+- **`start.py`** — `/start` command: sends welcome message with command list
+- **`subscribe.py`** — `/subscribe` and `/unsubscribe` commands:
+  - Subscriptions stored in `subscribers.json` file (JSON array of chat IDs)
+  - Functions: `subscribe_command`, `unsubscribe_command`, `get_subscribed_chats()`
+  - No database dependency — simple file-based persistence
 
 ### Services (`services/`)
-- `api_client.py` — `httpx.AsyncClient` for backend requests
-  - `GET /api/tournaments/active` — active tournaments
-  - `GET /api/tournaments/{id}/games/latest` — latest results
-- `notifier.py` — periodic polling of backend, sending notifications to subscribed chats
+- **`api_client.py`** — `ApiClient` class wrapping `httpx.AsyncClient`:
+  - `get_active_tournaments()` → `GET /api/tournaments?status=active`
+  - `get_tournament_games(tournament_id)` → `GET /api/tournaments/{id}/games`
+  - Lazy client initialization, timeout 10s
+- **`notifier.py`** — `Notifier` class for background polling:
+  - `check_for_updates()` called by job_queue every 60 seconds
+  - Tracks known game IDs in `_known_games: set[int]` to detect new games
+  - Formats notifications with HTML: tournament name, player names, results with chess emoji
+  - Sends messages to all subscribed chats via `bot.send_message()`
 
-### Config (planned: `config.py`)
-- `TG_BOT_TOKEN`, `BACKEND_URL` via pydantic-settings
-
-## Docker setup
-- `Dockerfile`: python:3.12-slim, uv, copies `bot.py` + handlers/ + services/
-- `docker-compose.yml`: depends_on backend, env_file
+### Docker
+- `Dockerfile`: python:3.12-slim, uv, copies `bot.py`, `config.py`, `handlers/`, `services/`
+- `docker-compose.yml`: depends on backend, uses env_file
 
 ## Integration with backend
-- **Long-polling**: telegram-bot polls backend REST API periodically
-- **No webhook**: simpler for local development (no public HTTPS URL needed)
+- **Long-polling**: bot polls backend REST API every 60 seconds
+- **No webhook**: suitable for local development (no public HTTPS URL needed)
+- **Data flow**: bot calls `GET /api/tournaments?status=active` → for each tournament calls `GET /api/tournaments/{id}/games` → compares with known IDs → sends notifications
+
+## Files
+- `telegram-bot/bot.py` — entry point
+- `telegram-bot/config.py` — Pydantic settings
+- `telegram-bot/handlers/__init__.py`
+- `telegram-bot/handlers/start.py` — /start handler
+- `telegram-bot/handlers/subscribe.py` — /subscribe, /unsubscribe handlers
+- `telegram-bot/services/__init__.py`
+- `telegram-bot/services/api_client.py` — backend HTTP client
+- `telegram-bot/services/notifier.py` — background polling notifier
 
 ## Links
-- → `modules/api-layer.md` (backend endpoints that bot will poll)
+- → `modules/api-layer.md` (backend endpoints that bot polls)
 - → `modules/docker-infra.md` (docker-compose service definition)
