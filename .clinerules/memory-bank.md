@@ -56,6 +56,21 @@ Create additional files/folders within memory-bank/ when they help organize:
 - Testing strategies
 - Deployment procedures
 
+## Установка агентских скиллов
+
+При установке новых скиллов (через `bunx skills` или `npx skills`) агент **обязан**:
+
+1. Добавить запись в `CHANGES.md` — дата, пакет(ы), количество скиллов
+2. Добавить запись в `PROMPTS.md` — контекст установки, назначение скиллов
+3. Добавить запись в `REPORT.md`:
+   - Раздел «История работы» — краткая запись
+   - Раздел «Ключевые проблемы и решения» — если возникли сложности
+4. Обновить Memory Bank:
+   - `techContext.md` — добавить упоминание скиллов в стек / инструменты разработки
+   - `activeContext.md` — отметить наличие скиллов как активное consideration
+   - `progress.md` — обновить список доступных инструментов
+5. Убедиться, что `skills-lock.json` закоммичен (не в `.gitignore`)
+
 ## Documentation Updates
 
 Memory Bank updates occur when:
@@ -63,5 +78,6 @@ Memory Bank updates occur when:
 2. After implementing significant changes
 3. When user requests with **update memory bank** (MUST review ALL files)
 4. When context needs clarification
+5. **When agent skills are installed or updated** (see "Установка агентских скиллов" above)
 
 REMEMBER: After every memory reset, I begin completely fresh. The Memory Bank is my only link to previous work. It must be maintained with precision and clarity, as my effectiveness depends entirely on its accuracy.

@@ -75,6 +75,20 @@
   3. Во все core-файлы Memory Bank добавлены ссылки на эти модули.
 - **Результат:** ✅ Теперь агент может найти любую информацию об эндпойнте, сервисе или модели не читая исходный код, а только открыв соответствующий module-файл.
 
+### 2026-06-06 — Установка скиллов не отражена в документации
+
+- **Суть:** После установки 5 пакетов агентских скиллов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills) информация об этом не была внесена в Memory Bank, PROMPTS.md, REPORT.md, .clinerules/ и IMPLEMENTATION_PLAN.md. Запись была сделана только в CHANGES.md.
+- **Причина:** Установка скиллов не была частью основного плана реализации (M1–M11) и выполнялась как отдельная задача, при которой агент следовал правилу `git_commit.md` (записать изменения), но не обновил остальные документы.
+- **Решение:**
+  1. Добавлена запись в PROMPTS.md — описание промпта и результата установки скиллов.
+  2. Добавлена запись в REPORT.md — проблема и её решение, история работы.
+  3. Обновлён Memory Bank (techContext.md, activeContext.md, progress.md) — добавлен раздел о скиллах.
+  4. Добавлено правило в .clinerules/memory-bank.md — при установке новых скиллов обновлять документацию.
+  5. Обновлён IMPLEMENTATION_PLAN.md — добавлен шаг «Установка скиллов и документирование».
+- **Результат:** ✅ Скиллы документально зафиксированы во всех обязательных файлах проекта. Агент в будущих сессиях сможет узнать о доступных скиллах из Memory Bank.
+
+---
+
 ## Удачные и неудачные шаги
 
 ### ✅ Удачно
@@ -297,3 +311,5 @@
 | 2026-06-06 21:06 | **M8: Frontend — фичи** — SSE-клиент (sse.js), toast-уведомления, CSS flash-warning; защита роутов (401 → /login); аутентификация, избранное, CSV импорт/экспорт (реализованы в M7); обновлены CHANGES.md, PROMPTS.md, REPORT.md |
 | 2026-06-06 21:16 | **M9: Telegram-bot** — config.py (Pydantic BaseSettings), bot.py (Application + job_queue), handlers (start, subscribe/unsubscribe с subscribers.json), services (api_client, notifier с периодическим polling), Dockerfile обновлён; docker compose build telegram-bot успешен |
 | 2026-06-06 21:27 | **M10: Тестирование и CI** — исправлены ошибки ruff в backend (122→0) и telegram-bot (12→0); созданы .pre-commit-config.yaml и .github/workflows/ci.yml; ruff check + pytest (20/20) проходят |
+| 2026-06-06 21:49 | **Установка агентских скиллов Cline** — установлены 5 пакетов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills); создан skills-lock.json; обновлён .gitignore |
+| 2026-06-06 21:57 | **Документирование скиллов** — добавлена запись об установке скиллов в PROMPTS.md, REPORT.md, Memory Bank, .clinerules/, IMPLEMENTATION_PLAN.md |

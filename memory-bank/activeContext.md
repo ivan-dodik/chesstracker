@@ -26,6 +26,7 @@
 - **Alpine.js**: компоненты ratingChart, overallStatsChart, playerDetail, tournamentDetail, headToHead, accordion
 - **GameRead**: расширен полями white_player_name, black_player_name
 - **TournamentStandings**: расширен полями wins, draws, losses
+- **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
 
 ## Ссылки на модули
 

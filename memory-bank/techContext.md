@@ -146,6 +146,14 @@ dependencies = [
 - **Тесты**: `pytest -v` (async через pytest-asyncio)
 - **Миграции**: `alembic revision --autogenerate` / `alembic upgrade head`
 - **Docker**: `docker compose up --build`
+- **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов):
+  - `mattpocock/skills` (29) — архитектура, code review, TDD, диагностика, планирование
+  - `anthropics/skills` (18) — фронтенд-дизайн, документы, тестирование, PDF, PPTX
+  - `obra/superpowers` (14) — процессы разработки, дебаггинг, code review, parallel agents
+  - `supabase/agent-skills` (2) — PostgreSQL best practices
+  - `xixu-me/skills` (12) — GitHub Actions, безопасность, хостинг, CLI утилиты
+  - Файл конфигурации: `skills-lock.json` (закоммичен)
+  - Справочная информация: см. `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»)
 
 ## Ссылки на модули
 

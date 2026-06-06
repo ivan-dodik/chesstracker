@@ -391,6 +391,23 @@ initialize memory bank
 
 ---
 
+## 2026-06-06 21:49 — Установка агентских скиллов Cline
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Установи наборы скиллов для Cline: mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills
+```
+
+**Результат:**
+- Установлены 5 пакетов скиллов: mattpocock/skills (29), anthropics/skills (18), obra/superpowers (14), supabase/agent-skills (2), xixu-me/skills (12)
+- Создан `skills-lock.json` с хешами всех скиллов
+- Обновлён `.gitignore` для игнорирования `.agents/`
+- Скиллы доступны агенту через `use_skill` в следующих категориях: архитектура, code review, TDD, диагностика, планирование, фронтенд-дизайн, документы, тестирование, дебаггинг, безопасность, GitHub Actions, хостинг
+
+---
+
 ## 2026-06-06 21:34 — M11: Финальная документация
 
 **Режим:** Act
