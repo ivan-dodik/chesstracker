@@ -30,11 +30,11 @@ async def create_game(
     tournament_id: int,
     data: GameCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> GameRead:
     """Create a new game (admin only)."""
     data.tournament_id = tournament_id
-    return await game_service.create_game(db, data)
+    return await game_service.create_game(db, data, user_id=current_user.id)
 
 
 @router.put("/api/games/{game_id}", response_model=GameRead)
@@ -42,10 +42,10 @@ async def update_game_result(
     game_id: int,
     data: GameResult,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> GameRead:
     """Update game result (admin only)."""
-    game = await game_service.update_game_result(db, game_id, data)
+    game = await game_service.update_game_result(db, game_id, data, user_id=current_user.id)
     if not game:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")
     return game
@@ -55,9 +55,9 @@ async def update_game_result(
 async def delete_game(
     game_id: int,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> None:
     """Delete a game (admin only)."""
-    deleted = await game_service.delete_game(db, game_id)
+    deleted = await game_service.delete_game(db, game_id, user_id=current_user.id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")

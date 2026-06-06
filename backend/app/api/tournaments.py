@@ -30,10 +30,10 @@ async def list_tournaments(
 async def create_tournament(
     data: TournamentCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> TournamentRead:
     """Create a new tournament (admin only)."""
-    return await tournament_service.create_tournament(db, data)
+    return await tournament_service.create_tournament(db, data, user_id=current_user.id)
 
 
 @router.get("/{tournament_id}", response_model=TournamentRead)
@@ -53,10 +53,10 @@ async def update_tournament(
     tournament_id: int,
     data: TournamentCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> TournamentRead:
     """Update tournament details (admin only)."""
-    tournament = await tournament_service.update_tournament(db, tournament_id, data)
+    tournament = await tournament_service.update_tournament(db, tournament_id, data, user_id=current_user.id)
     if not tournament:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tournament not found")
     return tournament
@@ -66,10 +66,10 @@ async def update_tournament(
 async def delete_tournament(
     tournament_id: int,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> None:
     """Delete a tournament (admin only)."""
-    deleted = await tournament_service.delete_tournament(db, tournament_id)
+    deleted = await tournament_service.delete_tournament(db, tournament_id, user_id=current_user.id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tournament not found")
 

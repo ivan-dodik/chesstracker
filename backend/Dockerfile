@@ -14,6 +14,7 @@ RUN uv sync --frozen --no-dev
 
 # Copy application code
 COPY app/ ./app/
+COPY tests/ ./tests/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
 

@@ -33,10 +33,10 @@ async def list_players(
 async def create_player(
     data: PlayerCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> PlayerRead:
     """Create a new player (admin only)."""
-    return await player_service.create_player(db, data)
+    return await player_service.create_player(db, data, user_id=current_user.id)
 
 
 @router.get("/{player_id}", response_model=PlayerRead)
@@ -56,10 +56,10 @@ async def update_player(
     player_id: int,
     data: PlayerCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> PlayerRead:
     """Update player details (admin only)."""
-    player = await player_service.update_player(db, player_id, data)
+    player = await player_service.update_player(db, player_id, data, user_id=current_user.id)
     if not player:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player not found")
     return player
@@ -69,9 +69,9 @@ async def update_player(
 async def delete_player(
     player_id: int,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(get_current_admin),
+    current_user: User = Depends(get_current_admin),
 ) -> None:
     """Delete a player (admin only)."""
-    deleted = await player_service.delete_player(db, player_id)
+    deleted = await player_service.delete_player(db, player_id, user_id=current_user.id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Player not found")

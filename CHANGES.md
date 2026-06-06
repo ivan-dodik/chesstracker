@@ -75,3 +75,22 @@
 - Docker build: успешен (backend + telegram-bot)
 - Все созданные ранее файлы M4 (deps.py, auth.py, players.py, tournaments.py, games.py, router.py, main.py, сервисы, схемы) прошли проверку
 - Файлы: backend/tests/conftest.py
+
+## 2026-06-06 16:58
+### M5: Backend — API: специфичные фичи — выполнено
+- Созданы сервисы и API для всех специфичных фич:
+  - `rating_service.py` + `api/ratings.py` — история рейтинга игрока (GET /api/players/{id}/rating-history) с фильтром по дате
+  - `favorite_service.py` + `api/favorites.py` — CRUD избранного (GET, POST, DELETE /api/favorites/{player_id})
+  - `stats_service.py` + `api/stats.py` — head-to-head, top-rated, overall stats
+  - `sse_service.py` + `api/sse.py` — Server-Sent Events (GET /api/events) с поддержкой keepalive
+  - `export_service.py` + `api/export.py` — экспорт турнирной таблицы в CSV (GET /api/tournaments/{id}/export/csv)
+  - `import_service.py` + `api/import_route.py` — импорт результатов из CSV (POST /api/tournaments/{id}/import/csv, admin only) с поддержкой двух форматов
+  - `activity_log_service.py` + `api/activity_log.py` — лог активности с фильтрацией (admin only)
+- Интегрировано логирование ActivityLog во все CRUD-операции (players, tournaments, games) с отслеживанием user_id
+- Интегрирована публикация SSE-событий при создании/обновлении партий
+- Обновлены `services/__init__.py` и `api/router.py` — добавлены все новые модули
+- Исправлен `Dockerfile` — добавлено копирование `tests/` директории
+- Написаны тесты (12 новых): test_ratings.py (3), test_stats.py (4), test_favorites.py (5)
+- Итоговый результат: 20/20 тестов проходят
+- Docker build: успешен
+- Файлы: backend/app/services/rating_service.py, backend/app/api/ratings.py, backend/app/services/favorite_service.py, backend/app/api/favorites.py, backend/app/services/stats_service.py, backend/app/api/stats.py, backend/app/services/sse_service.py, backend/app/api/sse.py, backend/app/services/export_service.py, backend/app/api/export.py, backend/app/services/import_service.py, backend/app/api/import_route.py, backend/app/services/activity_log_service.py, backend/app/api/activity_log.py, backend/app/services/__init__.py, backend/app/api/router.py, backend/Dockerfile, backend/tests/test_ratings.py, backend/tests/test_stats.py, backend/tests/test_favorites.py
