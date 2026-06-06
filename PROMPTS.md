@@ -729,3 +729,26 @@ initialize memory bank
 - Создана директория tests/services/ с conftest.py (SQLite fixtures: db_session, sample_player, sample_tournament, sample_user, sample_admin)
 - Созданы 8 тестовых файлов: test_player_service.py, test_tournament_service.py, test_game_service.py, test_rating_service.py, test_stats_service.py, test_favorite_service.py, test_activity_log_service.py, test_export_service.py
 - 21 тест: coverage всех основных сервисных функций
+
+---
+
+## 2026-06-07 09:15 — Исправление ошибки "Ошибка загрузки данных" на странице турниров
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Я обнаружил ошибку: на странице с турнирами нет информации о турнирах, вместо этого в поле пишет "Ошибка загрузки данных"
+```
+
+**План (Plan mode):**
+- Проанализировать шаблон `tournaments/list.html` — механизм загрузки данных через HTMX + JS
+- Проверить эндпоинт `/api/tournaments` в `tournaments.py`
+- Проверить сервис `tournament_service.py`
+- Проверить `main.js` на наличие используемых функций
+
+**Результат:**
+- Найдена причина: функция `renderTournamentsTable` вызывает несуществующую `escapeHtml()` → `ReferenceError` → catch → "Ошибка загрузки данных"
+- Исправление: добавлена функция `escapeHtml()` в `main.js` (безопасное экранирование через `textContent` + `innerHTML`)
+- Обновлены CHANGES.md, REPORT.md
+- Затронутые файлы: `backend/app/static/js/main.js`
