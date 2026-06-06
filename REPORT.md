@@ -75,6 +75,17 @@
   3. Во все core-файлы Memory Bank добавлены ссылки на эти модули.
 - **Результат:** ✅ Теперь агент может найти любую информацию об эндпойнте, сервисе или модели не читая исходный код, а только открыв соответствующий module-файл.
 
+### 2026-06-06 22:26 — Code Review и архитектурный анализ
+
+- **Суть:** Проведён формальный code review (скилл `requesting-code-review`) и архитектурный анализ (скилл `improve-codebase-architecture`). Выявлены критические, важные и минорные проблемы.
+- **Найденные проблемы (см. подробный отчёт [SECURITY_AUDIT.md](SECURITY_AUDIT.md)):**
+  - **Critical (3):** Default SECRET_KEY, N+1 запросы, CSV без лимита
+  - **Important (3):** CORS "*", дублирование standings, тесты на test.db
+  - **Minor (3):** SSE без auth, ActivityLog JSON, rate limiting
+  - **Architecture (3):** Shallow CRUD, rating engine coupled to DB, missing tests
+- **Решение:** Все Critical и Important исправлены. Minor задокументированы для будущих итераций.
+- **Результат:** ✅ Создан `SECURITY_AUDIT.md` с полным отчётом. 20/20 тестов проходят. ruff clean.
+
 ### 2026-06-06 — Установка скиллов не отражена в документации
 
 - **Суть:** После установки 5 пакетов агентских скиллов (mattpocock/skills, anthropics/skills, obra/superpowers, supabase/agent-skills, xixu-me/skills) информация об этом не была внесена в Memory Bank, PROMPTS.md, REPORT.md, .clinerules/ и IMPLEMENTATION_PLAN.md. Запись была сделана только в CHANGES.md.
