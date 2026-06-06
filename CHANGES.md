@@ -45,3 +45,10 @@
 - Созданы заглушки: `backend/app/main.py` (FastAPI с /health), `telegram-bot/bot.py`
 - Проверена сборка: `docker compose build` успешен (backend + telegram-bot образы построены)
 - Файлы: backend/pyproject.toml, backend/Dockerfile, backend/app/main.py, backend/app/__init__.py, backend/app/core/__init__.py, backend/app/models/__init__.py, backend/app/schemas/__init__.py, backend/app/api/__init__.py, backend/app/services/__init__.py, backend/tests/__init__.py, telegram-bot/pyproject.toml, telegram-bot/Dockerfile, telegram-bot/bot.py, .env.example, .env, docker-compose.yml, docker-compose.override.yml
+
+## 2026-06-06 16:24
+### Дополнение: явное обновление CHANGES.md, PROMPTS.md, REPORT.md в конце каждого майлстоуна
+- Обновлён .clinerules/implementation_plan.md — п.4 дополнен явными шагами обновления CHANGES.md и PROMPTS.md в конце каждого майлстоуна (ранее был только REPORT.md)
+- В IMPLEMENTATION_PLAN.md в каждом майлстоуне M2–M10 добавлен отдельный чекмак: «Обновить CHANGES.md, PROMPTS.md, REPORT.md — зафиксировать изменения, промпты и историю работы по M*»
+- Исправлено форматирование M11: проверка PROMPTS.md и CHANGES.md вынесена из вложенности REPORT.md на верхний уровень
+- Файлы: .clinerules/implementation_plan.md, IMPLEMENTATION_PLAN.md
