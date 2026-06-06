@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Турнир — Chess Tracker{% endblock %}
+
+{% block content %}
+<div x-data="tournamentDetail({{ tournament_id }})" x-init="init()">
+  <!-- Loading State -->
+  <div x-show="!tournament" style="text-align:center;padding:3rem;">
+    <div class="spinner" style="width:2rem;height:2rem;"></div>
+    <p style="margin-top:1rem;color:var(--color-text-light);">Загрузка...</p>
+  </div>
+
+  <template x-if="tournament">
+    <div>
+      <!-- Tournament Header -->
+      <div class="page-header">
+        <div>
+          <h1 x-text="tournament.name"></h1>
+          <div class="tournament-meta" style="margin-top:0.5rem;color:var(--color-text-light);">
+            <span x-text="'📅 ' + formatDate(tournament.start_date) + ' — ' + formatDate(tournament.end_date)"></span>
+            <span x-show="tournament.location" style="margin-left:1rem;" x-text="'📍 ' + tournament.location"></span>
+            <span style="margin-left:1rem;">
+              <span class="badge" :class="tournament.status === 'active' ? 'badge-active' : 'badge-completed'" x-text="tournament.status === 'active' ? 'Активен' : 'Завершён'"></span>
+            </span>
+            <span style="margin-left:1rem;" x-text="'🎯 ' + tournament.type"></span>
+            <span style="margin-left:1rem;" x-text="'🔢 ' + tournament.rounds + ' туров'"></span>
+          </div>
+        </div>
+        <div class="tournament-header-actions">
+          <a :href="'/api/tournaments/' + tournament.id + '/export/csv'" class="btn btn-success" download>
+            📥 Экспорт CSV
+          </a>
+        </div>
+      </div>
+
+      <!-- Standings -->
+      <div class="card">
+        <h3 class="card-header">🏆 Турнирная таблица</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Игрок</th>
+                <th>Очки</th>
+                <th>Победы</th>
+                <th>Ничьи</th>
+                <th>Поражения</th>
+              </tr>
+            </thead>
+            <tbody id="standings-body">
+              <tr><td colspan="6" style="text-align:center;padding:2rem;"><div class="spinner"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Games by Round (Accordion) -->
+      <div class="card">
+        <h3 class="card-header">🎮 Партии по турам</h3>
+        <div id="games-accordion">
+          <div style="text-align:center;padding:1.5rem;">
+            <div class="spinner"></div>
+            <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- CSV Import (admin only) -->
+      <div class="card" x-show="Auth.isAdmin()">
+        <h3 class="card-header">📤 Импорт CSV</h3>
+        <form x-ref="importForm" @submit.prevent="importCSV()" enctype="multipart/form-data">
+          <div class="form-group">
+            <label>Выберите CSV-файл</label>
+            <input type="file" class="form-control" accept=".csv" @change="file = $event.target.files[0]">
+            <p style="font-size:0.8125rem;color:var(--color-text-light);margin-top:0.375rem;">
+              Формат: игрок, тур, соперник, результат (1-0, 0-1, ½-½)
+            </p>
+          </div>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary" :disabled="!file || importing">
+              <span x-text="importing ? 'Загрузка...' : 'Импортировать CSV'"></span>
+            </button>
+          </div>
+          <div x-show="importMessage" :class="'flash-message flash-' + importType" style="margin-top:1rem;position:static;" x-text="importMessage"></div>
+        </form>
+      </div>
+    </div>
+  </template>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('tournamentDetail', (tournamentId) => ({
+      tournamentId,
+      tournament: null,
+      standings: [],
+      gamesByRound: {},
+      file: null,
+      importing: false,
+      importMessage: '',
+      importType: 'info',
+
+      async init() {
+        await this.loadTournament();
+        await this.loadStandings();
+        await this.loadGames();
+      },
+
+      async loadTournament() {
+        try {
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}`);
+          this.tournament = await resp.json();
+        } catch(e) {
+          console.error('Failed to load tournament', e);
+        }
+      },
+
+      async loadStandings() {
+        try {
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/standings`);
+          this.standings = await resp.json();
+          this.renderStandings();
+        } catch(e) {
+          console.error('Failed to load standings', e);
+        }
+      },
+
+      renderStandings() {
+        const tbody = document.getElementById('standings-body');
+        if (!tbody) return;
+        if (!this.standings.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--color-text-light);">Нет данных</td></tr>';
+          return;
+        }
+        let html = '';
+        this.standings.forEach((s, i) => {
+          html += `<tr>
+            <td>${i + 1}</td>
+            <td><a href="/players/${s.player_id}">${s.player_name}</a></td>
+            <td><strong>${s.points}</strong></td>
+            <td>${s.wins}</td>
+            <td>${s.draws}</td>
+            <td>${s.losses}</td>
+          </tr>`;
+        });
+        tbody.innerHTML = html;
+      },
+
+      async loadGames() {
+        try {
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/games?per_page=200`);
+          const data = await resp.json();
+          const games = data.items || [];
+          this.gamesByRound = {};
+          games.forEach(g => {
+            const round = g.round || 1;
+            if (!this.gamesByRound[round]) this.gamesByRound[round] = [];
+            this.gamesByRound[round].push(g);
+          });
+          this.renderGamesAccordion();
+        } catch(e) {
+          console.error('Failed to load games', e);
+        }
+      },
+
+      renderGamesAccordion() {
+        const container = document.getElementById('games-accordion');
+        if (!container) return;
+        const rounds = Object.keys(this.gamesByRound).sort((a, b) => a - b);
+
+        if (!rounds.length) {
+          container.innerHTML = '<p style="color:var(--color-text-light);text-align:center;">Партии не найдены</p>';
+          return;
+        }
+
+        let html = '';
+        rounds.forEach((round, idx) => {
+          const games = this.gamesByRound[round];
+          html += `<div class="accordion-item">
+            <div class="accordion-header" @click="toggleAccordion(${idx})" style="cursor:pointer;padding:0.75rem 1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:0.25rem;display:flex;justify-content:space-between;align-items:center;">
+              <strong>Тур ${round}</strong>
+              <span x-ref="arrow-${idx}" style="transition:transform 0.2s;">▶</span>
+            </div>
+            <div x-ref="panel-${idx}" style="display:none;padding:0.75rem 1rem;">
+              <table style="font-size:0.875rem;">
+                <tbody>
+                  ${games.map(g => {
+                    const result = g.result || '—';
+                    return `<tr>
+                      <td><a href="/players/${g.white_player_id}">${g.white_player_name || '?'}</a></td>
+                      <td style="text-align:center;padding:0 0.75rem;font-weight:600;">${result}</td>
+                      <td><a href="/players/${g.black_player_id}">${g.black_player_name || '?'}</a></td>
+                    </tr>`;
+                  }).join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>`;
+        });
+        container.innerHTML = html;
+
+        // Bind accordion toggles after Alpine processes
+        this.$nextTick(() => {
+          rounds.forEach((_, idx) => {
+            const header = container.querySelectorAll('.accordion-item')[idx]?.querySelector('.accordion-header');
+            if (header) {
+              header.addEventListener('click', () => this.toggleAccordion(idx));
+            }
+          });
+        });
+      },
+
+      toggleAccordion(idx) {
+        const panel = this.$refs['panel-' + idx];
+        const arrow = this.$refs['arrow-' + idx];
+        if (!panel) return;
+        if (panel.style.display === 'none' || !panel.style.display) {
+          panel.style.display = 'block';
+          if (arrow) arrow.style.transform = 'rotate(90deg)';
+        } else {
+          panel.style.display = 'none';
+          if (arrow) arrow.style.transform = '';
+        }
+      },
+
+      async importCSV() {
+        if (!this.file) return;
+        this.importing = true;
+        this.importMessage = '';
+
+        const formData = new FormData();
+        formData.append('file', this.file);
+
+        try {
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/import/csv`, {
+            method: 'POST',
+            headers: Auth.getAuthHeaders(),
+            body: formData,
+          });
+          if (resp.ok) {
+            const result = await resp.json();
+            this.importMessage = `Импортировано: ${result.imported || 0} партий`;
+            this.importType = 'success';
+            // Reload standings and games
+            setTimeout(() => { this.loadStandings(); this.loadGames(); }, 500);
+          } else {
+            const err = await resp.json();
+            this.importMessage = err.detail || 'Ошибка импорта';
+            this.importType = 'error';
+          }
+        } catch(e) {
+          this.importMessage = 'Ошибка сети';
+          this.importType = 'error';
+        } finally {
+          this.importing = false;
+        }
+      }
+    }));
+  });
+</script>
+{% endblock %}

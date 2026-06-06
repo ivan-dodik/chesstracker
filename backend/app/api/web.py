@@ -47,7 +47,19 @@ async def players_list(request: Request) -> HTMLResponse:
     return TemplateResponse("players/list.html", {"request": request})
 
 
+@router.get("/players/{player_id}", response_class=HTMLResponse, include_in_schema=False)
+async def player_detail(request: Request, player_id: int) -> HTMLResponse:
+    """Player detail page."""
+    return TemplateResponse("players/detail.html", {"request": request, "player_id": player_id})
+
+
 @router.get("/tournaments", response_class=HTMLResponse, include_in_schema=False)
 async def tournaments_list(request: Request) -> HTMLResponse:
     """Tournaments list page."""
     return TemplateResponse("tournaments/list.html", {"request": request})
+
+
+@router.get("/tournaments/{tournament_id}", response_class=HTMLResponse, include_in_schema=False)
+async def tournament_detail(request: Request, tournament_id: int) -> HTMLResponse:
+    """Tournament detail page."""
+    return TemplateResponse("tournaments/detail.html", {"request": request, "tournament_id": tournament_id})

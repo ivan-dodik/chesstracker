@@ -46,3 +46,6 @@ class TournamentStandings(BaseModel):
     player_name: str
     points: float
     games_played: int
+    wins: int = 0
+    draws: int = 0
+    losses: int = 0

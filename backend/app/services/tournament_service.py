@@ -125,6 +125,9 @@ async def get_standings(db: AsyncSession, tournament_id: int) -> list[dict]:
 
     points: dict[int, float] = defaultdict(float)
     games_played: dict[int, int] = defaultdict(int)
+    wins: dict[int, int] = defaultdict(int)
+    draws: dict[int, int] = defaultdict(int)
+    losses: dict[int, int] = defaultdict(int)
 
     for game in games:
         if not game.result:
@@ -134,11 +137,17 @@ async def get_standings(db: AsyncSession, tournament_id: int) -> list[dict]:
 
         if game.result == "1-0":
             points[game.white_player_id] += 1.0
+            wins[game.white_player_id] += 1
+            losses[game.black_player_id] += 1
         elif game.result == "0-1":
             points[game.black_player_id] += 1.0
+            wins[game.black_player_id] += 1
+            losses[game.white_player_id] += 1
         else:  # ½-½
             points[game.white_player_id] += 0.5
             points[game.black_player_id] += 0.5
+            draws[game.white_player_id] += 1
+            draws[game.black_player_id] += 1
 
     # Get player names
     player_ids = set(points.keys()) | set(games_played.keys())
@@ -152,6 +161,9 @@ async def get_standings(db: AsyncSession, tournament_id: int) -> list[dict]:
                 "player_name": player.name,
                 "points": points.get(pid, 0.0),
                 "games_played": games_played.get(pid, 0),
+                "wins": wins.get(pid, 0),
+                "draws": draws.get(pid, 0),
+                "losses": losses.get(pid, 0),
             })
 
     # Sort by points descending

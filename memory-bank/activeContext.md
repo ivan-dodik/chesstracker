@@ -1,24 +1,19 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M6: Frontend — базовая структура и навигация**. Созданы все HTML-шаблоны, CSS, JavaScript и веб-роуты. 4 страницы (дашборд, логин, игроки, турниры) возвращают HTTP 200.
+Завершён **M7: Frontend — дашборд и детальные страницы**. Добавлены графики Chart.js на дашборд, профили игроков (рейтинг, статистика, head-to-head, избранное), детали турниров (standings, партии по турам, CSV импорт/экспорт). 20/20 тестов проходят, docker build успешен.
 
 ## Последние изменения
 - Обновлён Memory Bank: созданы файлы описания модулей в `memory-bank/modules/`
 - Core-файлы Memory Bank дополнены ссылками на module-файлы
+- **M7: Frontend — дашборд и детальные страницы** — завершён
 
 ## Следующие шаги (приоритетный порядок)
-1. ✅ **M1: Архитектура и планирование** — выполнено
-2. ✅ **M2: Окружение и Docker** — выполнено
-3. ✅ **M3: Backend — модели и БД** — выполнено
-4. ✅ **M4: Backend — API: аутентификация и базовые CRUD** — выполнено
-5. ✅ **M5: Backend — API: специфичные фичи** — выполнено
-6. ✅ **M6: Frontend — базовая структура и навигация** (Jinja2, HTMX) — выполнено
-7. **M7: Frontend — дашборд и детальные страницы** (Chart.js, Alpine.js)
-8. **M8: Frontend — фичи** (избранное, SSE, CSV, аутентификация)
-9. **M9: Telegram-bot** (long-polling)
-10. **M10: Тестирование и CI** (GitHub Actions, ruff, pytest)
-11. **M11: Финальная документация** (README.md, REPORT.md)
+1. ✅ **M7: Frontend — дашборд и детальные страницы** — выполнено
+2. **M8: Frontend — фичи** (избранное на фронте, SSE-клиент, CSV, аутентификация)
+3. **M9: Telegram-bot** (long-polling)
+4. **M10: Тестирование и CI** (GitHub Actions, ruff, pytest)
+5. **M11: Финальная документация** (README.md, REPORT.md)
 
 ## Активные решения и considerations
 - **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.
@@ -29,6 +24,10 @@
 - **ActivityLog**: JSON-поля (old_values, new_values) хранятся как сериализованные строки в SQLite/PostgreSQL
 - **Jinja2**: используется кастомный Environment с cache_size=0 (обход несовместимости Jinja2 3.1.x со Starlette Jinja2Templates)
 - **Шаблоны**: не используют Flask-специфичные функции (get_flashed_messages заменён на JS-управление flash-сообщениями)
+- **Chart.js**: подключён через CDN (chart.umd.min.js v4.4.7), используется для line chart (история рейтинга) и doughnut chart (общая статистика)
+- **Alpine.js**: компоненты ratingChart, overallStatsChart, playerDetail, tournamentDetail, headToHead, accordion
+- **GameRead**: расширен полями white_player_name, black_player_name
+- **TournamentStandings**: расширен полями wins, draws, losses
 
 ## Ссылки на модули
 

@@ -23,6 +23,8 @@ class GameRead(BaseModel):
     round: int
     white_player_id: int
     black_player_id: int
+    white_player_name: Optional[str] = None
+    black_player_name: Optional[str] = None
     result: Optional[str] = None
     played_at: Optional[datetime] = None
     created_at: datetime

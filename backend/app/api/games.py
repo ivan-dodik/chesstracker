@@ -22,7 +22,7 @@ async def list_games(
     games, total = await game_service.get_games_by_tournament(
         db, tournament_id=tournament_id, page=page, per_page=per_page,
     )
-    return {"items": games, "total": total, "page": page, "per_page": per_page}
+    return {"items": [GameRead(**g) for g in games], "total": total, "page": page, "per_page": per_page}
 
 
 @router.post("/api/tournaments/{tournament_id}/games", response_model=GameRead, status_code=status.HTTP_201_CREATED)

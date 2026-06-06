@@ -142,6 +142,24 @@
 
 **Результат:** 4 страницы возвращают HTTP 200, 20/20 тестов проходят
 
+## Итоги майлстоуна M7: Frontend — дашборд и детальные страницы
+
+**Статус:** ✅ Завершён
+
+**Создано/изменено:**
+- Добавлены веб-роуты: `/players/{id}`, `/tournaments/{id}`
+- Chart.js CDN подключён в `base.html`
+- Дашборд: графики рейтинга (line chart) и статистики (doughnut chart) с Chart.js + Alpine.js
+- `players/detail.html` — профиль игрока: рейтинг, статистика wins/losses/draws, график рейтинга, head-to-head, избранное
+- `tournaments/detail.html` — детали турнира: информация, таблица standings с wins/draws/losses, партии по турам (аккордеон), экспорт CSV, импорт CSV для админа
+- TournamentStandings: добавлены wins, draws, losses
+- GameRead: добавлены white_player_name, black_player_name
+- game_service: обогащение партий именами игроков
+- tournament_service: подсчёт wins/draws/losses в standings
+- CSS-стили для страниц игрока, турнира, графиков, h2h
+
+**Результат:** 20/20 тестов проходят, docker build успешен
+
 ## История работы
 
 | Дата/Время | Событие |
@@ -163,3 +181,4 @@
 | 2026-06-06 16:58 | **M5: Backend — API: специфичные фичи** — rating, favorite, stats, SSE, export/import CSV, activity log сервисы и API; ActivityLog интегрирован во все CRUD; SSE-события при создании/обновлении партий; Dockerfile исправлен; 12 новых тестов; 20/20 passed; коммит `6f16a94` |
 | 2026-06-06 20:24 | **M6: Frontend — базовая структура и навигация** — style.css, main.js, base.html, login.html, index.html, players/list.html, tournaments/list.html, partials, web.py; исправлены Jinja2 cache issue и get_flashed_messages; 4 страницы HTTP 200; 20/20 тестов passed |
 | 2026-06-06 20:42 | **Memory Bank расширен module-файлами** — созданы 11 файлов описания модулей в `memory-bank/modules/` для быстрого поиска информации агентом; обновлены core-файлы со ссылками |
+| 2026-06-06 20:58 | **M7: Frontend — дашборд и детальные страницы** — Chart.js дашборд, профили игроков, детали турниров, head-to-head, аккордеон партий, CSV импорт/экспорт; обновлены схемы GameRead и TournamentStandings; 20/20 тестов passed; docker build успешен |

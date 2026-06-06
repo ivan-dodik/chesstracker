@@ -1,0 +1,245 @@
+{% extends "base.html" %}
+
+{% block title %}Игрок — Chess Tracker{% endblock %}
+
+{% block content %}
+<div x-data="playerDetail({{ player_id }})" x-init="init()">
+  <!-- Loading State -->
+  <div x-show="!player" style="text-align:center;padding:3rem;">
+    <div class="spinner" style="width:2rem;height:2rem;"></div>
+    <p style="margin-top:1rem;color:var(--color-text-light);">Загрузка...</p>
+  </div>
+
+  <template x-if="player">
+    <div>
+      <!-- Player Header -->
+      <div class="page-header">
+        <div class="player-header-info">
+          <h1 x-text="player.name"></h1>
+          <div class="player-meta">
+            <span class="stat-value" x-text="player.rating"></span>
+            <span class="stat-label">Рейтинг</span>
+            <span x-show="player.city" style="margin-left:1rem;color:var(--color-text-light);" x-text="'🏙 ' + player.city"></span>
+          </div>
+        </div>
+        <div class="player-header-actions">
+          <button class="btn btn-outline" @click="toggleFavorite()" x-text="isFavorite ? '★ В избранном' : '☆ В избранное'"></button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="player-stats-grid">
+        <div class="card stat-card">
+          <div class="stat-value" style="color:var(--color-success);" x-text="overallStats.wins || '—'"></div>
+          <div class="stat-label">Победы</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" style="color:var(--color-accent);" x-text="overallStats.losses || '—'"></div>
+          <div class="stat-label">Поражения</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" style="color:var(--color-warning);" x-text="overallStats.draws || '—'"></div>
+          <div class="stat-label">Ничьи</div>
+        </div>
+        <div class="card stat-card">
+          <div class="stat-value" style="color:var(--color-info);" x-text="overallStats.win_rate != null ? overallStats.win_rate + '%' : '—'"></div>
+          <div class="stat-label">% Побед</div>
+        </div>
+      </div>
+
+      <!-- Rating History Chart -->
+      <div class="card">
+        <h3 class="card-header">📈 История рейтинга</h3>
+        <div class="chart-container" style="position:relative;height:300px;">
+          <canvas x-ref="ratingChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Head-to-Head -->
+      <div class="card">
+        <h3 class="card-header">🥊 Личные встречи</h3>
+        <div class="head-to-head-controls">
+          <label>
+            Соперник:
+            <select class="form-control" x-model="h2hPlayerId" @change="loadHeadToHead()" style="width:auto;display:inline-block;">
+              <option value="">— выберите игрока —</option>
+              <template x-for="p in otherPlayers" :key="p.id">
+                <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+              </template>
+            </select>
+          </label>
+        </div>
+        <div x-show="!h2hPlayerId" style="padding:1rem;color:var(--color-text-light);">Выберите соперника для просмотра статистики личных встреч</div>
+        <div x-show="h2hPlayerId && h2hData" class="h2h-stats">
+          <div class="h2h-grid">
+            <div class="h2h-item">
+              <div class="h2h-label">Всего игр</div>
+              <div class="h2h-value" x-text="h2hData.total_games"></div>
+            </div>
+            <div class="h2h-item h2h-win">
+              <div class="h2h-label" x-text="'Победы: ' + player.name"></div>
+              <div class="h2h-value" x-text="h2hData.player1_wins"></div>
+            </div>
+            <div class="h2h-item h2h-loss">
+              <div class="h2h-label" x-text="'Победы соперника'"></div>
+              <div class="h2h-value" x-text="h2hData.player2_wins"></div>
+            </div>
+            <div class="h2h-item h2h-draw">
+              <div class="h2h-label">Ничьи</div>
+              <div class="h2h-value" x-text="h2hData.draws"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tournaments List -->
+      <div class="card">
+        <h3 class="card-header">🏟 Турниры</h3>
+        <div id="player-tournaments" hx-get="/api/tournaments?per_page=20" hx-trigger="load" hx-swap="innerHTML">
+          <div style="text-align:center;padding:1.5rem;">
+            <div class="spinner"></div>
+            <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<script>
+  document.addEventListener('alpine:init', () => {
+    // Load all players for head-to-head selector
+    let allPlayersCache = [];
+
+    Alpine.data('playerDetail', (playerId) => ({
+      playerId,
+      player: null,
+      overallStats: {},
+      isFavorite: false,
+      ratingChart: null,
+      h2hPlayerId: '',
+      h2hData: null,
+      otherPlayers: [],
+
+      async init() {
+        await this.loadPlayer();
+        await this.loadOverallStats();
+        await this.loadPlayersList();
+        this.$nextTick(() => this.renderRatingChart());
+      },
+
+      async loadPlayer() {
+        try {
+          const resp = await fetch(`/api/players/${this.playerId}`);
+          this.player = await resp.json();
+        } catch(e) {
+          console.error('Failed to load player', e);
+        }
+      },
+
+      async loadOverallStats() {
+        try {
+          const resp = await fetch(`/api/stats/overall/${this.playerId}`);
+          this.overallStats = await resp.json();
+        } catch(e) {
+          console.error('Failed to load stats', e);
+        }
+      },
+
+      async loadPlayersList() {
+        try {
+          const resp = await fetch('/api/players?per_page=200');
+          const data = await resp.json();
+          allPlayersCache = data.items || [];
+          this.otherPlayers = allPlayersCache.filter(p => p.id !== this.playerId);
+        } catch(e) {
+          console.error('Failed to load players', e);
+        }
+      },
+
+      async renderRatingChart() {
+        const canvas = this.$refs.ratingChart;
+        if (!canvas) return;
+
+        try {
+          const resp = await fetch(`/api/players/${this.playerId}/rating-history`);
+          const data = await resp.json();
+          if (!data.length) return;
+
+          const ctx = canvas.getContext('2d');
+          const labels = data.map(r => new Date(r.date).toLocaleDateString('ru-RU'));
+          const ratings = data.map(r => r.rating);
+
+          this.ratingChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+              labels,
+              datasets: [{
+                label: 'Рейтинг',
+                data: ratings,
+                borderColor: '#3498db',
+                backgroundColor: 'rgba(52,152,219,0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 3,
+                pointHoverRadius: 6,
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                y: {
+                  beginAtZero: false,
+                  ticks: { precision: 0 }
+                }
+              }
+            }
+          });
+        } catch(e) {
+          console.error('Failed to load rating chart', e);
+        }
+      },
+
+      async loadHeadToHead() {
+        if (!this.h2hPlayerId) {
+          this.h2hData = null;
+          return;
+        }
+        try {
+          const resp = await fetch(`/api/stats/head-to-head/${this.playerId}/${this.h2hPlayerId}`);
+          this.h2hData = await resp.json();
+        } catch(e) {
+          console.error('Failed to load head-to-head', e);
+        }
+      },
+
+      async toggleFavorite() {
+        if (!Auth.isAuthenticated()) {
+          window.location.href = '/login';
+          return;
+        }
+
+        try {
+          if (this.isFavorite) {
+            await fetch(`/api/favorites/${this.playerId}`, { method: 'DELETE', headers: Auth.getAuthHeaders() });
+            this.isFavorite = false;
+            showFlash('Удалено из избранного', 'info');
+          } else {
+            await fetch(`/api/favorites/${this.playerId}`, { method: 'POST', headers: Auth.getAuthHeaders() });
+            this.isFavorite = true;
+            showFlash('Добавлено в избранное', 'success');
+          }
+        } catch(e) {
+          showFlash('Ошибка при изменении избранного', 'error');
+        }
+      }
+    }));
+  });
+</script>
+{% endblock %}

@@ -30,6 +30,51 @@
     </div>
   </div>
 
+  <!-- Rating Chart of Top Player -->
+  <div class="dashboard-card dashboard-card-wide">
+    <h3>📈 История рейтинга</h3>
+    <div x-data="ratingChart()" x-init="init()">
+      <div class="chart-controls">
+        <label>
+          Игрок:
+          <select class="form-control" x-model="selectedPlayerId" @change="loadChart()" style="width:auto;display:inline-block;">
+            <option value="">— выберите игрока —</option>
+            <template x-for="p in players" :key="p.id">
+              <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+            </template>
+          </select>
+        </label>
+      </div>
+      <div class="chart-container" style="position:relative;height:250px;">
+        <canvas x-ref="ratingCanvas"></canvas>
+      </div>
+      <div x-show="!selectedPlayerId" style="text-align:center;padding:2rem;color:var(--color-text-light);">
+        Выберите игрока для отображения истории рейтинга
+      </div>
+    </div>
+  </div>
+
+  <!-- Overall Stats (Doughnut) -->
+  <div class="dashboard-card">
+    <h3>🥧 Статистика игрока</h3>
+    <div x-data="overallStatsChart()" x-init="init()">
+      <div style="margin-bottom:0.75rem;">
+        <select class="form-control" x-model="selectedPlayerId" @change="loadStats()" style="width:100%;">
+          <option value="">— выберите игрока —</option>
+          <template x-for="p in players" :key="p.id">
+            <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+          </template>
+        </select>
+      </div>
+      <div class="chart-container" style="position:relative;height:220px;">
+        <canvas x-ref="statsCanvas"></canvas>
+      </div>
+      <div x-show="!selectedPlayerId" style="text-align:center;padding:1.5rem;color:var(--color-text-light);">
+        Выберите игрока
+      </div>
+    </div>
+  </div>
+
   <!-- Active Tournaments -->
   <div class="dashboard-card">
     <h3>🏟 Активные турниры</h3>
@@ -44,14 +89,167 @@
   <!-- Recent Results -->
   <div class="dashboard-card">
     <h3>📋 Последние результаты</h3>
-    <p style="color:var(--color-text-light);">Будет доступно в следующем обновлении.</p>
+    <div id="recent-results" hx-get="/api/tournaments?per_page=1&status=completed" hx-trigger="load" hx-swap="innerHTML">
+      <div style="text-align:center;padding:2rem;">
+        <div class="spinner"></div>
+        <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+      </div>
+    </div>
   </div>
 </div>
 {% endblock %}
 
 {% block extra_head %}
 <script>
-  // HTMX response handling for favorites and top-rated
+  // Alpine.js components for dashboard charts
+  document.addEventListener('alpine:init', () => {
+    // Load players list for selectors
+    let playersCache = [];
+
+    async function loadPlayers() {
+      try {
+        const resp = await fetch('/api/players?per_page=100');
+        const data = await resp.json();
+        playersCache = data.items || [];
+      } catch(e) {
+        playersCache = [];
+      }
+    }
+    loadPlayers();
+
+    // Rating chart component
+    Alpine.data('ratingChart', () => ({
+      selectedPlayerId: '',
+      players: playersCache,
+      chart: null,
+
+      init() {
+        this.$nextTick(() => loadPlayers().then(() => {
+          this.players = playersCache;
+        }));
+      },
+
+      async loadChart() {
+        if (!this.selectedPlayerId) return;
+        this.destroyChart();
+        try {
+          const resp = await fetch(`/api/players/${this.selectedPlayerId}/rating-history`);
+          const data = await resp.json();
+          this.renderChart(data);
+        } catch(e) {
+          console.error('Failed to load rating history', e);
+        }
+      },
+
+      renderChart(data) {
+        const canvas = this.$refs.ratingCanvas;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const labels = data.map(r => new Date(r.date).toLocaleDateString('ru-RU'));
+        const ratings = data.map(r => r.rating);
+
+        this.chart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels,
+            datasets: [{
+              label: 'Рейтинг',
+              data: ratings,
+              borderColor: '#3498db',
+              backgroundColor: 'rgba(52,152,219,0.1)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 3,
+              pointHoverRadius: 5,
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false }
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: { precision: 0 }
+              }
+            }
+          }
+        });
+      },
+
+      destroyChart() {
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = null;
+        }
+      }
+    }));
+
+    // Overall stats doughnut chart
+    Alpine.data('overallStatsChart', () => ({
+      selectedPlayerId: '',
+      players: playersCache,
+      chart: null,
+
+      init() {
+        this.$nextTick(() => loadPlayers().then(() => {
+          this.players = playersCache;
+        }));
+      },
+
+      async loadStats() {
+        if (!this.selectedPlayerId) return;
+        this.destroyChart();
+        try {
+          const resp = await fetch(`/api/stats/overall/${this.selectedPlayerId}`);
+          const data = await resp.json();
+          this.renderChart(data);
+        } catch(e) {
+          console.error('Failed to load stats', e);
+        }
+      },
+
+      renderChart(data) {
+        const canvas = this.$refs.statsCanvas;
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+
+        this.chart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Победы', 'Поражения', 'Ничьи'],
+            datasets: [{
+              data: [data.wins, data.losses, data.draws],
+              backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+              borderWidth: 2,
+              borderColor: '#fff',
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { font: { size: 11 } }
+              }
+            }
+          }
+        });
+      },
+
+      destroyChart() {
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = null;
+        }
+      }
+    }));
+  });
+
+  // HTMX response handling
   document.body.addEventListener('htmx:afterSwap', function(evt) {
     // Process top-rated response
     if (evt.detail.target && evt.detail.target.id === 'top-rated') {
@@ -113,6 +311,27 @@
           </tr>`;
         });
         html += '</tbody></table>';
+        evt.detail.target.innerHTML = html;
+      } catch(e) {
+        evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет данных</p>';
+      }
+    }
+
+    // Process recent results
+    if (evt.detail.target && evt.detail.target.id === 'recent-results') {
+      try {
+        const data = JSON.parse(evt.detail.xhr.responseText);
+        if (!data.items || data.items.length === 0) {
+          evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет завершённых турниров</p>';
+          return;
+        }
+        const t = data.items[0];
+        let html = `<div class="recent-result-item">
+          <a href="/tournaments/${t.id}"><strong>${t.name}</strong></a>
+          <p style="color:var(--color-text-light);font-size:0.875rem;">
+            ${t.location || '—'} · ${formatDate(t.start_date)} — ${formatDate(t.end_date)}
+          </p>
+        </div>`;
         evt.detail.target.innerHTML = html;
       } catch(e) {
         evt.detail.target.innerHTML = '<p style="color:var(--color-text-light);">Нет данных</p>';
