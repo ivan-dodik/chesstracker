@@ -204,6 +204,19 @@
 - **Примечание:** Предыдущая проверка через Playwright (headless webkit) также показала положительный результат
 - **Вывод:** Форма логина и процесс аутентификации полностью работоспособны в реальном Chrome
 
+## 2026-06-07 03:45 — M13: API-тесты — Турниры, Игры, Export, Import
+- Создан `test_tournaments.py` — 9 тестов (list, create, get, update, delete, standings, empty list, 404)
+- Создан `test_games.py` — 6 тестов (list, create, update, delete, unauthorized, nonexistent)
+- Создан `test_export.py` — 3 теста (CSV success, nonexistent 404, empty tournament)
+- Создан `test_import_route.py` — 4 теста (import success, 401, invalid format, missing file)
+- Расширен `test_players.py` — +4 теста (update, delete, 404 cases)
+- Исправлены 3 бага в production, найденных тестами:
+  - `activity_log_service.py`: Object of type datetime is not JSON serializable (добавлен _DateTimeEncoder)
+  - `import_service.py`: parse_result не awaited (корутина передавалась в SQLAlchemy)
+  - `game.py`: GameCreate.tournament_id required → optional (устанавливается API)
+- **Итого: 36 → 62 теста (+26)**
+- Затронутые файлы: backend/tests/test_tournaments.py, test_games.py, test_export.py, test_import_route.py, test_players.py; backend/app/services/activity_log_service.py, import_service.py; backend/app/schemas/game.py
+
 ## 2026-06-07 03:37 — M12: TDD-инфраструктура и правила
 - Установлен `pytest-cov` в dev-зависимости backend
 - Создан `.clinerules/tdd.md` — TDD-правила (Red-Green-Refactor, маппинг файлов→тесты, критерии завершения, pre-commit)

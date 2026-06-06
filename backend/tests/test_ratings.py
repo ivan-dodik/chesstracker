@@ -32,3 +32,22 @@ async def test_get_rating_history_no_auth(client: AsyncClient) -> None:
     """Test rating history without authentication (should work - public endpoint)."""
     response = await client.get("/api/players/1/rating-history")
     assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_get_rating_history_nonexistent_player(client: AsyncClient) -> None:
+    """Test rating history for nonexistent player returns empty list."""
+    response = await client.get("/api/players/999999/rating-history")
+    assert response.status_code == 200
+    assert response.json() == []
+
+
+@pytest.mark.asyncio
+async def test_get_rating_history_empty_range(client: AsyncClient, admin_token: str) -> None:
+    """Test rating history with date range that yields no results."""
+    response = await client.get(
+        "/api/players/1/rating-history?date_from=2010-01-01&date_to=2010-12-31",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == []

@@ -100,3 +100,44 @@ async def test_delete_nonexistent_favorite(client: AsyncClient, user_token: str)
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_add_favorite_nonexistent_player(client: AsyncClient, user_token: str) -> None:
+    """Test adding a non-existent player to favorites (returns 409 Conflict)."""
+    response = await client.post(
+        "/api/favorites/999999",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+    assert response.status_code == 409
+
+
+@pytest.mark.asyncio
+async def test_delete_favorite_twice(client: AsyncClient, user_token: str, admin_token: str) -> None:
+    """Test deleting a favorite twice (second time should fail with 404)."""
+    # Create a player and add to favorites
+    player_resp = await client.post(
+        "/api/players",
+        json={"name": "Double Delete", "rating": 1700, "city": "City"},
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    player_id = player_resp.json()["id"]
+
+    await client.post(
+        f"/api/favorites/{player_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+
+    # First delete
+    resp1 = await client.delete(
+        f"/api/favorites/{player_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+    assert resp1.status_code == 204
+
+    # Second delete
+    resp2 = await client.delete(
+        f"/api/favorites/{player_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+    assert resp2.status_code == 404

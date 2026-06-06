@@ -44,3 +44,23 @@ async def test_head_to_head(client: AsyncClient) -> None:
     assert "player1_id" in data
     assert "player2_id" in data
     assert "total_games" in data
+
+
+@pytest.mark.asyncio
+async def test_head_to_head_nonexistent(client: AsyncClient) -> None:
+    """Test head-to-head with nonexistent player returns 0 games."""
+    response = await client.get("/api/stats/head-to-head/999999/999998")
+    assert response.status_code == 200
+    assert response.json()["total_games"] == 0
+
+
+@pytest.mark.asyncio
+async def test_overall_stats_empty_player(client: AsyncClient) -> None:
+    """Test overall stats for player with no games."""
+    response = await client.get("/api/stats/overall/999999")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["total_games"] == 0
+    assert data["wins"] == 0
+    assert data["losses"] == 0
+    assert data["draws"] == 0
