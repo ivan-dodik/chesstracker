@@ -1,7 +1,7 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-**M9: Telegram-bot** завершён. Создан полноценный long-polling бот с командами /start, /subscribe, /unsubscribe и фоновым опросом активных турниров. Docker build успешен.
+**M10: Тестирование и CI** завершён. Исправлены все ошибки ruff, создан pre-commit hook и GitHub Actions CI. ruff check проходит, 20/20 тестов проходят.
 
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
@@ -17,45 +17,22 @@
 - ✅ **M5: Backend — API: специфичные фичи**
 - ✅ **M6: Frontend — базовая структура и навигация**
 - ✅ **M7: Frontend — дашборд и детальные страницы**
-  - ✅ Веб-роуты: /players/{id}, /tournaments/{id}
-  - ✅ Chart.js CDN в base.html
-  - ✅ Дашборд: графики рейтинга (line chart) и статистики (doughnut chart)
-  - ✅ Профиль игрока: рейтинг, статистика wins/losses/draws, график, head-to-head, избранное
-  - ✅ Детали турнира: standings, партии по турам (аккордеон), CSV экспорт/импорт
-  - ✅ TournamentStandings: wins, draws, losses
-  - ✅ GameRead: white_player_name, black_player_name
-  - ✅ CSS для страниц игрока, турнира, графиков
-  - ✅ 20/20 тестов проходят
 - ✅ **M8: Frontend — фичи**
-  - ✅ SSE-клиент (backend/app/static/js/sse.js): EventSource к /api/events, toast-уведомления
-  - ✅ SSE-клиент подключён в base.html
-  - ✅ CSS flash-warning стиль
-  - ✅ Защита роутов: 401 → редирект на /login
-  - ✅ Аутентификация на фронте: логин форма, JWT в localStorage, Authorization header
-  - ✅ Избранное: кнопка ★ на профиле, список на дашборде
-  - ✅ Экспорт CSV: кнопка на странице турнира
-  - ✅ Импорт CSV: форма для админа на странице турнира
 - ✅ **M9: Telegram-bot**
-  - ✅ config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
-  - ✅ bot.py: инициализация Application, регистрация хендлеров, job_queue для polling
-  - ✅ handlers/start.py (/start — приветствие)
-  - ✅ handlers/subscribe.py (/subscribe, /unsubscribe с subscribers.json)
-  - ✅ services/api_client.py (HTTP-клиент для backend)
-  - ✅ services/notifier.py (периодический опрос, уведомления подписчикам)
-  - ✅ Dockerfile: копирование config.py
-  - ✅ docker compose build telegram-bot успешен
+- ✅ **M10: Тестирование и CI**
+  - ✅ ruff: все ошибки в backend (122) и telegram-bot (12) исправлены
+  - ✅ .pre-commit-config.yaml: ruff hook для backend и telegram-bot
+  - ✅ .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
+  - ✅ ruff check проходит на всех файлах
+  - ✅ 20/20 тестов проходят
 
 ## Что осталось сделать (в порядке приоритета)
 
-### M10: Тестирование и CI
-- ⬜ GitHub Actions, pre-commit hook
-
 ### M11: Финальная документация
-- ⬜ README.md, финальная проверка
+- ⬜ README.md, финальная проверка REPORT.md, PROMPTS.md, CHANGES.md, ARCHITECTURE.md
 
 ## Известные проблемы
 - **bcrypt 5.x** несовместим с passlib 1.7.4 — зафиксирована версия 4.0.1
-- **ruff** выдаёт ошибки в app/ (преимущественно в seed.py и моделях) — будут исправлены в M10 при настройке CI
 - **Jinja2 3.1.x** несовместим со Starlette Jinja2Templates — используется кастомный Environment с cache_size=0
 
 ## Эволюция проектных решений
@@ -66,9 +43,11 @@
 - **2026-06-06 16:40**: M4 завершён — API: auth + CRUD + тесты 8/8
 - **2026-06-06 16:58**: M5 завершён — API: специфичные фичи + тесты 20/20
 - **2026-06-06 20:24**: M6 завершён — Frontend: шаблоны, CSS, JS, веб-роуты
-- **2026-06-06 20:33**: Memory Bank расширен — созданы module-файлы для быстрого поиска информации агентом
+- **2026-06-06 20:33**: Memory Bank расширен — созданы module-файлы
 - **2026-06-06 20:58**: M7 завершён — дашборд с Chart.js, профили игроков, детали турниров
-- **2026-06-06 21:06**: M8 завершён — SSE-клиент, toast-уведомления, CSS flash-warning; обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
+- **2026-06-06 21:06**: M8 завершён — SSE-клиент, toast-уведомления, CSS flash-warning
+- **2026-06-06 21:16**: M9 завершён — Telegram-bot (long-polling, /start, /subscribe, /unsubscribe, notifier)
+- **2026-06-06 21:27**: M10 завершён — ruff clean, pre-commit hook, GitHub Actions CI
 
 ## Ссылки на модули
 Детальное описание каждого слоя — в соответствующих файлах:

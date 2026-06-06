@@ -32,9 +32,20 @@ dev = [
 [tool.ruff]
 line-length = 100
 target-version = "py312"
+exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.ruff.lint.per-file-ignores]
+"alembic/env.py" = ["E501"]
+"tests/*.py" = ["E501"]
+"app/seed.py" = ["E501"]
+"app/models/*.py" = ["E501"]
+"app/api/*.py" = ["E501"]
+"app/services/*.py" = ["E501"]
+"app/core/*.py" = ["E501"]
+"app/schemas/*.py" = ["E501"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

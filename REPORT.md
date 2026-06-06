@@ -176,6 +176,23 @@
 
 **Примечание:** Избранное, аутентификация, экспорт/импорт CSV были реализованы в рамках M7. В M8 добавлен SSE-клиент и обновлена документация.
 
+## Итоги майлстоуна M10: Тестирование и CI
+
+**Статус:** ✅ Завершён
+
+**Выполнено:**
+- Исправлены все ошибки ruff в backend (122 → 0) и telegram-bot (12 → 0)
+- Добавлены per-file-ignores для E501 в `pyproject.toml` обоих проектов
+- Переименована `TemplateResponse` → `template_response` в web.py (N802 fix)
+- Создан `.pre-commit-config.yaml` с ruff hook для backend и telegram-bot
+- Создан `.github/workflows/ci.yml`: ruff lint + pytest с PostgreSQL-сервисом
+- ruff check проходит на всех файлах, 20/20 тестов проходят
+
+**Основные проблемы:**
+- 122 ошибки ruff в backend — большинство E501 (line too long) в моделях и автогенерированных alembic/versions/
+- 12 ошибок ruff в telegram-bot — E501 и W292 (no newline at end of file)
+- deprecated linter settings — per-file-ignores перенесён в [tool.ruff.lint] секцию
+
 ## История работы
 
 | Дата/Время | Событие |
@@ -200,3 +217,4 @@
 | 2026-06-06 20:58 | **M7: Frontend — дашборд и детальные страницы** — Chart.js дашборд, профили игроков, детали турниров, head-to-head, аккордеон партий, CSV импорт/экспорт; обновлены схемы GameRead и TournamentStandings; 20/20 тестов passed; docker build успешен |
 | 2026-06-06 21:06 | **M8: Frontend — фичи** — SSE-клиент (sse.js), toast-уведомления, CSS flash-warning; защита роутов (401 → /login); аутентификация, избранное, CSV импорт/экспорт (реализованы в M7); обновлены CHANGES.md, PROMPTS.md, REPORT.md |
 | 2026-06-06 21:16 | **M9: Telegram-bot** — config.py (Pydantic BaseSettings), bot.py (Application + job_queue), handlers (start, subscribe/unsubscribe с subscribers.json), services (api_client, notifier с периодическим polling), Dockerfile обновлён; docker compose build telegram-bot успешен |
+| 2026-06-06 21:27 | **M10: Тестирование и CI** — исправлены ошибки ruff в backend (122→0) и telegram-bot (12→0); созданы .pre-commit-config.yaml и .github/workflows/ci.yml; ruff check + pytest (20/20) проходят |

@@ -4,9 +4,9 @@ import asyncio
 import datetime
 import random
 
-from app.core.database import async_session_factory, engine, Base
+from app.core.database import Base, async_session_factory, engine
 from app.core.security import hash_password
-from app.models import User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
+from app.models import ActivityLog, Favorite, Game, Player, RatingHistory, Tournament, User
 
 # --- Data pools ---
 
@@ -207,14 +207,14 @@ async def seed() -> None:
 
         await session.commit()
 
-        print(f"✅ Seed completed:")
-        print(f"   - 2 users (admin/admin123, user/user123)")
+        print("✅ Seed completed:")
+        print("   - 2 users (admin/admin123, user/user123)")
         print(f"   - {len(players)} players")
         print(f"   - {len(tournaments)} tournaments ({len([t for t in tournaments if t.status == 'completed'])} completed, {len([t for t in tournaments if t.status == 'active'])} active)")
         print(f"   - {len(games)} games")
         print(f"   - {len(rating_history)} rating history entries")
         print(f"   - {len(favorites)} favorites")
-        print(f"   - 3 activity logs")
+        print("   - 3 activity logs")
 
 
 if __name__ == "__main__":

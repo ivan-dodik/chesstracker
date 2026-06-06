@@ -2,7 +2,7 @@
 
 import asyncio
 import json
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 event_subscribers: dict[str, list[asyncio.Queue]] = {}
@@ -32,7 +32,7 @@ async def publish_event(event_type: str, data: dict[str, Any]) -> None:
     event_data = {
         "type": event_type,
         "data": data,
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
     message = f"data: {json.dumps(event_data, default=str)}\n\n"

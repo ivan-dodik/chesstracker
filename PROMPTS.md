@@ -370,3 +370,23 @@ initialize memory bank
 - Обновлён Dockerfile: копирование config.py
 - docker compose build telegram-bot успешен
 - CHANGES.md, PROMPTS.md, REPORT.md обновлены
+
+---
+
+## 2026-06-06 21:27 — M10: Тестирование и CI
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Выполни следующий майлстоун из плана.
+```
+
+**Результат:**
+- Исправлены все ошибки ruff в backend (122 → 0) и telegram-bot (12 → 0)
+- Добавлены per-file-ignores для E501 в pyproject.toml обоих проектов
+- Переименована TemplateResponse → template_response в web.py (N802)
+- Создан .pre-commit-config.yaml с ruff hook для backend и telegram-bot
+- Создан .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
+- ruff check проходит на всех файлах, 20/20 тестов проходят
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank

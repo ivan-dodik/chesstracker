@@ -7,7 +7,6 @@ at module load time to prevent asyncpg from being used during tests.
 
 import asyncio
 from collections.abc import AsyncGenerator
-from typing import Any
 
 import pytest
 import pytest_asyncio
@@ -16,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 # Override settings BEFORE any app modules are loaded
 import app.core.config
+
 app.core.config.settings.DATABASE_URL = "sqlite+aiosqlite:///./test.db"
 
 from app.core.database import Base, get_db  # noqa: E402

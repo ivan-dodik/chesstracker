@@ -1,6 +1,6 @@
 """Stats service — head-to-head, top-rated, overall stats."""
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Game, Player

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_admin, get_current_user, get_db
+from app.api.deps import get_current_admin, get_db
 from app.models import User
 from app.schemas.player import PlayerCreate, PlayerList, PlayerRead
 from app.services import player_service

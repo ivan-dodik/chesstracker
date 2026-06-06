@@ -1,15 +1,17 @@
 """Services package."""
 
-from app.services import player_service  # noqa: F401
-from app.services import tournament_service  # noqa: F401
-from app.services import game_service  # noqa: F401
-from app.services import rating_service  # noqa: F401
-from app.services import favorite_service  # noqa: F401
-from app.services import stats_service  # noqa: F401
-from app.services import sse_service  # noqa: F401
-from app.services import export_service  # noqa: F401
-from app.services import import_service  # noqa: F401
-from app.services import activity_log_service  # noqa: F401
+from app.services import (
+    activity_log_service,  # noqa: F401
+    export_service,  # noqa: F401
+    favorite_service,  # noqa: F401
+    game_service,  # noqa: F401
+    import_service,  # noqa: F401
+    player_service,  # noqa: F401
+    rating_service,  # noqa: F401
+    sse_service,  # noqa: F401
+    stats_service,  # noqa: F401
+    tournament_service,  # noqa: F401
+)
 
 __all__ = [
     "player_service",

@@ -3,7 +3,6 @@
 Long-polling bot that notifies subscribed users about new games and results.
 """
 
-import asyncio
 import logging
 
 from telegram import Update

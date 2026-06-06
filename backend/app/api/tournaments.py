@@ -5,7 +5,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin, get_db
 from app.models import User
-from app.schemas.tournament import TournamentCreate, TournamentList, TournamentRead, TournamentStandings
+from app.schemas.tournament import (
+    TournamentCreate,
+    TournamentList,
+    TournamentRead,
+    TournamentStandings,
+)
 from app.services import tournament_service
 
 router = APIRouter(prefix="/api/tournaments", tags=["tournaments"])

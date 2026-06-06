@@ -25,7 +25,7 @@ async def event_stream(request: Request) -> EventSourceResponse:
                 try:
                     message = await asyncio.wait_for(queue.get(), timeout=30.0)
                     yield message
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     yield {"event": "ping", "data": "keepalive"}
 
         finally:

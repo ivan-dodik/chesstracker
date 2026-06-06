@@ -7,7 +7,6 @@ from httpx import AsyncClient
 @pytest.mark.asyncio
 async def test_list_players(client: AsyncClient, user_token: str):
     """Test GET /api/players returns paginated list."""
-    from app.core.security import hash_password
     from app.models import Player
     from tests.conftest import TestSessionLocal
 

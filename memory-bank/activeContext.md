@@ -1,25 +1,20 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Завершён **M9: Telegram-bot**. Создан полноценный long-polling бот с командами /start, /subscribe, /unsubscribe и фоновым опросом активных турниров. Docker build успешен.
+Завершён **M10: Тестирование и CI**. Исправлены ошибки ruff, созданы pre-commit hook и GitHub Actions CI. ruff check проходит, 20/20 тестов проходят.
 
 ## Последние изменения
-- Создан config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
-- Реализован bot.py: инициализация Application, регистрация хендлеров, job_queue для периодического polling
-- Созданы handlers/start.py (/start — приветственное сообщение)
-- Созданы handlers/subscribe.py (/subscribe и /unsubscribe с subscribers.json)
-- Созданы services/api_client.py (HTTP-клиент для backend)
-- Созданы services/notifier.py (периодический опрос, уведомления подписчикам)
-- Обновлён Dockerfile: копирование config.py
-- docker compose build telegram-bot успешен
-- Обновлены CHANGES.md, PROMPTS.md, REPORT.md
+- Исправлены все ошибки ruff в backend (122 → 0) и telegram-bot (12 → 0)
+- Добавлены per-file-ignores для E501 в pyproject.toml обоих проектов
+- Переименована TemplateResponse → template_response в web.py (N802 fix)
+- Создан .pre-commit-config.yaml с ruff hook для backend и telegram-bot
+- Создан .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank
 
 ## Следующие шаги (приоритетный порядок)
-1. ✅ **M7: Frontend — дашборд и детальные страницы** — выполнено
-2. ✅ **M8: Frontend — фичи** — выполнено
-3. ✅ **M9: Telegram-bot** — выполнено
-4. **M10: Тестирование и CI** (GitHub Actions, ruff, pytest, pre-commit hook)
-5. **M11: Финальная документация** (README.md, REPORT.md)
+1. ✅ **M9: Telegram-bot** — выполнено
+2. ✅ **M10: Тестирование и CI** — выполнено
+3. **M11: Финальная документация** (README.md, финальная проверка REPORT.md, PROMPTS.md, CHANGES.md, ARCHITECTURE.md)
 
 ## Активные решения и considerations
 - **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.

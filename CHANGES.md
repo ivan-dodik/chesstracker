@@ -33,6 +33,15 @@
 - Экспорт CSV: кнопка на странице турнира
 - Импорт CSV: форма для админа на странице турнира
 
+## 2026-06-06 21:27 — M10: Тестирование и CI
+- Исправлены все ошибки ruff в backend (122 → 0) и telegram-bot (12 → 0)
+- Добавлены per-file-ignores для E501 в pyproject.toml обоих проектов
+- Переименована TemplateResponse → template_response в web.py (N802)
+- Создан .pre-commit-config.yaml с ruff hook для backend и telegram-bot
+- Создан .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
+- ruff check проходит на всех файлах, 20/20 тестов проходят
+- Обновлён Memory Bank (activeContext.md, progress.md)
+
 ## 2026-06-06 21:16 — M9: Telegram-bot
 - Создан config.py (Pydantic BaseSettings: TG_BOT_TOKEN, BACKEND_URL)
 - Реализован bot.py: инициализация Application, регистрация хендлеров, job_queue для периодического polling

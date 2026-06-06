@@ -1,0 +1,12 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.16
+    hooks:
+      - id: ruff
+        name: ruff check (backend)
+        args: [--fix]
+        files: ^backend/
+      - id: ruff
+        name: ruff check (telegram-bot)
+        args: [--fix]
+        files: ^telegram-bot/
