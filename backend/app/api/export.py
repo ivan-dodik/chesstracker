@@ -4,7 +4,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user, get_db
+from app.models import User
 from app.services.export_service import export_tournament_csv
 
 router = APIRouter(prefix="/api/tournaments", tags=["export"])
@@ -14,6 +15,7 @@ router = APIRouter(prefix="/api/tournaments", tags=["export"])
 async def export_csv(
     tournament_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> PlainTextResponse:
     """Export tournament standing as CSV."""
     csv_content = await export_tournament_csv(db, tournament_id)

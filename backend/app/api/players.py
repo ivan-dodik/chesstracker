@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_admin, get_db
+from app.api.deps import get_current_admin, get_current_user, get_db
 from app.models import User
 from app.schemas.player import PlayerCreate, PlayerList, PlayerRead
 from app.services import player_service
@@ -20,6 +20,7 @@ async def list_players(
     rating_max: int | None = None,
     city: str | None = None,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> PlayerList:
     """Get paginated list of players with optional filters."""
     players, total = await player_service.get_players(
@@ -43,6 +44,7 @@ async def create_player(
 async def get_player(
     player_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> PlayerRead:
     """Get player details by ID."""
     player = await player_service.get_player(db, player_id)

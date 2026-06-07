@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_admin, get_db
+from app.api.deps import get_current_admin, get_current_user, get_db
 from app.models import User
 from app.schemas.game import GameCreate, GameList, GameRead, GameResult
 from app.services import game_service
@@ -17,6 +17,7 @@ async def list_games(
     page: int = 1,
     per_page: int = 50,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> dict:
     """Get paginated list of games for a tournament."""
     games, total = await game_service.get_games_by_tournament(

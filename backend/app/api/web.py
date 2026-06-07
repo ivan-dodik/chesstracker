@@ -3,9 +3,11 @@
 from pathlib import Path
 from typing import Any
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader, Template
+
+from app.api.deps import get_current_user_for_web
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 template_dir = str(BASE_DIR / "templates")
@@ -30,36 +32,53 @@ router = APIRouter(tags=["web"])
 
 
 @router.get("/", response_class=HTMLResponse, include_in_schema=False)
-async def index(request: Request) -> HTMLResponse:
+async def index(
+    request: Request,
+    _current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
     """Dashboard page."""
     return template_response("index.html", {"request": request})
 
 
 @router.get("/login", response_class=HTMLResponse, include_in_schema=False)
 async def login_page(request: Request) -> HTMLResponse:
-    """Login page."""
+    """Login page (public)."""
     return template_response("login.html", {"request": request})
 
 
 @router.get("/players", response_class=HTMLResponse, include_in_schema=False)
-async def players_list(request: Request) -> HTMLResponse:
+async def players_list(
+    request: Request,
+    _current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
     """Players list page."""
     return template_response("players/list.html", {"request": request})
 
 
 @router.get("/players/{player_id}", response_class=HTMLResponse, include_in_schema=False)
-async def player_detail(request: Request, player_id: int) -> HTMLResponse:
+async def player_detail(
+    request: Request,
+    player_id: int,
+    _current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
     """Player detail page."""
     return template_response("players/detail.html", {"request": request, "player_id": player_id})
 
 
 @router.get("/tournaments", response_class=HTMLResponse, include_in_schema=False)
-async def tournaments_list(request: Request) -> HTMLResponse:
+async def tournaments_list(
+    request: Request,
+    _current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
     """Tournaments list page."""
     return template_response("tournaments/list.html", {"request": request})
 
 
 @router.get("/tournaments/{tournament_id}", response_class=HTMLResponse, include_in_schema=False)
-async def tournament_detail(request: Request, tournament_id: int) -> HTMLResponse:
+async def tournament_detail(
+    request: Request,
+    tournament_id: int,
+    _current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
     """Tournament detail page."""
     return template_response("tournaments/detail.html", {"request": request, "tournament_id": tournament_id})

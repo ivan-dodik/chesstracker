@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_list_games_by_tournament(client: AsyncClient, admin_token: str):
+async def test_list_games_by_tournament(client: AsyncClient, admin_token: str, user_token: str):
     """Test GET /api/tournaments/{id}/games returns games."""
     # Create tournament, players, and a game
     tourn = await client.post(
@@ -45,7 +45,10 @@ async def test_list_games_by_tournament(client: AsyncClient, admin_token: str):
     assert game.status_code == 201
 
     # List games
-    response = await client.get(f"/api/tournaments/{tourn_id}/games?per_page=10")
+    response = await client.get(
+        f"/api/tournaments/{tourn_id}/games?per_page=10",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -194,9 +197,12 @@ async def test_delete_game_admin(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_list_games_nonexistent_tournament(client: AsyncClient):
+async def test_list_games_nonexistent_tournament(client: AsyncClient, user_token: str):
     """Test GET games for nonexistent tournament returns empty list."""
-    response = await client.get("/api/tournaments/999999/games")
+    response = await client.get(
+        "/api/tournaments/999999/games",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["total"] == 0

@@ -3,7 +3,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_admin, get_db
+from app.api.deps import get_current_admin, get_current_user, get_db
 from app.models import User
 from app.schemas.tournament import (
     TournamentCreate,
@@ -23,6 +23,7 @@ async def list_tournaments(
     status: str | None = None,
     location: str | None = None,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> TournamentList:
     """Get paginated list of tournaments with optional filters."""
     tournaments, total = await tournament_service.get_tournaments(
@@ -45,6 +46,7 @@ async def create_tournament(
 async def get_tournament(
     tournament_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> TournamentRead:
     """Get tournament details by ID."""
     tournament = await tournament_service.get_tournament(db, tournament_id)
@@ -83,6 +85,7 @@ async def delete_tournament(
 async def get_standings(
     tournament_id: int,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> list[TournamentStandings]:
     """Get tournament standings."""
     standings = await tournament_service.get_standings(db, tournament_id)

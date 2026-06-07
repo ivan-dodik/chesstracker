@@ -5,17 +5,33 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_index_returns_200(client: AsyncClient):
-    """Test GET / returns 200 and contains dashboard heading."""
-    response = await client.get("/")
+async def test_index_with_token_returns_200(client: AsyncClient, admin_token: str):
+    """Test GET / returns 200 and contains dashboard heading (with auth)."""
+    response = await client.get(
+        "/",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     assert response.status_code == 200
     assert "Дашборд" in response.text
 
 
 @pytest.mark.asyncio
-async def test_index_contains_htmx_attributes(client: AsyncClient):
+async def test_index_with_cookie_returns_200(client: AsyncClient, admin_token: str):
+    """Test GET / returns 200 with cookie auth."""
+    response = await client.get(
+        "/",
+        cookies={"jwt_token": admin_token},
+    )
+    assert response.status_code == 200
+
+
+@pytest.mark.asyncio
+async def test_index_contains_htmx_attributes(client: AsyncClient, admin_token: str):
     """Test dashboard page contains HTMX load triggers."""
-    response = await client.get("/")
+    response = await client.get(
+        "/",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     # Top-rated section
     assert 'hx-get="/api/stats/top-rated"' in response.text
     # Favorites section
@@ -27,26 +43,90 @@ async def test_index_contains_htmx_attributes(client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_index_contains_alpine_components(client: AsyncClient):
+async def test_index_contains_alpine_components(client: AsyncClient, admin_token: str):
     """Test dashboard page contains Alpine.js x-data attributes."""
-    response = await client.get("/")
+    response = await client.get(
+        "/",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     assert 'x-data="ratingChart()"' in response.text
     assert 'x-data="overallStatsChart()"' in response.text
     assert 'x-data="authState()"' in response.text
 
 
 @pytest.mark.asyncio
-async def test_index_favorites_section_hidden_for_unauthenticated(client: AsyncClient):
+async def test_index_favorites_section_hidden_for_unauthenticated(client: AsyncClient, admin_token: str):
     """Test favorites section has x-show bound to auth state (BUGS.md fix)."""
-    response = await client.get("/")
+    response = await client.get(
+        "/",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
     # The favorites section should use x-show="isAuth" to hide for unauthenticated users
     assert 'x-data="{ isAuth: Auth.isAuthenticated() }"' in response.text
     assert 'x-show="isAuth"' in response.text
 
 
 @pytest.mark.asyncio
+async def test_index_without_token_returns_401(client: AsyncClient):
+    """Test GET / without auth returns 401."""
+    response = await client.get("/")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_players_page_with_token(client: AsyncClient, admin_token: str):
+    """Test GET /players returns 200 with auth."""
+    response = await client.get(
+        "/players",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Игроки" in response.text
+
+
+@pytest.mark.asyncio
+async def test_players_page_without_token_returns_401(client: AsyncClient):
+    """Test GET /players without auth returns 401."""
+    response = await client.get("/players")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_player_detail_page_with_token(client: AsyncClient, admin_token: str):
+    """Test GET /players/1 returns 200 with auth."""
+    response = await client.get(
+        "/players/1",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Игрок" in response.text
+
+
+@pytest.mark.asyncio
+async def test_tournaments_page_with_token(client: AsyncClient, admin_token: str):
+    """Test GET /tournaments returns 200 with auth."""
+    response = await client.get(
+        "/tournaments",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Турниры" in response.text
+
+
+@pytest.mark.asyncio
+async def test_tournament_detail_page_with_token(client: AsyncClient, admin_token: str):
+    """Test GET /tournaments/1 returns 200 with auth."""
+    response = await client.get(
+        "/tournaments/1",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Турнир" in response.text
+
+
+@pytest.mark.asyncio
 async def test_login_page_returns_200(client: AsyncClient):
-    """Test GET /login returns 200 and contains login form."""
+    """Test GET /login returns 200 and contains login form (public)."""
     response = await client.get("/login")
     assert response.status_code == 200
     assert "Вход в Chess Tracker" in response.text

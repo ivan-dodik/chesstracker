@@ -5,9 +5,12 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_top_rated(client: AsyncClient) -> None:
+async def test_top_rated(client: AsyncClient, user_token: str) -> None:
     """Test getting top-rated players."""
-    response = await client.get("/api/stats/top-rated")
+    response = await client.get(
+        "/api/stats/top-rated",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)
@@ -16,17 +19,23 @@ async def test_top_rated(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_top_rated_with_limit(client: AsyncClient) -> None:
+async def test_top_rated_with_limit(client: AsyncClient, user_token: str) -> None:
     """Test top-rated with custom limit."""
-    response = await client.get("/api/stats/top-rated?limit=5")
+    response = await client.get(
+        "/api/stats/top-rated?limit=5",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     assert len(response.json()) <= 5
 
 
 @pytest.mark.asyncio
-async def test_overall_stats(client: AsyncClient) -> None:
+async def test_overall_stats(client: AsyncClient, user_token: str) -> None:
     """Test getting overall stats for a player."""
-    response = await client.get("/api/stats/overall/1")
+    response = await client.get(
+        "/api/stats/overall/1",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert "total_games" in data
@@ -36,9 +45,12 @@ async def test_overall_stats(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_head_to_head(client: AsyncClient) -> None:
+async def test_head_to_head(client: AsyncClient, user_token: str) -> None:
     """Test head-to-head stats."""
-    response = await client.get("/api/stats/head-to-head/1/2")
+    response = await client.get(
+        "/api/stats/head-to-head/1/2",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert "player1_id" in data
@@ -47,17 +59,23 @@ async def test_head_to_head(client: AsyncClient) -> None:
 
 
 @pytest.mark.asyncio
-async def test_head_to_head_nonexistent(client: AsyncClient) -> None:
+async def test_head_to_head_nonexistent(client: AsyncClient, user_token: str) -> None:
     """Test head-to-head with nonexistent player returns 0 games."""
-    response = await client.get("/api/stats/head-to-head/999999/999998")
+    response = await client.get(
+        "/api/stats/head-to-head/999999/999998",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     assert response.json()["total_games"] == 0
 
 
 @pytest.mark.asyncio
-async def test_overall_stats_empty_player(client: AsyncClient) -> None:
+async def test_overall_stats_empty_player(client: AsyncClient, user_token: str) -> None:
     """Test overall stats for player with no games."""
-    response = await client.get("/api/stats/overall/999999")
+    response = await client.get(
+        "/api/stats/overall/999999",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["total_games"] == 0

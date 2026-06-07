@@ -29,6 +29,13 @@ async def test_list_players(client: AsyncClient, user_token: str):
 
 
 @pytest.mark.asyncio
+async def test_list_players_unauthorized(client: AsyncClient):
+    """Test GET /api/players without token returns 401."""
+    response = await client.get("/api/players?per_page=10")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
 async def test_create_player_admin(client: AsyncClient, admin_token: str):
     """Test admin can create a player."""
     response = await client.post(
@@ -54,7 +61,7 @@ async def test_create_player_forbidden(client: AsyncClient, user_token: str):
 
 
 @pytest.mark.asyncio
-async def test_get_player_by_id(client: AsyncClient, admin_token: str):
+async def test_get_player_by_id(client: AsyncClient, admin_token: str, user_token: str):
     """Test GET /api/players/{id} returns player details."""
     from app.models import Player
     from tests.conftest import TestSessionLocal
@@ -67,10 +74,27 @@ async def test_get_player_by_id(client: AsyncClient, admin_token: str):
 
     response = await client.get(
         f"/api/players/{player_id}",
-        headers={"Authorization": f"Bearer {admin_token}"},
+        headers={"Authorization": f"Bearer {user_token}"},
     )
     assert response.status_code == 200
     assert response.json()["name"] == "Detail Player"
+
+
+@pytest.mark.asyncio
+async def test_get_player_by_id_unauthorized(client: AsyncClient):
+    """Test GET /api/players/{id} without token returns 401."""
+    response = await client.get("/api/players/1")
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_get_player_not_found(client: AsyncClient, user_token: str):
+    """Test GET /api/players/{id} for nonexistent player returns 404."""
+    response = await client.get(
+        "/api/players/999999",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
+    assert response.status_code == 404
 
 
 @pytest.mark.asyncio
@@ -98,7 +122,7 @@ async def test_update_player_admin(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_delete_player_admin(client: AsyncClient, admin_token: str):
+async def test_delete_player_admin(client: AsyncClient, admin_token: str, user_token: str):
     """Test admin can delete a player."""
     # Create player
     create_resp = await client.post(
@@ -117,7 +141,10 @@ async def test_delete_player_admin(client: AsyncClient, admin_token: str):
     assert response.status_code == 204
 
     # Verify deleted
-    get_resp = await client.get(f"/api/players/{player_id}")
+    get_resp = await client.get(
+        f"/api/players/{player_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert get_resp.status_code == 404
 
 

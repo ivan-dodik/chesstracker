@@ -288,6 +288,16 @@
 - Обновлён Memory Bank (`memory-bank/infrastructure/ci.md`)
 - Затронутые файлы: `.github/workflows/ci.yml`, `memory-bank/infrastructure/ci.md`
 
+## 2026-06-07 11:17 — Внедрение обязательной авторизации для всех страниц и API
+- **M1: Cookie-based auth helper** — создан `get_current_user_for_web` в `deps.py` (поддержка `Authorization: Bearer` и cookie `jwt_token`)
+- **M2: Защита API read endpoints** — добавлен `Depends(get_current_user)` на все GET-эндпоинты: players, tournaments, games, stats, ratings, export
+- **M3: Защита веб-роутов** — добавлен `Depends(get_current_user_for_web)` на все страницы, кроме `/login`
+- **M4: Cookie на фронтенде** — при логине устанавливается cookie `jwt_token` для поддержки прямой навигации
+- **M5: Проверка ролей** — admin/user разделение уже реализовано на фронтенде (`x-show="isAdmin"`)
+- **Публичными остались:** `/login`, `/health`, `/static/*`, `/api/auth/login`, `/api/events` (SSE)
+- Обновлены тесты: все 111 проходят
+- Затронутые файлы: backend/app/api/deps.py, web.py, players.py, tournaments.py, games.py, stats.py, ratings.py, export.py; backend/app/static/js/main.js; backend/tests/test_auth.py, test_web.py, test_players.py, test_tournaments.py, test_games.py, test_stats.py, test_ratings.py, test_export.py
+
 ## 2026-06-07 09:53 — Реструктуризация Memory Bank: модульная документация для агента
 - **Перемещены** `memory-bank/modules/` → `memory-bank/backend/` (11 файлов)
 - **Созданы новые документы** (20 файлов):

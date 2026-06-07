@@ -5,7 +5,7 @@ from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
-async def test_export_csv_success(client: AsyncClient, admin_token: str):
+async def test_export_csv_success(client: AsyncClient, admin_token: str, user_token: str):
     """Test export tournament standings as CSV returns valid CSV."""
     # Create tournament with players and a game
     tourn = await client.post(
@@ -41,21 +41,27 @@ async def test_export_csv_success(client: AsyncClient, admin_token: str):
     )
 
     # Export
-    response = await client.get(f"/api/tournaments/{tourn_id}/export/csv")
+    response = await client.get(
+        f"/api/tournaments/{tourn_id}/export/csv",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     assert response.headers["content-type"] == "text/csv; charset=utf-8"
     assert "Player" in response.text or "player" in response.text.lower()
 
 
 @pytest.mark.asyncio
-async def test_export_csv_nonexistent(client: AsyncClient):
+async def test_export_csv_nonexistent(client: AsyncClient, user_token: str):
     """Test export for nonexistent tournament returns 404."""
-    response = await client.get("/api/tournaments/999999/export/csv")
+    response = await client.get(
+        "/api/tournaments/999999/export/csv",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_export_csv_empty_tournament(client: AsyncClient, admin_token: str):
+async def test_export_csv_empty_tournament(client: AsyncClient, admin_token: str, user_token: str):
     """Test export for tournament with no games returns valid CSV."""
     tourn = await client.post(
         "/api/tournaments",
@@ -72,5 +78,8 @@ async def test_export_csv_empty_tournament(client: AsyncClient, admin_token: str
     )
     tourn_id = tourn.json()["id"]
 
-    response = await client.get(f"/api/tournaments/{tourn_id}/export/csv")
+    response = await client.get(
+        f"/api/tournaments/{tourn_id}/export/csv",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200

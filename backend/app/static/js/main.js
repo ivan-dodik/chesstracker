@@ -115,7 +115,9 @@ document.addEventListener('alpine:init', () => {
 
         // Save token to localStorage
         Auth.setToken(data.access_token);
-        console.log('[Login] Token saved to localStorage');
+        // Set cookie for browser-rendered page access (direct navigation)
+        document.cookie = `jwt_token=${data.access_token}; path=/; max-age=86400; SameSite=Lax`;
+        console.log('[Login] Token saved to localStorage and cookie set');
 
         // Try to get user info, but don't block navigation if it fails
         try {

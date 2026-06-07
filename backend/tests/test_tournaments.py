@@ -19,9 +19,12 @@ async def test_list_tournaments(client: AsyncClient, user_token: str):
 
 
 @pytest.mark.asyncio
-async def test_list_tournaments_empty(client: AsyncClient):
+async def test_list_tournaments_empty(client: AsyncClient, user_token: str):
     """Test GET /api/tournaments returns empty list when no tournaments exist."""
-    response = await client.get("/api/tournaments?per_page=10")
+    response = await client.get(
+        "/api/tournaments?per_page=10",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["total"] == 0
@@ -69,7 +72,7 @@ async def test_create_tournament_forbidden(client: AsyncClient, user_token: str)
 
 
 @pytest.mark.asyncio
-async def test_get_tournament_by_id(client: AsyncClient, admin_token: str):
+async def test_get_tournament_by_id(client: AsyncClient, admin_token: str, user_token: str):
     """Test GET /api/tournaments/{id} returns tournament details."""
     # First create a tournament
     create_resp = await client.post(
@@ -88,7 +91,10 @@ async def test_get_tournament_by_id(client: AsyncClient, admin_token: str):
     assert create_resp.status_code == 201
     tournament_id = create_resp.json()["id"]
 
-    response = await client.get(f"/api/tournaments/{tournament_id}")
+    response = await client.get(
+        f"/api/tournaments/{tournament_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "Detail Tournament"
@@ -96,9 +102,12 @@ async def test_get_tournament_by_id(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_get_tournament_not_found(client: AsyncClient):
+async def test_get_tournament_not_found(client: AsyncClient, user_token: str):
     """Test GET /api/tournaments/{id} with nonexistent ID returns 404."""
-    response = await client.get("/api/tournaments/999999")
+    response = await client.get(
+        "/api/tournaments/999999",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 404
 
 
@@ -141,7 +150,7 @@ async def test_update_tournament_admin(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_delete_tournament_admin(client: AsyncClient, admin_token: str):
+async def test_delete_tournament_admin(client: AsyncClient, admin_token: str, user_token: str):
     """Test admin can delete a tournament."""
     # Create tournament
     create_resp = await client.post(
@@ -168,12 +177,15 @@ async def test_delete_tournament_admin(client: AsyncClient, admin_token: str):
     assert response.status_code == 204
 
     # Verify deleted
-    get_resp = await client.get(f"/api/tournaments/{tournament_id}")
+    get_resp = await client.get(
+        f"/api/tournaments/{tournament_id}",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert get_resp.status_code == 404
 
 
 @pytest.mark.asyncio
-async def test_get_standings(client: AsyncClient, admin_token: str):
+async def test_get_standings(client: AsyncClient, admin_token: str, user_token: str):
     """Test GET /api/tournaments/{id}/standings returns standings."""
     # Create a tournament with players and games
     create_resp = await client.post(
@@ -222,7 +234,10 @@ async def test_get_standings(client: AsyncClient, admin_token: str):
     assert game.status_code == 201
 
     # Get standings
-    response = await client.get(f"/api/tournaments/{tournament_id}/standings")
+    response = await client.get(
+        f"/api/tournaments/{tournament_id}/standings",
+        headers={"Authorization": f"Bearer {user_token}"},
+    )
     assert response.status_code == 200
     data = response.json()
     assert isinstance(data, list)

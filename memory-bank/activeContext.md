@@ -4,14 +4,13 @@
 Проект полностью реализован. Добавлена TDD-инфраструктура. Задокументирована проблема с циклическим редиректом после логина (см. BUGS.md).
 
 ## Последние изменения
-- **M12: TDD-инфраструктура и правила (03:37)**:
-  - Установлен `pytest-cov` в dev-зависимости backend
-  - Создан `.clinerules/tdd.md` — TDD-правила (Red-Green-Refactor, маппинг файлов→тесты, критерии завершения, pre-commit)
-  - Обновлён `pyproject.toml` — testpaths, addopts "-v --tb=short"
-  - Обновлён `.pre-commit-config.yaml` — добавлен hook pytest для backend
-  - Обновлён `.github/workflows/ci.yml` — pytest с `--cov`, job `test-telegram-bot`
-  - Обновлён `IMPLEMENTATION_PLAN.md` — добавлены майлстоуны M12–M17
-  - 36/36 тестов проходят
+- **Обязательная авторизация (11:17)**:
+  - Создан `get_current_user_for_web` в `deps.py` — поддержка `Authorization: Bearer` и cookie `jwt_token`
+  - Защищены все API read endpoints (`Depends(get_current_user)`)
+  - Защищены все веб-страницы, кроме `/login` (`Depends(get_current_user_for_web)`)
+  - При логине устанавливается cookie `jwt_token` для прямой навигации
+  - 111/111 тестов проходят
+  - Все изменённые файлы: `backend/app/api/deps.py`, `web.py`, `players.py`, `tournaments.py`, `games.py`, `stats.py`, `ratings.py`, `export.py`; `backend/app/static/js/main.js`; `backend/tests/test_auth.py`, `test_web.py`, `test_players.py`, `test_tournaments.py`, `test_games.py`, `test_stats.py`, `test_ratings.py`, `test_export.py`
 
 ## Следующие шаги
 - **M13: API-тесты** — Турниры, Игры, Export, Import (~24 теста)
