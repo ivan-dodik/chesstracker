@@ -4,10 +4,12 @@ import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
+from app.api.deps import RedirectToLogin
 from app.api.router import api_router
 from app.api.web import router as web_router
 
@@ -46,6 +48,12 @@ app.add_middleware(
 static_dir = BASE_DIR / "static"
 if static_dir.exists():
     app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+
+# Register exception handler for RedirectToLogin
+@app.exception_handler(RedirectToLogin)
+async def redirect_to_login_handler(request: Request, exc: RedirectToLogin) -> RedirectResponse:
+    """Redirect unauthenticated web requests to /login."""
+    return RedirectResponse(url="/login", status_code=303)
 
 # Web page router (Jinja2 templates)
 app.include_router(web_router)

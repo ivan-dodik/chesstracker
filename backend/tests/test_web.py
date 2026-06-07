@@ -67,10 +67,11 @@ async def test_index_favorites_section_hidden_for_unauthenticated(client: AsyncC
 
 
 @pytest.mark.asyncio
-async def test_index_without_token_returns_401(client: AsyncClient):
-    """Test GET / without auth returns 401."""
-    response = await client.get("/")
-    assert response.status_code == 401
+async def test_index_without_token_redirects_to_login(client: AsyncClient):
+    """Test GET / without auth redirects to /login."""
+    response = await client.get("/", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/login"
 
 
 @pytest.mark.asyncio
@@ -85,10 +86,11 @@ async def test_players_page_with_token(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_players_page_without_token_returns_401(client: AsyncClient):
-    """Test GET /players without auth returns 401."""
-    response = await client.get("/players")
-    assert response.status_code == 401
+async def test_players_page_without_token_redirects_to_login(client: AsyncClient):
+    """Test GET /players without auth redirects to /login."""
+    response = await client.get("/players", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/login"
 
 
 @pytest.mark.asyncio

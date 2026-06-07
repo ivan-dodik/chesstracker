@@ -109,10 +109,11 @@ async def test_web_auth_with_cookie(client: AsyncClient, admin_token: str):
 
 
 @pytest.mark.asyncio
-async def test_web_auth_without_credentials_returns_401(client: AsyncClient):
-    """Test web page without any credentials returns 401."""
-    response = await client.get("/players")
-    assert response.status_code == 401
+async def test_web_auth_without_credentials_redirects_to_login(client: AsyncClient):
+    """Test web page without any credentials redirects to /login."""
+    response = await client.get("/players", follow_redirects=False)
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/login"
 
 
 @pytest.mark.asyncio

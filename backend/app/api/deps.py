@@ -15,6 +15,10 @@ security_scheme = HTTPBearer(auto_error=True)
 web_security_scheme = HTTPBearer(auto_error=False)
 
 
+class RedirectToLogin(Exception):
+    """Raised to redirect unauthenticated web requests to /login."""
+
+
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Provide an async database session."""
     async with async_session_factory() as session:
@@ -73,18 +77,26 @@ async def get_current_user_for_web(
     Supports two methods:
     1. Authorization: Bearer <token> header (for HTMX/fetch requests)
     2. jwt_token cookie (for direct browser navigation)
+
+    For direct browser navigation (no Authorization header), raises RedirectToLogin
+    which is caught by an exception handler in main.py to redirect to /login.
+    For HTMX/fetch requests, returns 401 JSON (handled by htmx:responseError on frontend).
     """
     token: str | None = None
 
-    # 1. Try Authorization header first
+    # 1. Try Authorization header first (HTMX/fetch requests)
     if credentials is not None:
         token = credentials.credentials
 
-    # 2. Fall back to cookie
+    # 2. Fall back to cookie (direct browser navigation)
     if token is None:
         token = request.cookies.get("jwt_token")
 
     if token is None:
+        # If this is a direct browser navigation (no Authorization header),
+        # redirect to login page instead of returning JSON 401
+        if credentials is None:
+            raise RedirectToLogin()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
