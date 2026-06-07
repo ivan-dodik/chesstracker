@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class PlayerCreate(BaseModel):
@@ -11,6 +11,13 @@ class PlayerCreate(BaseModel):
     rating: int = 0
     city: str | None = None
     avatar_url: str | None = None
+
+    @field_validator("rating")
+    @classmethod
+    def validate_rating(cls, v: int) -> int:
+        if v < 0:
+            raise ValueError("Rating cannot be negative")
+        return v
 
 
 class PlayerRead(BaseModel):

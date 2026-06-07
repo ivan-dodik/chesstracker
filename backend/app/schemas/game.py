@@ -2,7 +2,9 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+VALID_GAME_RESULTS = {"1-0", "0-1", "½-½"}
 
 
 class GameCreate(BaseModel):
@@ -13,6 +15,13 @@ class GameCreate(BaseModel):
     black_player_id: int
     result: str | None = None
     played_at: datetime | None = None
+
+    @field_validator("result")
+    @classmethod
+    def validate_result(cls, v: str | None) -> str | None:
+        if v is not None and v not in VALID_GAME_RESULTS:
+            raise ValueError(f"Invalid game result: {v}. Must be one of: {', '.join(sorted(VALID_GAME_RESULTS))}")
+        return v
 
 
 class GameRead(BaseModel):
@@ -42,3 +51,10 @@ class GameList(BaseModel):
 class GameResult(BaseModel):
     """Schema for updating game result."""
     result: str
+
+    @field_validator("result")
+    @classmethod
+    def validate_result(cls, v: str) -> str:
+        if v not in VALID_GAME_RESULTS:
+            raise ValueError(f"Invalid game result: {v}. Must be one of: {', '.join(sorted(VALID_GAME_RESULTS))}")
+        return v

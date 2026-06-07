@@ -2,7 +2,9 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
+
+VALID_TOURNAMENT_TYPES = {"classic", "blitz", "rapid"}
 
 
 class TournamentCreate(BaseModel):
@@ -14,6 +16,20 @@ class TournamentCreate(BaseModel):
     rounds: int = 0
     type: str = "classic"
     status: str = "active"
+
+    @field_validator("type")
+    @classmethod
+    def validate_type(cls, v: str) -> str:
+        if v not in VALID_TOURNAMENT_TYPES:
+            raise ValueError(f"Invalid tournament type: {v}. Must be one of: {', '.join(sorted(VALID_TOURNAMENT_TYPES))}")
+        return v
+
+    @field_validator("end_date")
+    @classmethod
+    def validate_dates(cls, v: datetime, info) -> datetime:
+        if "start_date" in info.data and v < info.data["start_date"]:
+            raise ValueError("end_date must be after start_date")
+        return v
 
 
 class TournamentRead(BaseModel):

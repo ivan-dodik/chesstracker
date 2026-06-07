@@ -409,3 +409,4 @@
 | 2026-06-07 11:17 | **Внедрение обязательной авторизации** — Cookie-based auth helper (get_current_user_for_web); защита API read endpoints; защита веб-роутов (кроме /login); cookie на фронтенде; 111/111 тестов проходят |
 | 2026-06-07 11:42 | **Исправление: редирект на /login** — Создан RedirectToLogin exception + handler в main.py; прямой переход → 303 на /login; HTMX с невалидным токеном → JSON 401; 111/111 тестов проходят |
 | | 2026-06-07 11:58 | **V1: Верификация seed-данных** — создан test_seed_verify.py (17 тестов); RED: тесты не проходили из-за импорта service conftest (другая БД); GREEN: исправлен импорт на tests.conftest; все 17 тестов проходят, ruff clean; итого: 128 тестов (+17) |
+| | 2026-06-07 12:06 | **V2: Верификация CRUD** — создан test_crud_verify.py (14 тестов: поиск/фильтрация/пагинация/валидация/авторизация); исправлены 4 бага валидации (Pydantic field_validator: rating, tournament type/dates, game result); итого: 142 теста (+14) |
