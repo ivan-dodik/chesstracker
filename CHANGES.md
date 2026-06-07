@@ -280,6 +280,14 @@
 - **Добавлено примечание** в `.clinerules/implementation_plan.md` к п.4 — перед git push выполнять шаг 2 из git_commit.md
 - Затронутые файлы: `.clinerules/git_commit.md`, `.clinerules/update_prompts.md`, `.clinerules/implementation_plan.md`
 
+## 2026-06-07 10:03 — CI/CD: добавлена сборка Docker-образов, кэширование uv, уточнены триггеры
+- **Добавлен job `build`** в `.github/workflows/ci.yml` — сборка Docker-образов через `docker compose build` с `docker/setup-buildx-action@v3`
+- **Добавлено кэширование uv** (`enable-cache: true`) в job'ы `test-backend` и `test-telegram-bot`
+- **Уточнены триггеры**: `push` только в ветку `main` + `pull_request` (избегает двойного запуска при PR)
+- **Job graph**: `lint` → параллельно `test-backend`, `test-telegram-bot`, `build`
+- Обновлён Memory Bank (`memory-bank/infrastructure/ci.md`)
+- Затронутые файлы: `.github/workflows/ci.yml`, `memory-bank/infrastructure/ci.md`
+
 ## 2026-06-07 09:53 — Реструктуризация Memory Bank: модульная документация для агента
 - **Перемещены** `memory-bank/modules/` → `memory-bank/backend/` (11 файлов)
 - **Созданы новые документы** (20 файлов):

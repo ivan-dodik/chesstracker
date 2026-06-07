@@ -194,6 +194,34 @@ initialize memory bank
 - Memory Bank обновлён (activeContext.md, progress.md)
 - Выполнен коммит и пуш
 
+## 2026-06-07 — CI/CD: добавлена сборка Docker-образов
+
+**Режим:** Plan → Act
+
+**Промпт пользователя (Plan mode):**
+```
+Проверь, как обстоят дела с CI/CD (Github Actions). Всё ли соответствует требованиям к ДЗ, что нужно добавить, а что удалить (лишнее и несущественное).
+```
+
+**План (Plan mode):**
+- Изучить `.github/workflows/ci.yml`
+- Сверить с требованиями ДЗ из `project_task.md`
+- Предложить: кэширование uv, уточнение триггеров, опционально сборку Docker
+
+**Промпт пользователя (Act mode):**
+```
+Добавь сборку докер образов.
+```
+
+**Результат:**
+- Обновлён `.github/workflows/ci.yml`:
+  - Исправлены триггеры: `push` только в `main` + `pull_request`
+  - Добавлено кэширование uv (`enable-cache: true`) в `test-backend` и `test-telegram-bot`
+  - Добавлен job `build`: `docker/setup-buildx-action@v3` + `docker compose build`
+  - Job graph: `lint` → параллельно `test-backend`, `test-telegram-bot`, `build`
+- Обновлён Memory Bank (`memory-bank/infrastructure/ci.md`)
+- Обновлены CHANGES.md, PROMPTS.md, REPORT.md
+
 ---
 
 ## 2026-06-06 14:02 — Исправление отсутствия REPORT.md и настройка обновления после каждого майлстоуна
