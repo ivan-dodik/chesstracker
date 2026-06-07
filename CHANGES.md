@@ -396,3 +396,16 @@
 - 148/148 тестов проходят
 - ruff check — clean
 - Изменённые файлы: players.py, player_service.py, tournament_service.py, players/detail.html, tournaments/detail.html, test_player_games.py, test_player_tournaments.py
+
+## 2026-06-07 13:45 — Исправление fetch() без авторизации (финальное)
+
+**Описание:** Все fetch() вызовы в Alpine.js компонентах не передавали Authorization заголовок, хотя API эндпоинты требуют аутентификации. Это вызывало пустые страницы турниров и игроков (401 от API).
+
+**Корневая причина:** HTMX имеет глобальный обработчик htmx:configRequest, который добавляет Authorization для HTMX-запросов. Но Alpine.js компоненты используют прямой fetch() без этого обработчика.
+
+**Изменённые файлы:**
+- `backend/app/templates/tournaments/detail.html` — добавлен `headers: Auth.getAuthHeaders()` в 3 fetch
+- `backend/app/templates/players/detail.html` — добавлен `headers: Auth.getAuthHeaders()` в 7 fetch
+- `backend/app/static/js/main.js` — добавлен `headers: Auth.getAuthHeaders()` в 4 fetch
+
+**Результат:** 148/148 тестов проходят, Docker пересобран

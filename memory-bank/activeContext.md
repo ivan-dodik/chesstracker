@@ -51,3 +51,10 @@
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)
+
+## 2026-06-07: Исправлена корневая причина пустых страниц
+
+**Проблема:** fetch() в Alpine.js компонентах не передавал Authorization заголовок.
+**Решение:** Добавлен `headers: Auth.getAuthHeaders()` во все fetch() вызовы.
+**Статус:** Исправлено, 148/148 тестов, закоммичено.
+**Урок:** API-тесты не покрывают фронтенд-поведение. Нужны E2E-тесты.

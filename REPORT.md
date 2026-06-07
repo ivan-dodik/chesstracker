@@ -433,3 +433,29 @@
 | | 2026-06-07 12:39 | **V8: Финальный отчёт** — исправлены 3 проблемы ruff (RedirectToLogin→RedirectToLoginError, E402 в activity_log_service.py, E501 в main.py); финальный прогон: ruff check clean, 142 теста проходят; все майлстоуны верификации завершены |
 
 | | | 2026-06-07 12:58 | **V9: Исправление страниц турнира и игрока** — TDD: 6 тестов → реализация; добавлены эндпоинты /api/players/{id}/games и /api/players/{id}/tournaments; исправлен шаблон players/detail.html (htmx→Alpine.js); исправлен шаблон tournaments/detail.html (innerHTML→Alpine.js reactive); 148/148 тестов; ruff clean |
+
+## 2026-06-07 13:45 — Диагностика и исправление пустых страниц
+
+### Ключевая проблема
+Страницы турнира (/tournaments/2) и игрока (/players/28) были пустыми — данные не загружались.
+
+### Корневая причина
+Все fetch() вызовы в Alpine.js компонентах (tournaments/detail.html, players/detail.html, main.js) НЕ передавали заголовок `Authorization: Bearer token`, хотя все API эндпоинты требуют аутентификации через `Depends(get_current_user)`.
+
+HTMX имеет глобальный обработчик `htmx:configRequest`, который добавляет Authorization для HTMX-запросов. Но Alpine.js компоненты используют прямой `fetch()` API, который не проходит через HTMX → запросы уходят без токена → 401 → пустые данные.
+
+### Диагностика (Phase 1: Root Cause Investigation)
+1. **Данные в БД** — проверено через API: 25 игр, 11 standings, всё корректно ✅
+2. **API-эндпоинты** — все работают с токеном ✅
+3. **Фронтенд HTML** — страницы загружаются (200, 11KB) ✅
+4. **fetch() в HTML** — НЕ содержат Authorization заголовка ❌ ← корневая причина
+5. **Тесты** — 148/148 проходят, потому что тесты передают токен явно
+
+### Причина, почему тесты не поймали баг
+Тесты используют `httpx.AsyncClient` с `headers={"Authorization": f"Bearer {token}"}` — они не тестируют клиентский JavaScript. Фронтенд-логика (загрузка данных через fetch) не покрыта тестами.
+
+### Исправление
+Добавлен `headers: Auth.getAuthHeaders()` во все 14 fetch() вызовов в шаблонах и main.js.
+
+### Вывод
+API-тесты не покрывают фронтенд-поведение. Нужны E2E-тесты (Playwright/Selenium) для проверки работы JavaScript в браузере.

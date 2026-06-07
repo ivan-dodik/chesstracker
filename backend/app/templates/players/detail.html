@@ -195,7 +195,7 @@
 
       async loadPlayer() {
         try {
-          const resp = await fetch(`/api/players/${this.playerId}`);
+          const resp = await fetch(`/api/players/${this.playerId}`, { headers: Auth.getAuthHeaders() });
           this.player = await resp.json();
         } catch(e) {
           console.error('Failed to load player', e);
@@ -204,7 +204,7 @@
 
       async loadOverallStats() {
         try {
-          const resp = await fetch(`/api/stats/overall/${this.playerId}`);
+          const resp = await fetch(`/api/stats/overall/${this.playerId}`, { headers: Auth.getAuthHeaders() });
           this.overallStats = await resp.json();
         } catch(e) {
           console.error('Failed to load stats', e);
@@ -213,7 +213,7 @@
 
       async loadPlayersList() {
         try {
-          const resp = await fetch('/api/players?per_page=200');
+          const resp = await fetch('/api/players?per_page=200', { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           allPlayersCache = data.items || [];
           this.otherPlayers = allPlayersCache.filter(p => p.id !== this.playerId);
@@ -224,7 +224,7 @@
 
       async loadGames() {
         try {
-          const resp = await fetch(`/api/players/${this.playerId}/games?per_page=50`);
+          const resp = await fetch(`/api/players/${this.playerId}/games?per_page=50`, { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           this.games = data.items || [];
         } catch(e) {
@@ -234,7 +234,7 @@
 
       async loadTournaments() {
         try {
-          const resp = await fetch(`/api/players/${this.playerId}/tournaments`);
+          const resp = await fetch(`/api/players/${this.playerId}/tournaments`, { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           this.playerTournaments = data.items || [];
         } catch(e) {
@@ -247,7 +247,7 @@
         if (!canvas) return;
 
         try {
-          const resp = await fetch(`/api/players/${this.playerId}/rating-history`);
+          const resp = await fetch(`/api/players/${this.playerId}/rating-history`, { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           if (!data.length) return;
 
@@ -295,7 +295,7 @@
           return;
         }
         try {
-          const resp = await fetch(`/api/stats/head-to-head/${this.playerId}/${this.h2hPlayerId}`);
+          const resp = await fetch(`/api/stats/head-to-head/${this.playerId}/${this.h2hPlayerId}`, { headers: Auth.getAuthHeaders() });
           this.h2hData = await resp.json();
         } catch(e) {
           console.error('Failed to load head-to-head', e);

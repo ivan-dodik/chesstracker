@@ -197,7 +197,7 @@ document.addEventListener('alpine:init', () => {
 
     async loadPlayers() {
       try {
-        const resp = await fetch('/api/players?per_page=100');
+        const resp = await fetch('/api/players?per_page=100', { headers: Auth.getAuthHeaders() });
         const data = await resp.json();
         this.players = data.items || [];
       } catch(e) {
@@ -209,7 +209,7 @@ document.addEventListener('alpine:init', () => {
       if (!this.selectedPlayerId) return;
       this.destroyChart();
       try {
-        const resp = await fetch(`/api/players/${this.selectedPlayerId}/rating-history`);
+        const resp = await fetch(`/api/players/${this.selectedPlayerId}/rating-history`, { headers: Auth.getAuthHeaders() });
         const data = await resp.json();
         this.renderChart(data);
       } catch(e) {
@@ -275,7 +275,7 @@ document.addEventListener('alpine:init', () => {
 
     async loadPlayers() {
       try {
-        const resp = await fetch('/api/players?per_page=100');
+        const resp = await fetch('/api/players?per_page=100', { headers: Auth.getAuthHeaders() });
         const data = await resp.json();
         this.players = data.items || [];
       } catch(e) {
@@ -287,7 +287,7 @@ document.addEventListener('alpine:init', () => {
       if (!this.selectedPlayerId) return;
       this.destroyChart();
       try {
-        const resp = await fetch(`/api/stats/overall/${this.selectedPlayerId}`);
+        const resp = await fetch(`/api/stats/overall/${this.selectedPlayerId}`, { headers: Auth.getAuthHeaders() });
         const data = await resp.json();
         this.renderChart(data);
       } catch(e) {

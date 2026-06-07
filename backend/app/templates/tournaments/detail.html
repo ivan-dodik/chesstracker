@@ -143,7 +143,7 @@
 
       async loadTournament() {
         try {
-          const resp = await fetch(`/api/tournaments/${this.tournamentId}`);
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}`, { headers: Auth.getAuthHeaders() });
           this.tournament = await resp.json();
         } catch(e) {
           console.error('Failed to load tournament', e);
@@ -152,7 +152,7 @@
 
       async loadStandings() {
         try {
-          const resp = await fetch(`/api/tournaments/${this.tournamentId}/standings`);
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/standings`, { headers: Auth.getAuthHeaders() });
           this.standings = await resp.json();
         } catch(e) {
           console.error('Failed to load standings', e);
@@ -161,7 +161,7 @@
 
       async loadGames() {
         try {
-          const resp = await fetch(`/api/tournaments/${this.tournamentId}/games?per_page=200`);
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/games?per_page=200`, { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           const games = data.items || [];
           this.gamesByRound = {};
