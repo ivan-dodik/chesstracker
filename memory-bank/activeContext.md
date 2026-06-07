@@ -13,12 +13,13 @@
   - Все изменённые файлы: `backend/app/api/deps.py`, `web.py`, `players.py`, `tournaments.py`, `games.py`, `stats.py`, `ratings.py`, `export.py`; `backend/app/static/js/main.js`; `backend/tests/test_auth.py`, `test_web.py`, `test_players.py`, `test_tournaments.py`, `test_games.py`, `test_stats.py`, `test_ratings.py`, `test_export.py`
 
 ## Следующие шаги
-- **M13: API-тесты** — Турниры, Игры, Export, Import (~24 теста)
-- **M14: API-тесты** — Activity Log, Health, краевые случаи (~12 тестов)
-- **M15: Unit-тесты сервисов** (~20 тестов)
-- **M16: Telegram-bot тесты и CI** (~6 тестов)
-- **M17: E2E тесты Playwright** (~4 теста)
-- ✅ Исправить контрастность цветов CSS (цвет ссылок `#3498db`, placeholder-текст `#7f8c8d`) — результат аудита доступности Score 80/100
+- ✅ M12: TDD-инфраструктура и правила
+- ✅ M13: API-тесты — Турниры, Игры, Export, Import (~24 теста)
+- ✅ M14: API-тесты — Activity Log, Health, краевые случаи (~12 тестов)
+- ✅ M15: Unit-тесты сервисов (~20 тестов)
+- ✅ M16: Telegram-bot тесты и CI (~6 тестов)
+- ✅ M17: E2E тесты Playwright (29 тестов)
+- ✅ Исправить контрастность цветов CSS
 - ✅ Добавить `<label>` к select элементам на дашборде
 - ✅ Устранить гонку между HTMX `hx-trigger="load"` и Alpine.js `x-show` на дашборде
 
@@ -52,9 +53,12 @@
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)
 
-## 2026-06-07: Исправлена корневая причина пустых страниц
+## 2026-06-07: E2E тесты (Playwright) — 29 тестов
 
-**Проблема:** fetch() в Alpine.js компонентах не передавал Authorization заголовок.
-**Решение:** Добавлен `headers: Auth.getAuthHeaders()` во все fetch() вызовы.
-**Статус:** Исправлено, 148/148 тестов, закоммичено.
-**Урок:** API-тесты не покрывают фронтенд-поведение. Нужны E2E-тесты.
+**Статус:** ✅ Завершён. 29/29 E2E + 148/148 API = 177 тестов.
+**Инфраструктура:** `backend/e2e/` (вне `tests/`), conftest.py с сервером + SQLite + seed.
+**Проблемы:** конфликт conftest.py (решён выносом), networkidle (заменён на domcontentloaded), cookie для веб-маршрутов, Playwright Download API.
+**BUGS.md:** Баг аутентификации помечен как RESOLVED.
+
+## Итоговый статус проекта
+Все майлстоуны M1–M17 завершены. 177 тестов (148 API + 29 E2E). Все требований ДЗ выполнены.

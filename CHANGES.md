@@ -409,3 +409,37 @@
 - `backend/app/static/js/main.js` — добавлен `headers: Auth.getAuthHeaders()` в 4 fetch
 
 **Результат:** 148/148 тестов проходят, Docker пересобран
+
+## 2026-06-07 14:25 — E2E тесты (Playwright)
+
+**Описание:** Разработана E2E-инфраструктура и 29 тестов для покрытия фронтенда браузерными тестами.
+
+**Ключевые особенности:**
+- Сервер запускается на случайном порту с временной SQLite базой
+- Seed-данные (admin/user) создаются перед стартом сервера
+- `login_and_set_token()` — быстрый логин через API + JWT в localStorage и cookie
+- `login()` — логин через UI-форму (Alpine.js)
+- Замена `networkidle` на `domcontentloaded` (CDN ресурсы не дают завершиться networkidle)
+- Cookie `jwt_token` устанавливается для веб-маршрутов
+
+**Инфраструктура:**
+- `backend/e2e/` — E2E тесты (вне `tests/`, чтобы не конфликтовать с conftest.py)
+- `backend/pyproject.toml` — добавлены `playwright`, `markers`, `norecursedirs`
+- `scripts/run_e2e.py` — convenience-скрипт запуска
+
+**Тесты (29 тестов, 8 файлов):**
+- `test_auth.py` (5): логин admin/user, ошибка, защита страниц, logout
+- `test_navigation.py` (2): навигация между страницами, логотип
+- `test_dashboard.py` (2): загрузка дашборда, избранные
+- `test_players_list.py` (4): список, пагинация HTMX, поиск, переход
+- `test_player_detail.py` (5): профиль, график Chart.js, статистика, ★, h2h
+- `test_tournaments_list.py` (4): список, фильтр, пагинация, переход
+- `test_tournament_detail.py` (5): турнир, таблица, CSV экспорт/импорт, аккордеон
+- `test_sse.py` (2): SSE подключение, toast инфраструктура
+
+**Затронутые файлы:**
+- Созданы: `backend/e2e/__init__.py`, `backend/e2e/conftest.py`, 8 файлов тестов
+- Изменены: `backend/pyproject.toml`, `scripts/run_e2e.py`
+- Обновлён: `BUGS.md` (баг аутентификации помечен как RESOLVED)
+
+**Результат:** 29/29 E2E + 148/148 API тестов = 177 тестов проходят
