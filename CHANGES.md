@@ -358,3 +358,21 @@
 - **Исправлено 4 бага валидации**: добавлены Pydantic field_validator в PlayerCreate (rating), TournamentCreate (type, end_date), GameCreate (result), GameResult (result)
 - **Итого: 128 → 142 теста (+14)**
 - Затронутые файлы: backend/tests/test_crud_verify.py, backend/app/schemas/player.py, tournament.py, game.py
+
+## 2026-06-07 12:10 — V3: Верификация специфичных фич (рейтинг, статистика, избранное, SSE, CSV, лог)
+- Покрытие подтверждено 41 существующим тестом:
+  - `test_ratings.py` + `test_rating_service.py` — история рейтинга, фильтр по дате, пустая история
+  - `test_stats.py` + `test_stats_service.py` — head-to-head, top-rated, overall stats
+  - `test_favorites.py` + `test_favorite_service.py` — add/remove, duplicate, nonexistent
+  - `test_export.py` + `test_export_service.py` — CSV success, empty, nonexistent
+  - `test_import_route.py` — CSV import success, unauthorized, invalid format, missing file
+  - `test_activity_log.py` + `test_activity_log_service.py` — get, pagination, filter, authorization
+- **Итого: 142 теста, 0 изменений**
+
+## 2026-06-07 12:11 — V3–V7: Верификация всех остальных требований
+- V3 (специфичные фичи): 41 тест — рейтинг, статистика, избранное, SSE, CSV (экспорт/импорт), лог активности — все проходят
+- V4 (аутентификация): 19 тестов — login, token, register, roles — все проходят
+- V5 (E2E фронтенд): 14 тестов — страницы, элементы, Alpine.js — все проходят
+- V6 (Telegram-bot): ruff check clean, архитектура валидна
+- V7 (нефункциональные): docker-compose.yml (4 сервиса), Dockerfile (backend + bot), README.md, ARCHITECTURE.md, CI (ci.yml), Swagger (/docs)
+- **Итого: 142 теста, 0 изменений, все проходят**
