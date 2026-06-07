@@ -55,6 +55,44 @@
         </div>
       </div>
 
+      <!-- Game History -->
+      <div class="card">
+        <h3 class="card-header">🎮 История игр</h3>
+        <div x-show="!games.length" style="padding:1rem;color:var(--color-text-light);text-align:center;">Нет сыгранных партий</div>
+        <div class="table-container" x-show="games.length">
+          <table>
+            <thead>
+              <tr>
+                <th>Турнир</th>
+                <th>Тур</th>
+                <th>Белые</th>
+                <th>Результат</th>
+                <th>Чёрные</th>
+                <th>Дата</th>
+              </tr>
+            </thead>
+            <tbody>
+              <template x-for="g in games" :key="g.id">
+                <tr>
+                  <td><a :href="'/tournaments/' + g.tournament_id" x-text="g.tournament_name || '—'" style="font-size:0.8125rem;"></a></td>
+                  <td x-text="g.round"></td>
+                  <td>
+                    <a :href="'/players/' + g.white_player_id" x-text="g.white_player_name || '?'"></a>
+                    <span x-show="g.white_player_id === playerId" style="font-weight:bold;color:var(--color-primary);"> (вы)</span>
+                  </td>
+                  <td style="text-align:center;font-weight:600;" x-text="g.result || '—'"></td>
+                  <td>
+                    <a :href="'/players/' + g.black_player_id" x-text="g.black_player_name || '?'"></a>
+                    <span x-show="g.black_player_id === playerId" style="font-weight:bold;color:var(--color-primary);"> (вы)</span>
+                  </td>
+                  <td style="font-size:0.8125rem;" x-text="g.played_at ? formatDate(g.played_at) : '—'"></td>
+                </tr>
+              </template>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <!-- Head-to-Head -->
       <div class="card">
         <h3 class="card-header">🥊 Личные встречи</h3>
@@ -95,12 +133,33 @@
       <!-- Tournaments List -->
       <div class="card">
         <h3 class="card-header">🏟 Турниры</h3>
-        <div id="player-tournaments" hx-get="/api/tournaments?per_page=20" hx-trigger="load" hx-swap="innerHTML">
-          <div style="text-align:center;padding:1.5rem;">
-            <div class="spinner"></div>
-            <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+        <div x-show="!playerTournaments.length" style="padding:1rem;color:var(--color-text-light);text-align:center;">Нет турниров</div>
+        <template x-if="playerTournaments.length">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Название</th>
+                  <th>Даты</th>
+                  <th>Тип</th>
+                  <th>Статус</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="t in playerTournaments" :key="t.id">
+                  <tr>
+                    <td><a :href="'/tournaments/' + t.id" x-text="t.name"></a></td>
+                    <td style="font-size:0.8125rem;" x-text="formatDate(t.start_date) + ' — ' + formatDate(t.end_date)"></td>
+                    <td x-text="t.type"></td>
+                    <td>
+                      <span class="badge" :class="t.status === 'active' ? 'badge-active' : 'badge-completed'" x-text="t.status === 'active' ? 'Активен' : 'Завершён'"></span>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
           </div>
-        </div>
+        </template>
       </div>
     </div>
   </template>
@@ -122,11 +181,15 @@
       h2hPlayerId: '',
       h2hData: null,
       otherPlayers: [],
+      games: [],
+      playerTournaments: [],
 
       async init() {
         await this.loadPlayer();
         await this.loadOverallStats();
         await this.loadPlayersList();
+        await this.loadGames();
+        await this.loadTournaments();
         this.$nextTick(() => this.renderRatingChart());
       },
 
@@ -156,6 +219,26 @@
           this.otherPlayers = allPlayersCache.filter(p => p.id !== this.playerId);
         } catch(e) {
           console.error('Failed to load players', e);
+        }
+      },
+
+      async loadGames() {
+        try {
+          const resp = await fetch(`/api/players/${this.playerId}/games?per_page=50`);
+          const data = await resp.json();
+          this.games = data.items || [];
+        } catch(e) {
+          console.error('Failed to load games', e);
+        }
+      },
+
+      async loadTournaments() {
+        try {
+          const resp = await fetch(`/api/players/${this.playerId}/tournaments`);
+          const data = await resp.json();
+          this.playerTournaments = data.items || [];
+        } catch(e) {
+          console.error('Failed to load tournaments', e);
         }
       },
 

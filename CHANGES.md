@@ -377,10 +377,22 @@
 - V7 (нефункциональные): docker-compose.yml (4 сервиса), Dockerfile (backend + bot), README.md, ARCHITECTURE.md, CI (ci.yml), Swagger (/docs)
 - **Итого: 142 теста, 0 изменений, все проходят**
 
-## 2026-06-07 12:39 — V8: Финальный отчёт — ruff чист, все 142 теста проходят
-- Исправлены 3 проблемы ruff:
-  - N818: `RedirectToLogin` → `RedirectToLoginError` (app/api/deps.py, app/main.py)
-  - E402: импорты в activity_log_service.py перемещены наверх
-  - E501: строка 101 → разбита на 2 строки (main.py)
-- Финальный прогон: ruff check — clean, pytest — 142 passed
-- Обновлены CHANGES.md, REPORT.md
+## 2026-06-07 12:58 — V9: Исправление страниц турнира и игрока
+- Добавлены API эндпоинты:
+  - GET /api/players/{player_id}/games — история игр игрока
+  - GET /api/players/{player_id}/tournaments — турниры игрока
+- Добавлены сервисы:
+  - player_service.get_player_games() — игры игрока с именами оппонентов и названиями турниров
+  - tournament_service.get_player_tournaments() — турниры, где играл игрок
+- Исправлен шаблон players/detail.html:
+  - htmx hx-get заменён на Alpine.js fetch (htmx не может обрабатывать JSON)
+  - Добавлена секция "История игр" с таблицей партий
+  - Список турниров теперь загружается через /api/players/{id}/tournaments
+  - Индикатор загрузки больше не крутится бесконечно
+- Исправлен шаблон tournaments/detail.html:
+  - Аккордеон туров переписан с innerHTML на Alpine.js reactive (x-for + x-show)
+  - Таблица standings переписана с Alpine.js вместо ручного innerHTML
+- TDD-подход: сначала написаны тесты (RED → 6 failed), затем реализация (GREEN → 6 passed)
+- 148/148 тестов проходят
+- ruff check — clean
+- Изменённые файлы: players.py, player_service.py, tournament_service.py, players/detail.html, tournaments/detail.html, test_player_games.py, test_player_tournaments.py

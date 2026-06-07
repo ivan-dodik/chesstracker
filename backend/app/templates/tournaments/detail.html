@@ -48,8 +48,20 @@
                 <th>Поражения</th>
               </tr>
             </thead>
-            <tbody id="standings-body">
-              <tr><td colspan="6" style="text-align:center;padding:2rem;"><div class="spinner"></div></td></tr>
+            <tbody>
+              <template x-if="!standings.length">
+                <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--color-text-light);">Нет данных</td></tr>
+              </template>
+              <template x-for="(s, i) in standings" :key="s.player_id">
+                <tr>
+                  <td x-text="i + 1"></td>
+                  <td><a :href="'/players/' + s.player_id" x-text="s.player_name"></a></td>
+                  <td><strong x-text="s.points"></strong></td>
+                  <td x-text="s.wins"></td>
+                  <td x-text="s.draws"></td>
+                  <td x-text="s.losses"></td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -58,12 +70,30 @@
       <!-- Games by Round (Accordion) -->
       <div class="card">
         <h3 class="card-header">🎮 Партии по турам</h3>
-        <div id="games-accordion">
-          <div style="text-align:center;padding:1.5rem;">
-            <div class="spinner"></div>
-            <p style="margin-top:0.5rem;color:var(--color-text-light);">Загрузка...</p>
+        <template x-if="!rounds.length">
+          <p style="color:var(--color-text-light);text-align:center;padding:1rem;">Партии не найдены</p>
+        </template>
+        <template x-for="(round, idx) in rounds" :key="idx">
+          <div class="accordion-item">
+            <div class="accordion-header" @click="toggleRound(idx)" style="cursor:pointer;padding:0.75rem 1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:0.25rem;display:flex;justify-content:space-between;align-items:center;">
+              <strong x-text="'Тур ' + round"></strong>
+              <span :style="'transition:transform 0.2s;' + (openRounds[idx] ? 'transform:rotate(90deg);' : '')">▶</span>
+            </div>
+            <div x-show="openRounds[idx]" style="padding:0.75rem 1rem;">
+              <table style="font-size:0.875rem;">
+                <tbody>
+                  <template x-for="g in gamesByRound[round]" :key="g.id">
+                    <tr>
+                      <td><a :href="'/players/' + g.white_player_id" x-text="g.white_player_name || '?'"></a></td>
+                      <td style="text-align:center;padding:0 0.75rem;font-weight:600;" x-text="g.result || '—'"></td>
+                      <td><a :href="'/players/' + g.black_player_id" x-text="g.black_player_name || '?'"></a></td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
 
       <!-- CSV Import (admin only) -->
@@ -98,6 +128,8 @@
       tournament: null,
       standings: [],
       gamesByRound: {},
+      rounds: [],
+      openRounds: {},
       file: null,
       importing: false,
       importMessage: '',
@@ -122,31 +154,9 @@
         try {
           const resp = await fetch(`/api/tournaments/${this.tournamentId}/standings`);
           this.standings = await resp.json();
-          this.renderStandings();
         } catch(e) {
           console.error('Failed to load standings', e);
         }
-      },
-
-      renderStandings() {
-        const tbody = document.getElementById('standings-body');
-        if (!tbody) return;
-        if (!this.standings.length) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--color-text-light);">Нет данных</td></tr>';
-          return;
-        }
-        let html = '';
-        this.standings.forEach((s, i) => {
-          html += `<tr>
-            <td>${i + 1}</td>
-            <td><a href="/players/${s.player_id}">${s.player_name}</a></td>
-            <td><strong>${s.points}</strong></td>
-            <td>${s.wins}</td>
-            <td>${s.draws}</td>
-            <td>${s.losses}</td>
-          </tr>`;
-        });
-        tbody.innerHTML = html;
       },
 
       async loadGames() {
@@ -160,70 +170,14 @@
             if (!this.gamesByRound[round]) this.gamesByRound[round] = [];
             this.gamesByRound[round].push(g);
           });
-          this.renderGamesAccordion();
+          this.rounds = Object.keys(this.gamesByRound).sort((a, b) => a - b);
         } catch(e) {
           console.error('Failed to load games', e);
         }
       },
 
-      renderGamesAccordion() {
-        const container = document.getElementById('games-accordion');
-        if (!container) return;
-        const rounds = Object.keys(this.gamesByRound).sort((a, b) => a - b);
-
-        if (!rounds.length) {
-          container.innerHTML = '<p style="color:var(--color-text-light);text-align:center;">Партии не найдены</p>';
-          return;
-        }
-
-        let html = '';
-        rounds.forEach((round, idx) => {
-          const games = this.gamesByRound[round];
-          html += `<div class="accordion-item">
-            <div class="accordion-header" @click="toggleAccordion(${idx})" style="cursor:pointer;padding:0.75rem 1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:var(--radius-sm);margin-bottom:0.25rem;display:flex;justify-content:space-between;align-items:center;">
-              <strong>Тур ${round}</strong>
-              <span x-ref="arrow-${idx}" style="transition:transform 0.2s;">▶</span>
-            </div>
-            <div x-ref="panel-${idx}" style="display:none;padding:0.75rem 1rem;">
-              <table style="font-size:0.875rem;">
-                <tbody>
-                  ${games.map(g => {
-                    const result = g.result || '—';
-                    return `<tr>
-                      <td><a href="/players/${g.white_player_id}">${g.white_player_name || '?'}</a></td>
-                      <td style="text-align:center;padding:0 0.75rem;font-weight:600;">${result}</td>
-                      <td><a href="/players/${g.black_player_id}">${g.black_player_name || '?'}</a></td>
-                    </tr>`;
-                  }).join('')}
-                </tbody>
-              </table>
-            </div>
-          </div>`;
-        });
-        container.innerHTML = html;
-
-        // Bind accordion toggles after Alpine processes
-        this.$nextTick(() => {
-          rounds.forEach((_, idx) => {
-            const header = container.querySelectorAll('.accordion-item')[idx]?.querySelector('.accordion-header');
-            if (header) {
-              header.addEventListener('click', () => this.toggleAccordion(idx));
-            }
-          });
-        });
-      },
-
-      toggleAccordion(idx) {
-        const panel = this.$refs['panel-' + idx];
-        const arrow = this.$refs['arrow-' + idx];
-        if (!panel) return;
-        if (panel.style.display === 'none' || !panel.style.display) {
-          panel.style.display = 'block';
-          if (arrow) arrow.style.transform = 'rotate(90deg)';
-        } else {
-          panel.style.display = 'none';
-          if (arrow) arrow.style.transform = '';
-        }
+      toggleRound(idx) {
+        this.openRounds[idx] = !this.openRounds[idx];
       },
 
       async importCSV() {

@@ -115,6 +115,57 @@ async def delete_tournament(
     return True
 
 
+async def get_player_tournaments(
+    db: AsyncSession,
+    player_id: int,
+    page: int = 1,
+    per_page: int = 20,
+) -> tuple[list[dict], int]:
+    """Get paginated list of tournaments a player participated in."""
+    from app.models import Game, Tournament
+
+    # Get distinct tournament IDs where this player has games
+    tids_query = (
+        select(Game.tournament_id)
+        .where(
+            (Game.white_player_id == player_id) | (Game.black_player_id == player_id),
+        )
+        .distinct()
+        .subquery()
+    )
+
+    count_query = select(func.count()).select_from(tids_query)
+    total_result = await db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    query = (
+        select(Tournament)
+        .where(Tournament.id.in_(select(tids_query.c.tournament_id)))
+        .order_by(Tournament.start_date.desc())
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+    )
+    result = await db.execute(query)
+    tournaments = list(result.scalars().all())
+
+    enriched = []
+    for t in tournaments:
+        enriched.append({
+            "id": t.id,
+            "name": t.name,
+            "start_date": t.start_date,
+            "end_date": t.end_date,
+            "location": t.location,
+            "rounds": t.rounds,
+            "type": t.type,
+            "status": t.status,
+            "created_at": t.created_at,
+            "updated_at": t.updated_at,
+        })
+
+    return enriched, total
+
+
 async def get_standings(db: AsyncSession, tournament_id: int) -> list[dict]:
     """Get tournament standings sorted by points."""
     return await calculate_standings(db, tournament_id)

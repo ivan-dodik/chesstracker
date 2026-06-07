@@ -5,8 +5,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin, get_current_user, get_db
 from app.models import User
+from app.schemas.game import GameList, GameRead
 from app.schemas.player import PlayerCreate, PlayerList, PlayerRead
-from app.services import player_service
+from app.schemas.tournament import TournamentList
+from app.services import player_service, tournament_service
 
 router = APIRouter(prefix="/api/players", tags=["players"])
 
@@ -28,6 +30,41 @@ async def list_players(
         name=name, rating_min=rating_min, rating_max=rating_max, city=city,
     )
     return PlayerList(items=players, total=total, page=page, per_page=per_page)
+
+
+@router.get("/{player_id}/games", response_model=GameList)
+async def get_player_games(
+    player_id: int,
+    page: int = 1,
+    per_page: int = 50,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> dict:
+    """Get paginated list of games for a player."""
+    games, total = await player_service.get_player_games(
+        db, player_id=player_id, page=page, per_page=per_page,
+    )
+    return {"items": [GameRead(**g) for g in games], "total": total, "page": page, "per_page": per_page}
+
+
+@router.get("/{player_id}/tournaments", response_model=TournamentList)
+async def get_player_tournaments(
+    player_id: int,
+    page: int = 1,
+    per_page: int = 20,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> TournamentList:
+    """Get paginated list of tournaments a player participated in."""
+    from app.schemas.tournament import TournamentRead
+
+    tournaments, total = await tournament_service.get_player_tournaments(
+        db, player_id=player_id, page=page, per_page=per_page,
+    )
+    from app.models import Tournament as TournamentModel
+
+    items = [TournamentRead.model_validate(TournamentModel(**t)) for t in tournaments]
+    return TournamentList(items=items, total=total, page=page, per_page=per_page)
 
 
 @router.post("", response_model=PlayerRead, status_code=status.HTTP_201_CREATED)

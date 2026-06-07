@@ -2,6 +2,7 @@
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.models import Player
 from app.schemas.player import PlayerCreate
@@ -96,6 +97,57 @@ async def update_player(
     )
 
     return player
+
+
+async def get_player_games(
+    db: AsyncSession,
+    player_id: int,
+    page: int = 1,
+    per_page: int = 50,
+) -> tuple[list[dict], int]:
+    """Get paginated list of games for a player with opponent names."""
+    from app.models import Game
+
+    count_query = select(func.count(Game.id)).where(
+        (Game.white_player_id == player_id) | (Game.black_player_id == player_id),
+    )
+    total_result = await db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    query = (
+        select(Game)
+        .options(
+            selectinload(Game.white_player),
+            selectinload(Game.black_player),
+            selectinload(Game.tournament),
+        )
+        .where(
+            (Game.white_player_id == player_id) | (Game.black_player_id == player_id),
+        )
+        .order_by(Game.played_at.desc(), Game.id.desc())
+        .offset((page - 1) * per_page)
+        .limit(per_page)
+    )
+    result = await db.execute(query)
+    games = list(result.scalars().all())
+
+    enriched = []
+    for g in games:
+        enriched.append({
+            "id": g.id,
+            "tournament_id": g.tournament_id,
+            "round": g.round,
+            "white_player_id": g.white_player_id,
+            "black_player_id": g.black_player_id,
+            "white_player_name": g.white_player.name if g.white_player else None,
+            "black_player_name": g.black_player.name if g.black_player else None,
+            "tournament_name": g.tournament.name if g.tournament else None,
+            "result": g.result,
+            "played_at": g.played_at,
+            "created_at": g.created_at,
+        })
+
+    return enriched, total
 
 
 async def delete_player(
