@@ -376,3 +376,11 @@
 - V6 (Telegram-bot): ruff check clean, архитектура валидна
 - V7 (нефункциональные): docker-compose.yml (4 сервиса), Dockerfile (backend + bot), README.md, ARCHITECTURE.md, CI (ci.yml), Swagger (/docs)
 - **Итого: 142 теста, 0 изменений, все проходят**
+
+## 2026-06-07 12:39 — V8: Финальный отчёт — ruff чист, все 142 теста проходят
+- Исправлены 3 проблемы ruff:
+  - N818: `RedirectToLogin` → `RedirectToLoginError` (app/api/deps.py, app/main.py)
+  - E402: импорты в activity_log_service.py перемещены наверх
+  - E501: строка 101 → разбита на 2 строки (main.py)
+- Финальный прогон: ruff check — clean, pytest — 142 passed
+- Обновлены CHANGES.md, REPORT.md

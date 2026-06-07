@@ -15,7 +15,7 @@ security_scheme = HTTPBearer(auto_error=True)
 web_security_scheme = HTTPBearer(auto_error=False)
 
 
-class RedirectToLogin(Exception):
+class RedirectToLoginError(Exception):
     """Raised to redirect unauthenticated web requests to /login."""
 
 
@@ -96,7 +96,7 @@ async def get_current_user_for_web(
         # If this is a direct browser navigation (no Authorization header),
         # redirect to login page instead of returning JSON 401
         if credentials is None:
-            raise RedirectToLogin()
+            raise RedirectToLoginError()
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",

@@ -4,6 +4,11 @@ import json
 from datetime import date, datetime
 from typing import Any
 
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.models import ActivityLog
+
 
 class _DateTimeEncoder(json.JSONEncoder):
     """JSON encoder that supports datetime and date objects."""
@@ -11,11 +16,6 @@ class _DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, (datetime, date)):
             return obj.isoformat()
         return super().default(obj)
-
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.models import ActivityLog
 
 
 async def log_activity(
