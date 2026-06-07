@@ -298,6 +298,14 @@
 - Обновлены тесты: все 111 проходят
 - Затронутые файлы: backend/app/api/deps.py, web.py, players.py, tournaments.py, games.py, stats.py, ratings.py, export.py; backend/app/static/js/main.js; backend/tests/test_auth.py, test_web.py, test_players.py, test_tournaments.py, test_games.py, test_stats.py, test_ratings.py, test_export.py
 
+## 2026-06-07 11:42 — Исправление: редирект на /login вместо JSON 401
+- **Проблема:** При открытии `/` без токена возвращался JSON `{"detail":"Not authenticated"}` вместо страницы логина
+- **Причина:** `get_current_user_for_web` выбрасывал `HTTPException(401)`, который FastAPI возвращал как JSON
+- **Решение:** Создан класс `RedirectToLogin` в `deps.py` + exception handler в `main.py` с редиректом 303 → `/login`
+- **Логика:** Прямой переход → 303 редирект; HTMX/fetch с невалидным токеном → JSON 401
+- 111/111 тестов проходят
+- Затронутые файлы: backend/app/api/deps.py, backend/app/main.py, backend/tests/test_auth.py, backend/tests/test_web.py
+
 ## 2026-06-07 09:53 — Реструктуризация Memory Bank: модульная документация для агента
 - **Перемещены** `memory-bank/modules/` → `memory-bank/backend/` (11 файлов)
 - **Созданы новые документы** (20 файлов):
