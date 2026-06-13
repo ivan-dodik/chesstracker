@@ -18,3 +18,6 @@ class RatingHistory(Base):
     tournament_id: Mapped[int | None] = mapped_column(ForeignKey("tournaments.id", ondelete="SET NULL"), nullable=True)
 
     player: Mapped["Player"] = relationship("Player", back_populates="rating_history", lazy="selectin")  # noqa: F821
+    tournament: Mapped["Tournament | None"] = relationship(  # noqa: F821
+        "Tournament", back_populates="rating_history", lazy="selectin"
+    )

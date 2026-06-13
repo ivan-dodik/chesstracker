@@ -28,7 +28,7 @@ class TestGameService:
 
         data = GameCreate(
             tournament_id=sample_tournament.id,
-            round=1,
+            game_round=1,
             white_player_id=sample_player.id,
             black_player_id=player2.id,
             result="1-0",
@@ -36,7 +36,7 @@ class TestGameService:
         game = await create_game(db_session, data, user_id=1)
 
         assert game.id is not None
-        assert game.round == 1
+        assert game.game_round == 1
         assert game.result == "1-0"
         assert game.white_player_id == sample_player.id
         assert game.black_player_id == player2.id
@@ -57,7 +57,7 @@ class TestGameService:
         await db_session.flush()
 
         data = GameCreate(
-            tournament_id=sample_tournament.id, round=1,
+            tournament_id=sample_tournament.id, game_round=1,
             white_player_id=sample_player.id, black_player_id=player2.id,
         )
         game = await create_game(db_session, data, user_id=1)
@@ -85,7 +85,7 @@ class TestGameService:
         await db_session.flush()
 
         data = GameCreate(
-            tournament_id=sample_tournament.id, round=1,
+            tournament_id=sample_tournament.id, game_round=1,
             white_player_id=sample_player.id, black_player_id=player2.id,
         )
         game = await create_game(db_session, data, user_id=1)

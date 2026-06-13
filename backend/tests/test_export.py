@@ -36,7 +36,7 @@ async def test_export_csv_success(client: AsyncClient, admin_token: str, user_to
 
     await client.post(
         f"/api/tournaments/{tourn_id}/games",
-        json={"round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
+        json={"game_round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
 

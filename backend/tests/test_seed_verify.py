@@ -121,7 +121,7 @@ async def seed_db():
                     result = random.choices(["1-0", "0-1", "½-½"], weights=[0.4, 0.3, 0.3], k=1)[0]
                     games.append(Game(
                         tournament_id=tournament.id,
-                        round=r,
+                        game_round=r,
                         white_player_id=w.id,
                         black_player_id=b.id,
                         result=result,
@@ -132,7 +132,7 @@ async def seed_db():
             pair = random.sample(players, 2)
             games.append(Game(
                 tournament_id=t.id,
-                round=random.randint(1, t.rounds),
+                game_round=random.randint(1, t.rounds),
                 white_player_id=pair[0].id,
                 black_player_id=pair[1].id,
                 result=random.choice(["1-0", "0-1", "½-½"]),

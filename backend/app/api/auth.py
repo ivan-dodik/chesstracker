@@ -1,6 +1,8 @@
 """Authentication endpoints: login, register, me."""
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,12 +11,16 @@ from app.core.security import create_access_token, hash_password, verify_passwor
 from app.models import User
 from app.schemas.user import LoginRequest, Token, UserCreate, UserRead
 
+limiter = Limiter(key_func=get_remote_address, default_limits=[])
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=Token)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     data: LoginRequest,
+    response: Response,
     db: AsyncSession = Depends(get_db),
 ) -> Token:
     """Authenticate user and return JWT token."""
@@ -28,6 +34,18 @@ async def login(
         )
 
     token = create_access_token({"sub": str(user.id), "role": user.role})
+
+    # Set HttpOnly cookie for browser-rendered page access
+    response.set_cookie(
+        key="jwt_token",
+        value=token,
+        httponly=True,
+        secure=False,  # Set True in production with HTTPS
+        samesite="lax",
+        max_age=86400,
+        path="/",
+    )
+
     return Token(access_token=token, token_type="bearer")
 
 

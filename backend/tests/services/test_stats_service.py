@@ -40,11 +40,11 @@ class TestStatsService:
         await db_session.flush()
 
         games = [
-            Game(tournament_id=sample_tournament.id, round=1,
+            Game(tournament_id=sample_tournament.id, game_round=1,
                  white_player_id=sample_player.id, black_player_id=player2.id, result="1-0"),
-            Game(tournament_id=sample_tournament.id, round=2,
+            Game(tournament_id=sample_tournament.id, game_round=2,
                  white_player_id=player2.id, black_player_id=sample_player.id, result="1-0"),
-            Game(tournament_id=sample_tournament.id, round=3,
+            Game(tournament_id=sample_tournament.id, game_round=3,
                  white_player_id=sample_player.id, black_player_id=player2.id, result="½-½"),
         ]
         for g in games:
@@ -71,9 +71,9 @@ class TestStatsService:
         await db_session.flush()
 
         games = [
-            Game(tournament_id=tournament.id, round=1,
+            Game(tournament_id=tournament.id, game_round=1,
                  white_player_id=sample_player.id, black_player_id=player2.id, result="1-0"),
-            Game(tournament_id=tournament.id, round=2,
+            Game(tournament_id=tournament.id, game_round=2,
                  white_player_id=sample_player.id, black_player_id=player2.id, result="1-0"),
         ]
         for g in games:

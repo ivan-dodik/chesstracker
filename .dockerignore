@@ -1,0 +1,11 @@
+.git
+tests
+e2e
+.env
+.env.*
+*.md
+screenshots
+node_modules
+__pycache__
+.clinerules
+.memory-bank

@@ -7,6 +7,8 @@
 // Auth Helpers
 // ============================================================
 
+const DEBUG = window.location.hostname === 'localhost';
+
 const Auth = {
   getToken() {
     return localStorage.getItem('jwt_token');
@@ -61,6 +63,23 @@ const Auth = {
 
 // Alpine docs: register extensions inside alpine:init (see https://alpinejs.dev/essentials/lifecycle)
 document.addEventListener('alpine:init', () => {
+  // Shared players store (avoids duplicate fetch in ratingChart + overallStatsChart)
+  Alpine.store('players', {
+    items: [],
+    loaded: false,
+    async load() {
+      if (this.loaded) return;
+      try {
+        const resp = await fetch('/api/players?per_page=100', { headers: Auth.getAuthHeaders() });
+        const data = await resp.json();
+        this.items = data.items || [];
+        this.loaded = true;
+      } catch(e) {
+        this.items = [];
+      }
+    }
+  });
+
   // Auth state (for navbar)
   Alpine.data('authState', () => ({
     isAuth: Auth.isAuthenticated(),
@@ -88,7 +107,7 @@ document.addEventListener('alpine:init', () => {
       this.error = '';
       this.loading = true;
 
-      console.log('[Login] Attempting login for user:', this.username);
+      if (DEBUG) console.log('[Login] Attempting login for user:', this.username);
 
       try {
         const response = await fetch('/api/auth/login', {
@@ -100,24 +119,21 @@ document.addEventListener('alpine:init', () => {
           })
         });
 
-        console.log('[Login] Login response status:', response.status);
+        if (DEBUG) console.log('[Login] Login response status:', response.status);
 
         if (!response.ok) {
           const data = await response.json();
-          console.error('[Login] Login failed:', data);
+          if (DEBUG) console.error('[Login] Login failed:', data);
           this.error = data.detail || 'Invalid credentials';
           this.loading = false;
           return;
         }
 
         const data = await response.json();
-        console.log('[Login] Login successful, token received');
+        if (DEBUG) console.log('[Login] Login successful, token received');
 
-        // Save token to localStorage
+        // Save token to localStorage (cookie is set by server with HttpOnly flag)
         Auth.setToken(data.access_token);
-        // Set cookie for browser-rendered page access (direct navigation)
-        document.cookie = `jwt_token=${data.access_token}; path=/; max-age=86400; SameSite=Lax`;
-        console.log('[Login] Token saved to localStorage and cookie set');
 
         // Try to get user info, but don't block navigation if it fails
         try {
@@ -127,22 +143,22 @@ document.addEventListener('alpine:init', () => {
           if (meResponse.ok) {
             const user = await meResponse.json();
             Auth.setUser(user);
-            console.log('[Login] User info loaded:', user);
+            if (DEBUG) console.log('[Login] User info loaded:', user);
           } else {
-            console.warn('[Login] Failed to load user info, status:', meResponse.status);
+            if (DEBUG) console.warn('[Login] Failed to load user info, status:', meResponse.status);
           }
         } catch (meErr) {
           console.warn('[Login] Error fetching user info:', meErr);
           // Don't fail the login if me endpoint fails
         }
 
-        console.log('[Login] Redirecting to dashboard...');
+        if (DEBUG) console.log('[Login] Redirecting to dashboard...');
         // Use a small delay to ensure localStorage is updated
         setTimeout(() => {
           window.location.href = '/';
         }, 100);
       } catch (err) {
-        console.error('[Login] Network error:', err);
+        if (DEBUG) console.error('[Login] Network error:', err);
         this.error = 'Network error. Please try again.';
         this.loading = false;
       }
@@ -191,18 +207,9 @@ document.addEventListener('alpine:init', () => {
     players: [],
     chart: null,
 
-    init() {
-      this.loadPlayers();
-    },
-
-    async loadPlayers() {
-      try {
-        const resp = await fetch('/api/players?per_page=100', { headers: Auth.getAuthHeaders() });
-        const data = await resp.json();
-        this.players = data.items || [];
-      } catch(e) {
-        this.players = [];
-      }
+    async init() {
+      await Alpine.store('players').load();
+      this.players = Alpine.store('players').items;
     },
 
     async loadChart() {
@@ -269,18 +276,9 @@ document.addEventListener('alpine:init', () => {
     players: [],
     chart: null,
 
-    init() {
-      this.loadPlayers();
-    },
-
-    async loadPlayers() {
-      try {
-        const resp = await fetch('/api/players?per_page=100', { headers: Auth.getAuthHeaders() });
-        const data = await resp.json();
-        this.players = data.items || [];
-      } catch(e) {
-        this.players = [];
-      }
+    async init() {
+      await Alpine.store('players').load();
+      this.players = Alpine.store('players').items;
     },
 
     async loadStats() {

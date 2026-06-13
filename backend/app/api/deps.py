@@ -24,7 +24,8 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_factory() as session:
         try:
             yield session
-            await session.commit()
+            if session.is_modified:
+                await session.commit()
         except Exception:
             await session.rollback()
             raise
@@ -48,7 +49,15 @@ async def _get_user_from_token(db: AsyncSession, token: str) -> User:
             detail="Invalid token payload",
         )
 
-    result = await db.execute(select(User).where(User.id == int(user_id)))
+    try:
+        user_id_int = int(user_id)
+    except (ValueError, TypeError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token payload",
+        )
+
+    result = await db.execute(select(User).where(User.id == user_id_int))
     user = result.scalar_one_or_none()
     if user is None:
         raise HTTPException(

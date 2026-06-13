@@ -59,6 +59,10 @@ class SSEClient {
       // Keepalive — do nothing
     });
 
+    this.eventSource.onopen = () => {
+      this.currentDelay = this.reconnectDelay;  // Reset delay on successful connection
+    };
+
     this.eventSource.onerror = () => {
       console.warn('SSE: connection lost, reconnecting...');
       this.eventSource.close();

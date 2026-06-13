@@ -224,7 +224,7 @@ async def test_get_standings(client: AsyncClient, admin_token: str, user_token: 
     game = await client.post(
         f"/api/tournaments/{tournament_id}/games",
         json={
-            "round": 1,
+            "game_round": 1,
             "white_player_id": p1_id,
             "black_player_id": p2_id,
             "result": "1-0",

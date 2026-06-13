@@ -33,12 +33,12 @@ async def test_get_player_tournaments_success(client: AsyncClient, user_token: s
         await session.commit()
 
         game1 = Game(
-            tournament_id=t1.id, round=1,
+            tournament_id=t1.id, game_round=1,
             white_player_id=player1.id, black_player_id=player2.id,
             result="1-0", played_at=datetime.datetime(2026, 1, 2),
         )
         game2 = Game(
-            tournament_id=t2.id, round=1,
+            tournament_id=t2.id, game_round=1,
             white_player_id=player1.id, black_player_id=player2.id,
             result="½-½", played_at=datetime.datetime(2026, 2, 2),
         )

@@ -10,7 +10,7 @@ VALID_GAME_RESULTS = {"1-0", "0-1", "½-½"}
 class GameCreate(BaseModel):
     """Schema for creating a new game."""
     tournament_id: int | None = None
-    round: int
+    game_round: int
     white_player_id: int
     black_player_id: int
     result: str | None = None
@@ -28,7 +28,7 @@ class GameRead(BaseModel):
     """Schema for reading game details."""
     id: int
     tournament_id: int
-    round: int
+    game_round: int
     white_player_id: int
     black_player_id: int
     white_player_name: str | None = None

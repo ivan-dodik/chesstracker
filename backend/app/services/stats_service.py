@@ -1,6 +1,6 @@
 """Stats service — head-to-head, top-rated, overall stats."""
 
-from sqlalchemy import or_, select
+from sqlalchemy import case, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Game, Player
@@ -12,41 +12,38 @@ async def get_head_to_head(
     player2_id: int,
 ) -> dict:
     """Get head-to-head statistics between two players."""
-    query = select(Game).where(
-        or_(
-            (Game.white_player_id == player1_id) & (Game.black_player_id == player2_id),
-            (Game.white_player_id == player2_id) & (Game.black_player_id == player1_id),
-        )
-    ).where(Game.result.isnot(None))
+    pair_filter = or_(
+        (Game.white_player_id == player1_id) & (Game.black_player_id == player2_id),
+        (Game.white_player_id == player2_id) & (Game.black_player_id == player1_id),
+    )
+
+    query = select(
+        func.count(Game.id).label("total_games"),
+        # player1 wins: (white and 1-0) or (black and 0-1)
+        func.count(case(
+            ((Game.white_player_id == player1_id) & (Game.result == "1-0"), 1),
+            ((Game.black_player_id == player1_id) & (Game.result == "0-1"), 1),
+        )).label("player1_wins"),
+        # player2 wins: (white and 0-1) or (black and 1-0)
+        func.count(case(
+            ((Game.white_player_id == player2_id) & (Game.result == "1-0"), 1),
+            ((Game.black_player_id == player2_id) & (Game.result == "0-1"), 1),
+        )).label("player2_wins"),
+        func.count(case(
+            (Game.result == "½-½", 1),
+        )).label("draws"),
+    ).where(pair_filter).where(Game.result.isnot(None))
 
     result = await db.execute(query)
-    games = list(result.scalars().all())
-
-    player1_wins = 0
-    player2_wins = 0
-    draws = 0
-
-    for game in games:
-        if game.result == "1-0":
-            if game.white_player_id == player1_id:
-                player1_wins += 1
-            else:
-                player2_wins += 1
-        elif game.result == "0-1":
-            if game.white_player_id == player1_id:
-                player2_wins += 1
-            else:
-                player1_wins += 1
-        else:  # ½-½
-            draws += 1
+    row = result.one()
 
     return {
         "player1_id": player1_id,
         "player2_id": player2_id,
-        "total_games": len(games),
-        "player1_wins": player1_wins,
-        "player2_wins": player2_wins,
-        "draws": draws,
+        "total_games": row.total_games,
+        "player1_wins": row.player1_wins,
+        "player2_wins": row.player2_wins,
+        "draws": row.draws,
     }
 
 
@@ -65,39 +62,37 @@ async def get_overall_stats(
     player_id: int,
 ) -> dict:
     """Get overall statistics for a player."""
-    query = select(Game).where(
-        or_(
-            Game.white_player_id == player_id,
-            Game.black_player_id == player_id,
-        )
-    ).where(Game.result.isnot(None))
+    player_filter = or_(
+        Game.white_player_id == player_id,
+        Game.black_player_id == player_id,
+    )
+
+    query = select(
+        func.count(Game.id).label("total_games"),
+        # wins: (white and 1-0) or (black and 0-1)
+        func.count(case(
+            ((Game.white_player_id == player_id) & (Game.result == "1-0"), 1),
+            ((Game.black_player_id == player_id) & (Game.result == "0-1"), 1),
+        )).label("wins"),
+        # losses: (white and 0-1) or (black and 1-0)
+        func.count(case(
+            ((Game.white_player_id == player_id) & (Game.result == "0-1"), 1),
+            ((Game.black_player_id == player_id) & (Game.result == "1-0"), 1),
+        )).label("losses"),
+        func.count(case(
+            (Game.result == "½-½", 1),
+        )).label("draws"),
+    ).where(player_filter).where(Game.result.isnot(None))
 
     result = await db.execute(query)
-    games = list(result.scalars().all())
+    row = result.one()
 
-    wins = 0
-    losses = 0
-    draws = 0
-
-    for game in games:
-        if game.result == "1-0":
-            if game.white_player_id == player_id:
-                wins += 1
-            else:
-                losses += 1
-        elif game.result == "0-1":
-            if game.white_player_id == player_id:
-                losses += 1
-            else:
-                wins += 1
-        else:  # ½-½
-            draws += 1
-
+    total = row.total_games
     return {
         "player_id": player_id,
-        "total_games": len(games),
-        "wins": wins,
-        "losses": losses,
-        "draws": draws,
-        "win_rate": round(wins / len(games) * 100, 1) if games else 0.0,
+        "total_games": total,
+        "wins": row.wins,
+        "losses": row.losses,
+        "draws": row.draws,
+        "win_rate": round(row.wins / total * 100, 1) if total else 0.0,
     }

@@ -39,7 +39,7 @@ async def test_list_games_by_tournament(client: AsyncClient, admin_token: str, u
 
     game = await client.post(
         f"/api/tournaments/{tourn_id}/games",
-        json={"round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
+        json={"game_round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert game.status_code == 201
@@ -53,7 +53,7 @@ async def test_list_games_by_tournament(client: AsyncClient, admin_token: str, u
     data = response.json()
     assert "items" in data
     assert len(data["items"]) >= 1
-    assert data["items"][0]["round"] == 1
+    assert data["items"][0]["game_round"] == 1
 
 
 @pytest.mark.asyncio
@@ -87,12 +87,12 @@ async def test_create_game_admin(client: AsyncClient, admin_token: str):
 
     response = await client.post(
         f"/api/tournaments/{tourn_id}/games",
-        json={"round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
+        json={"game_round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert response.status_code == 201
     data = response.json()
-    assert data["round"] == 1
+    assert data["game_round"] == 1
     assert data["result"] == "1-0"
 
 
@@ -101,7 +101,7 @@ async def test_create_game_unauthorized(client: AsyncClient):
     """Test creating a game without auth returns 401."""
     response = await client.post(
         "/api/tournaments/1/games",
-        json={"round": 1, "white_player_id": 1, "black_player_id": 2, "result": "1-0"},
+        json={"game_round": 1, "white_player_id": 1, "black_player_id": 2, "result": "1-0"},
     )
     assert response.status_code == 401
 
@@ -138,7 +138,7 @@ async def test_update_game_result(client: AsyncClient, admin_token: str):
 
     game = await client.post(
         f"/api/tournaments/{tourn_id}/games",
-        json={"round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
+        json={"game_round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "1-0"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     game_id = game.json()["id"]
@@ -184,7 +184,7 @@ async def test_delete_game_admin(client: AsyncClient, admin_token: str):
 
     game = await client.post(
         f"/api/tournaments/{tourn_id}/games",
-        json={"round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "½-½"},
+        json={"game_round": 1, "white_player_id": p1_id, "black_player_id": p2_id, "result": "½-½"},
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     game_id = game.json()["id"]

@@ -2,6 +2,7 @@
 
 import asyncio
 import datetime
+import os
 import random
 
 from app.core.database import Base, async_session_factory, engine
@@ -49,7 +50,7 @@ TOURNAMENT_NAMES = [
 def generate_rating_change(current_rating: int) -> int:
     """Generate a random rating change between -15 and +15."""
     delta = random.randint(-15, 15)
-    return max(0, current_rating + delta)
+    return max(100, current_rating + delta)
 
 
 def random_games_for_tournament(players: list[Player], tournament_id: int, rounds: int, start_date: datetime.datetime) -> list[Game]:
@@ -77,7 +78,7 @@ def random_games_for_tournament(players: list[Player], tournament_id: int, round
 
             game = Game(
                 tournament_id=tournament_id,
-                round=r,
+                game_round=r,
                 white_player_id=players[w].id,
                 black_player_id=players[b].id,
                 result=result,
@@ -89,6 +90,12 @@ def random_games_for_tournament(players: list[Player], tournament_id: int, round
 
 async def seed() -> None:
     """Run the seed script."""
+    if os.getenv("ENVIRONMENT") == "production":
+        raise RuntimeError("Seed script must not run in production")
+
+    admin_password = os.getenv("SEED_ADMIN_PASSWORD", "admin123")
+    user_password = os.getenv("SEED_USER_PASSWORD", "user123")
+
     print("Creating tables...")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -99,12 +106,12 @@ async def seed() -> None:
         # --- Users ---
         admin = User(
             username="admin",
-            hashed_password=hash_password("admin123"),
+            hashed_password=hash_password(admin_password),
             role="admin",
         )
         user = User(
             username="user",
-            hashed_password=hash_password("user123"),
+            hashed_password=hash_password(user_password),
             role="user",
         )
         session.add_all([admin, user])
@@ -160,7 +167,7 @@ async def seed() -> None:
                 player_sample = random.sample(players, 2)
                 game = Game(
                     tournament_id=t.id,
-                    round=random.randint(1, t.rounds),
+                    game_round=random.randint(1, t.rounds),
                     white_player_id=player_sample[0].id,
                     black_player_id=player_sample[1].id,
                     result=random.choice(["1-0", "0-1", "½-½"]),
@@ -208,7 +215,7 @@ async def seed() -> None:
         await session.commit()
 
         print("✅ Seed completed:")
-        print("   - 2 users (admin/admin123, user/user123)")
+        print(f"   - 2 users (admin/{admin_password}, user/{user_password})")
         print(f"   - {len(players)} players")
         print(f"   - {len(tournaments)} tournaments ({len([t for t in tournaments if t.status == 'completed'])} completed, {len([t for t in tournaments if t.status == 'active'])} active)")
         print(f"   - {len(games)} games")

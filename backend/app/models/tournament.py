@@ -23,3 +23,6 @@ class Tournament(Base):
     updated_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
     games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament", lazy="selectin")  # noqa: F821
+    rating_history: Mapped[list["RatingHistory"]] = relationship(  # noqa: F821
+        "RatingHistory", back_populates="tournament", lazy="selectin"
+    )

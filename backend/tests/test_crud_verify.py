@@ -290,7 +290,7 @@ class TestCRUDValidation:
         resp = await client.post(
             f"/api/tournaments/{tourn_id}/games",
             json={
-                "round": 1,
+                "game_round": 1,
                 "white_player_id": p1.json()["id"],
                 "black_player_id": p2.json()["id"],
                 "result": "invalid_result",

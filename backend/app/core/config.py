@@ -16,8 +16,8 @@ class Settings(BaseSettings):
 
     @field_validator("SECRET_KEY", mode="after")
     @classmethod
-    def warn_default_secret_key(cls, v: str) -> str:
-        """Warn if SECRET_KEY is still the default value."""
+    def validate_secret_key(cls, v: str) -> str:
+        """Validate SECRET_KEY: warn if default, enforce minimum length."""
         if v == "change-me-to-a-random-secret-key":
             import warnings
             warnings.warn(
@@ -25,10 +25,15 @@ class Settings(BaseSettings):
                 "Change it in .env or environment variables for production.",
                 stacklevel=2,
             )
+        if len(v) < 32:
+            raise ValueError("SECRET_KEY must be at least 32 characters long")
         return v
 
     # Telegram
     TG_BOT_TOKEN: str = ""
+
+    # CORS
+    CORS_ORIGINS: list[str] = ["http://localhost:8000"]
 
     # Backend
     BACKEND_URL: str = "http://backend:8000"

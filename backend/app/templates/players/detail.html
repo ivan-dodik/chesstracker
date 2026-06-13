@@ -75,7 +75,7 @@
               <template x-for="g in games" :key="g.id">
                 <tr>
                   <td><a :href="'/tournaments/' + g.tournament_id" x-text="g.tournament_name || '—'" style="font-size:0.8125rem;"></a></td>
-                  <td x-text="g.round"></td>
+                  <td x-text="g.game_round || g.round"></td>
                   <td>
                     <a :href="'/players/' + g.white_player_id" x-text="g.white_player_name || '?'"></a>
                     <span x-show="g.white_player_id === playerId" style="font-weight:bold;color:var(--color-primary);"> (вы)</span>

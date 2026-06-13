@@ -166,7 +166,7 @@
           const games = data.items || [];
           this.gamesByRound = {};
           games.forEach(g => {
-            const round = g.round || 1;
+            const round = g.game_round || g.round || 1;
             if (!this.gamesByRound[round]) this.gamesByRound[round] = [];
             this.gamesByRound[round].push(g);
           });

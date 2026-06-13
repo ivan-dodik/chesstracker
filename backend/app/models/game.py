@@ -13,7 +13,7 @@ class Game(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     tournament_id: Mapped[int] = mapped_column(ForeignKey("tournaments.id", ondelete="CASCADE"), nullable=False, index=True)
-    round: Mapped[int] = mapped_column(Integer, nullable=False)
+    game_round: Mapped[int] = mapped_column("round", Integer, nullable=False)
     white_player_id: Mapped[int] = mapped_column(ForeignKey("players.id", ondelete="CASCADE"), nullable=False, index=True)
     black_player_id: Mapped[int] = mapped_column(ForeignKey("players.id", ondelete="CASCADE"), nullable=False, index=True)
     result: Mapped[str | None] = mapped_column(Enum("1-0", "0-1", "½-½", name="game_result"), nullable=True)

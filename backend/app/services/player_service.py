@@ -136,7 +136,7 @@ async def get_player_games(
         enriched.append({
             "id": g.id,
             "tournament_id": g.tournament_id,
-            "round": g.round,
+            "game_round": g.game_round,
             "white_player_id": g.white_player_id,
             "black_player_id": g.black_player_id,
             "white_player_name": g.white_player.name if g.white_player else None,

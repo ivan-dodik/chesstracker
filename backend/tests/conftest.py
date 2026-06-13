@@ -50,6 +50,15 @@ def _cleanup_test_db() -> None:
         pass
 
 
+@pytest.fixture(autouse=True)
+def _disable_rate_limiter():
+    """Disable rate limiter during tests (official slowapi approach)."""
+    from app.api.auth import limiter
+    limiter.enabled = False
+    yield
+    limiter.enabled = True
+
+
 @pytest_asyncio.fixture(autouse=True)
 async def setup_database():
     """Create tables before each test and drop them after."""

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Game, Player, Tournament
 
 
-async def parse_result(result_str: str) -> str | None:
+def parse_result(result_str: str) -> str | None:
     """Parse a result string to standard format."""
     result_str = result_str.strip()
     if result_str in ("1-0", "1:0", "1"):
@@ -96,7 +96,7 @@ async def import_tournament_csv(
                 black_id = black_player.id
 
             # Parse result
-            result_value = await parse_result(row.get("result", ""))
+            result_value = parse_result(row.get("result", ""))
             if result_value is None:
                 errors.append(f"Row {row_idx}: Invalid result format: {row.get('result', '')}")
                 games_skipped += 1
@@ -106,7 +106,7 @@ async def import_tournament_csv(
             existing = await db.execute(
                 select(Game).where(
                     Game.tournament_id == tournament_id,
-                    Game.round == round_num,
+                    Game.game_round == round_num,
                     Game.white_player_id == white_id,
                     Game.black_player_id == black_id,
                 )
@@ -117,7 +117,7 @@ async def import_tournament_csv(
 
             game = Game(
                 tournament_id=tournament_id,
-                round=round_num,
+                game_round=round_num,
                 white_player_id=white_id,
                 black_player_id=black_id,
                 result=result_value,

@@ -30,7 +30,7 @@ async def get_games_by_tournament(
             selectinload(Game.black_player),
         )
         .where(Game.tournament_id == tournament_id)
-        .order_by(Game.round, Game.id)
+        .order_by(Game.game_round, Game.id)
         .offset((page - 1) * per_page)
         .limit(per_page)
     )
@@ -43,7 +43,7 @@ async def get_games_by_tournament(
         enriched.append({
             "id": g.id,
             "tournament_id": g.tournament_id,
-            "round": g.round,
+            "game_round": g.game_round,
             "white_player_id": g.white_player_id,
             "black_player_id": g.black_player_id,
             "white_player_name": g.white_player.name if g.white_player else None,

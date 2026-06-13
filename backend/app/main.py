@@ -8,10 +8,14 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 from app.api.deps import RedirectToLoginError
 from app.api.router import api_router
 from app.api.web import router as web_router
+from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -26,22 +30,24 @@ async def lifespan(app: FastAPI):
     logger.info("Shutting down Chess Tracker Backend...")
 
 
+limiter = Limiter(key_func=get_remote_address)
+
 app = FastAPI(
     title="Chess Tracker API",
     description="API for tracking chess tournaments, players and ratings",
     version="0.1.0",
     lifespan=lifespan,
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS middleware
-# In production, restrict allow_origins to specific domains
-CORS_ORIGINS = ["*"]  # Allow all origins in development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # Static files

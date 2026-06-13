@@ -24,7 +24,7 @@ class TestExportService:
         await db_session.flush()
 
         game = Game(
-            tournament_id=sample_tournament.id, round=1,
+            tournament_id=sample_tournament.id, game_round=1,
             white_player_id=sample_player.id, black_player_id=player2.id,
             result="1-0",
         )

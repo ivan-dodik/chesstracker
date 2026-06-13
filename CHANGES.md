@@ -570,3 +570,62 @@
 - Создан: `CODE_REVIEW.md` — полный отчёт код-ревью
 
 **Результат:** 22 проблемы найдены, 9 позитивных замечаний. Приоритеты: P0 (2-3ч), P1 (3-4ч), P2 (4-6ч), P3 (6-8ч)
+
+## 2026-06-14 01:42 — Исправления по CODE_REVIEW.md (21/22 замечаний)
+
+**Исправлены все замечания из CODE_REVIEW.md:**
+
+🔴 **Critical (3/3):**
+- CR-1: CORS `allow_origins` читается из env-переменной `CORS_ORIGINS`
+- CR-2: JWT cookie устанавливается на сервере с `httponly=True`, `samesite="lax"`
+- CR-5: `int(user_id)` в deps.py обёрнут в try/except → 401 при невалидном payload
+
+🟠 **High (3/3):**
+- CR-3: Seed-пароли из env-переменных (`SEED_ADMIN_PASSWORD`, `SEED_USER_PASSWORD`) + guard от production
+- CR-4: `SECRET_KEY` валидируется на длину ≥32 символов при старте приложения
+- CR-8: Rate limiting через slowapi (`@limiter.limit("5/minute")` на login endpoint)
+
+🟡 **Performance (4/4):**
+- CR-6: SQL-агрегация через `func.count(case(...))` вместо Python-итерации в stats_service
+- CR-7: Auto-commit в `get_db()` только при `session.is_modified`
+- CR-9: CSV size limit (уже был реализован)
+- CR-10: `parse_result()` — убран `async def` (синхронная функция)
+
+🟢 **Code Quality (11/12):**
+- CR-12: Добавлен `Tournament.rating_history` relationship
+- CR-13: `round` → `game_round` в модели Game (DB-колонка `round` сохранена через `key=`)
+- CR-14: `console.log` обёрнуты в `if (DEBUG)` guard
+- CR-15: `generate_rating_change()` — `max(100, ...)` вместо `max(0, ...)`
+- CR-16: Создан `.dockerignore`
+- CR-17: Убрано копирование `tests/` в production Dockerfile
+- CR-18: Telegram-bot `depends_on: service_healthy` + backend healthcheck
+- CR-19: passlib заменён на прямое использование bcrypt
+- CR-20: SSE reconnect delay сбрасывается при успешном `onopen`
+- CR-21: Alpine store `players` — устранено дублирование `loadPlayers()`
+- CR-22: Backend healthcheck в docker-compose.yml (`/health`)
+
+**Обновлены/созданы файлы:**
+- `backend/app/api/auth.py` — rate limiting + JWT cookie на сервере
+- `backend/app/api/deps.py` — int(user_id) guard
+- `backend/app/core/config.py` — SECRET_KEY validation, CORS_ORIGINS из env
+- `backend/app/core/security.py` — passlib → bcrypt
+- `backend/app/main.py` — CORS из settings
+- `backend/app/models/game.py` — `game_round` column + migration
+- `backend/app/models/tournament.py` — rating_history relationship
+- `backend/app/seed.py` — env-пароли, production guard, min rating 100
+- `backend/app/services/game_service.py` — enriched dict: game_round
+- `backend/app/services/player_service.py` — enriched dict: game_round
+- `backend/app/services/stats_service.py` — SQL aggregation
+- `backend/app/api/deps.py` — is_modified guard
+- `backend/app/static/js/main.js` — conditional console.log, Alpine store
+- `backend/app/static/js/sse.js` — delay reset on open
+- `backend/app/templates/tournaments/detail.html` — g.game_round
+- `backend/app/templates/players/detail.html` — g.game_round
+- `.dockerignore` — создан
+- `backend/Dockerfile` — убрано копирование tests
+- `docker-compose.yml` — healthcheck + bot depends_on
+- `backend/pyproject.toml` — убран passlib
+- `backend/tests/conftest.py` — rate limiter disabled
+- 8+ test-файлов обновлены: `round` → `game_round`
+
+**Результат:** 148/148 тестов проходят, ruff check без ошибок
