@@ -72,6 +72,16 @@
 - **2026-06-07 02:40**: Установлен MCP Browser Tools (`browser-tools-mcp`, `browser-tools-server` v1.2.1)
 - **2026-06-07 03:15**: Проверена форма логина через MCP Browser Tools в реальном Chrome — аутентификация работает корректно
 
+## 2026-06-13: Docker entrypoint — авто-миграции и seed
+
+**Статус:** ✅ Завершён.
+
+- ✅ Создан `backend/entrypoint.sh` — автоматические миграции (alembic) + seed при пустой БД
+- ✅ Обновлён `backend/Dockerfile` — COPY entrypoint.sh, CMD ./entrypoint.sh
+- ✅ Обновлён `docker-compose.override.yml` — UVICORN_OPTS env var для dev-режима (--reload)
+- ✅ Обновлён `README.md` — примечание о авто-миграциях, entrypoint.sh в структуре
+- ✅ Дополнительные требования ДЗ проверены: docker compose up ✅, REPORT.md ✅, Swagger ✅
+
 ## Ссылки на модули
 Детальное описание каждого слоя — в соответствующих файлах (см. [полный индекс](index.md)):
 - [Backend: все модули](backend/overview.md)

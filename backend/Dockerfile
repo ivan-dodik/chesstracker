@@ -20,6 +20,8 @@ COPY app/ ./app/
 COPY tests/ ./tests/
 COPY alembic/ ./alembic/
 COPY alembic.ini ./
+COPY entrypoint.sh ./
+RUN chmod +x ./entrypoint.sh
 
 # Set ownership for the app directory
 RUN chown -R appuser:appuser /app
@@ -33,5 +35,5 @@ ENV UV_CACHE_DIR=/home/appuser/.cache/uv
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run the application (migrations + seed on first start)
+CMD ["./entrypoint.sh"]

@@ -46,6 +46,8 @@ cp .env.example .env
 docker compose up --build
 ```
 
+> При первом запуске автоматически выполняются миграции базы данных и заполняются тестовые данные (30 игроков, 10 турниров, 200+ партий).
+
 4. Открыть в браузере:
    - **Веб-интерфейс**: http://localhost:8000
    - **Swagger UI**: http://localhost:8000/docs
@@ -205,6 +207,7 @@ chesstracker/
 │   │   ├── main.py            # Точка входа
 │   │   └── seed.py            # Seed-данные
 │   ├── alembic/               # Миграции
+│   ├── entrypoint.sh          # Точка входа Docker (миграции + seed)
 │   └── tests/                 # Тесты
 ├── telegram-bot/              # Telegram бот
 │   ├── handlers/              # Обработчики команд

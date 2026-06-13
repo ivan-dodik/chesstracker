@@ -62,3 +62,25 @@
 
 ## Итоговый статус проекта
 Все майлстоуны M1–M17 завершены. 177 тестов (148 API + 29 E2E). Все требований ДЗ выполнены.
+
+## 2026-06-13: Docker entrypoint — авто-миграции и seed
+
+**Статус:** ✅ Завершён.
+
+**Проблема:** После `docker compose up` база данных оставалась пустой — нет таблиц, нет данных. Требовались ручные команды `alembic upgrade head` и `python -m app.seed`.
+
+**Решение:** Создан `backend/entrypoint.sh`:
+1. `alembic upgrade head` — миграции
+2. Проверка БД (COUNT users) — seed только при пустой БД
+3. `uvicorn app.main:app` — запуск сервера
+
+**Изменённые файлы:**
+- Создан: `backend/entrypoint.sh`
+- Изменён: `backend/Dockerfile` (COPY + CMD entrypoint.sh)
+- Изменён: `docker-compose.override.yml` (UVICORN_OPTS env var вместо прямого command)
+- Изменён: `README.md` (примечание о авто-миграциях)
+
+**Доп. требования ДЗ:**
+1. ✅ `docker compose up` — работает с авто-миграциями и seed
+2. ✅ REPORT.md — 507+ строк, все разделы заполнены параллельно
+3. ✅ Swagger — `/docs` доступен, web-роуты скрыты (`include_in_schema=False`)
