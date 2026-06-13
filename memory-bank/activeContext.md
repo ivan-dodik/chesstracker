@@ -49,7 +49,7 @@
 - [Backend: все модули](backend/overview.md)
 - [Frontend: шаблоны, CSS, JS](frontend/overview.md)
 - [Telegram-bot](telegram-bot/overview.md)
-- [Testing: 36 тестов](testing/overview.md)
+- [Testing: 177 тестов](testing/overview.md)
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)
@@ -63,6 +63,23 @@
 
 ## Итоговый статус проекта
 Все майлстоуны M1–M17 завершены. 177 тестов (148 API + 29 E2E). Все требований ДЗ выполнены.
+
+## 2026-06-14: Аудит документации для агентов
+
+**Статус:** ✅ Завершён.
+
+**Изменения:**
+- Исправлены сломанные ссылки `modules/` → `backend/`, `frontend/` в productContext.md, activeContext.md, progress.md
+- Устранено дублирование: объединены git_commit.md + update_prompts.md (update_prompts.md удалён)
+- Разрешён конфликт caveman vs документация: добавлено исключение для CHANGES.md, PROMPTS.md, REPORT.md, memory-bank/, .clinerules/
+- Синхронизированы чекмаки IMPLEMENTATION_PLAN.md (M1-M17 все помечены [x])
+- Обновлена ARCHITECTURE.md: полная структура tests/ и e2e/, telegram-bot/tests/, майлстоуны M12-M17
+- Обновлён pre-commit: ruff format для обоих сервисов + стандартные хуки (trailing-whitespace, end-of-file-fixer, check-yaml, check-toml, check-added-large-files)
+
+**Затронутые файлы:**
+- `memory-bank/productContext.md`, `activeContext.md`, `progress.md`, `testing/overview.md`
+- `.clinerules/git_commit.md`, `.clinerules/skills-usage.md`, `.clinerules/update_prompts.md` (удалён)
+- `IMPLEMENTATION_PLAN.md`, `ARCHITECTURE.md`, `.pre-commit-config.yaml`
 
 ## 2026-06-13: Docker entrypoint — авто-миграции и seed
 

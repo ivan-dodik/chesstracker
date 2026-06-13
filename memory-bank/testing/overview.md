@@ -4,35 +4,49 @@
 - **pytest 9.x** + **pytest-asyncio** (asyncio_mode = "auto")
 - **httpx** (AsyncClient with ASGITransport)
 - **pytest-cov** for coverage reports
-- Total: **36 tests** (all pass)
+- Total: **177 tests** (148 API + 29 E2E, all pass)
 
 ## Test structure
 ```
 tests/
 ├── conftest.py              # API test fixtures (DB override, client, tokens)
-├── test_auth.py             # 4 tests: login, /me, unauthorized
-├── test_players.py          # 4 tests: list, create (admin), create (user=403), get
-├── test_tournaments.py      # 4 tests: list, create, get, standings
-├── test_games.py            # 4 tests: list, create, update result, delete
-├── test_ratings.py          # 3 tests: history, date filter, no auth
-├── test_stats.py            # 4 tests: top-rated, limit, overall, head-to-head
-├── test_favorites.py        # 5 tests: get, unauthorized, add+remove, duplicate, 404
-├── test_activity_log.py     # 2 tests: list (admin), unauthorized
-├── test_export.py           # 2 tests: export CSV, nonexistent tournament
-├── test_import_route.py     # 2 tests: import CSV, invalid format
-├── test_health.py           # 2 tests: health check, SSE events
-├── test_auth_flow.py        # 2 tests: register + login flow
-├── test_web.py              # 2 tests: dashboard page, login page
+├── test_auth.py             # Auth tests: login, /me, register
+├── test_auth_flow.py        # Register + login flow
+├── test_players.py          # Player CRUD tests
+├── test_player_games.py     # Player games tests
+├── test_player_tournaments.py # Player tournaments tests
+├── test_tournaments.py      # Tournament CRUD tests
+├── test_games.py            # Game CRUD tests
+├── test_ratings.py          # Rating history tests
+├── test_stats.py            # Stats tests
+├── test_favorites.py        # Favorites tests
+├── test_activity_log.py     # Activity log tests
+├── test_export.py           # CSV export tests
+├── test_import_route.py     # CSV import tests
+├── test_health.py           # Health check tests
+├── test_web.py              # Web route tests
+├── test_seed_verify.py      # Seed data verification
+├── test_crud_verify.py      # CRUD verification
 └── services/
-    ├── conftest.py          # Service test fixtures (db_session, sample_*)
     ├── test_player_service.py
     ├── test_tournament_service.py
     ├── test_game_service.py
     ├── test_rating_service.py
-    ├── test_favorite_service.py
     ├── test_stats_service.py
+    ├── test_favorite_service.py
     ├── test_activity_log_service.py
     └── test_export_service.py
+
+e2e/
+├── conftest.py              # E2E fixtures (server, browser, seed)
+├── test_auth.py
+├── test_dashboard.py
+├── test_navigation.py
+├── test_player_detail.py
+├── test_players_list.py
+├── test_sse.py
+├── test_tournament_detail.py
+└── test_tournaments_list.py
 ```
 
 ## Running tests

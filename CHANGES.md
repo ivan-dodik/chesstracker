@@ -507,3 +507,50 @@
 - `.clinerules/skills-usage.md` — правило использования скиллов (caveman always-on)
 
 **Итого:** 32 скилла из 6 репозиториев
+
+---
+
+## 2026-06-14 00:40 — Аудит и улучшение документации для агентов
+
+**Описание:** Анализ проектной документации (memory-bank, .clinerules, IMPLEMENTATION_PLAN.md, ARCHITECTURE.md, pre-commit). Исправлены сломанные ссылки, устранено дублирование, обновлены устаревшие данные.
+
+**Изменения:**
+
+1. **Исправлены сломанные ссылки `modules/`** → `backend/`, `frontend/` и т.д.:
+   - `memory-bank/productContext.md` — раздел «Архитектура модулей»
+   - `memory-bank/activeContext.md` — цифра "36 тестов" → "177 тестов"
+   - `memory-bank/progress.md` — цифра "36 тестов" → "177 тестов", "20 тестов" → "177 тестов", "5 пакетов (75+)" → "6 пакетов (85+)"
+
+2. **Устранено дублирование правил:**
+   - `.clinerules/git_commit.md` — объединён с `update_prompts.md` (коммит + документирование в одном файле)
+   - `.clinerules/update_prompts.md` — **удалён** (дублировал требования из git_commit.md)
+
+3. **Разрешён конфликт caveman vs документация:**
+   - `.clinerules/skills-usage.md` — добавлено исключение: документационные файлы (CHANGES.md, PROMPTS.md, REPORT.md, memory-bank/, .clinerules/) пишутся подробно
+
+4. **Синхронизированы чекмаки:**
+   - `IMPLEMENTATION_PLAN.md` — все `- [ ]` заменены на `- [x]` (M1–M17 выполнены)
+
+5. **Обновлена ARCHITECTURE.md:**
+   - Структура `tests/` — добавлены все файлы (test_tournaments, test_games, services/, e2e/)
+   - Структура `telegram-bot/tests/` — добавлена
+   - Цифра "20 тестов" → "177 тестов"
+
+6. **Очищен Memory Bank:**
+   - `memory-bank/testing/overview.md` — "36 tests" → "177 tests", обновлена структура тестов
+
+7. **Улучшен pre-commit:**
+   - `.pre-commit-config.yaml` — добавлены `pre-commit-hooks` (trailing-whitespace, end-of-file-fixer, check-yaml, check-toml, check-added-large-files)
+   - Добавлен `ruff-format` для backend и telegram-bot
+
+**Созданы/обновлены:**
+- `memory-bank/productContext.md` — исправлены ссылки
+- `memory-bank/activeContext.md` — исправлена цифра тестов
+- `memory-bank/progress.md` — исправлены цифры тестов и скиллов
+- `memory-bank/testing/overview.md` — обновлена структура и цифры
+- `.clinerules/git_commit.md` — объединён с update_prompts.md
+- `.clinerules/skills-usage.md` — добавлено исключение для документации
+- `IMPLEMENTATION_PLAN.md` — синхронизированы чекмаки
+- `ARCHITECTURE.md` — обновлена структура tests/ и майлстоуны
+- `.pre-commit-config.yaml` — добавлены ruff format и стандартные хуки
+- `.clinerules/update_prompts.md` — **удалён**

@@ -1,4 +1,14 @@
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ['--maxkb=500']
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.15.16
     hooks:
@@ -10,6 +20,13 @@ repos:
         name: ruff check (telegram-bot)
         args: [--fix]
         files: ^telegram-bot/
+      - id: ruff-format
+        name: ruff format (backend)
+        files: ^backend/
+      - id: ruff-format
+        name: ruff format (telegram-bot)
+        files: ^telegram-bot/
+
   - repo: local
     hooks:
       - id: pytest

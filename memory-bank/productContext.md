@@ -35,15 +35,12 @@
 
 ## Архитектура модулей
 
-Подробное описание слоёв приложения — в `memory-bank/modules/`:
+Подробное описание слоёв приложения — в `memory-bank/`:
 
-- [Модуль API (эндпоинты)](modules/api-layer.md)
-- [Модуль Core (конфиг, БД, безопасность)](modules/core-layer.md)
-- [Модуль Models (ORM)](modules/models-layer.md)
-- [Модуль Schemas (Pydantic)](modules/schemas-layer.md)
-- [Модуль Services (бизнес-логика)](modules/services-layer.md)
-- [Модуль Web (фронтенд)](modules/web-layer.md)
-- [Модуль Alembic (миграции)](modules/alembic.md)
-- [Модуль Testing (тесты)](modules/testing.md)
-- [Модуль Telegram-bot](modules/telegram-bot.md)
-- [Модуль Docker/infra](modules/docker-infra.md)
+- [Backend: API, Core, Models, Services](backend/overview.md)
+- [Frontend: шаблоны, CSS, JS](frontend/overview.md)
+- [Telegram-bot](telegram-bot/overview.md)
+- [Testing: 177 тестов](testing/overview.md)
+- [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
+- [Config: зависимости, env](config/backend-pyproject.md)
+- [Meta: баги, security, архитектура](meta/bugs.md)

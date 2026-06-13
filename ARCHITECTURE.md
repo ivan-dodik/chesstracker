@@ -120,11 +120,45 @@ backend/
 │   └── versions/
 ├── tests/
 │   ├── __init__.py
+│   ├── conftest.py
 │   ├── test_auth.py
+│   ├── test_auth_flow.py
 │   ├── test_players.py
+│   ├── test_player_games.py
+│   ├── test_player_tournaments.py
+│   ├── test_tournaments.py
+│   ├── test_games.py
 │   ├── test_ratings.py
 │   ├── test_stats.py
-│   └── test_favorites.py
+│   ├── test_favorites.py
+│   ├── test_activity_log.py
+│   ├── test_health.py
+│   ├── test_web.py
+│   ├── test_export.py
+│   ├── test_import_route.py
+│   ├── test_seed_verify.py
+│   ├── test_crud_verify.py
+│   └── services/
+│       ├── __init__.py
+│       ├── test_player_service.py
+│       ├── test_tournament_service.py
+│       ├── test_game_service.py
+│       ├── test_rating_service.py
+│       ├── test_stats_service.py
+│       ├── test_favorite_service.py
+│       ├── test_activity_log_service.py
+│       └── test_export_service.py
+├── e2e/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_dashboard.py
+│   ├── test_navigation.py
+│   ├── test_player_detail.py
+│   ├── test_players_list.py
+│   ├── test_sse.py
+│   ├── test_tournament_detail.py
+│   └── test_tournaments_list.py
 ├── pyproject.toml
 └── Dockerfile
 ```
@@ -148,6 +182,11 @@ telegram-bot/
 │   ├── __init__.py
 │   ├── api_client.py
 │   └── notifier.py
+├── tests/
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_api_client.py
+│   └── test_notifier.py
 ├── pyproject.toml
 └── Dockerfile
 ```
@@ -338,4 +377,4 @@ telegram-bot/
 7. **Линтер — `ruff`** (flake8 + isort + pyupgrade в одном)
 8. **Pre-commit hook** — автоматический ruff check перед каждым коммитом
 9. **GitHub Actions CI** — lint (ruff) + тесты (pytest с PostgreSQL) на каждый push/PR
-10. **Тестовая инфраструктура** — 20 тестов (pytest-asyncio, SQLite вместо PostgreSQL для изоляции), покрытие auth, CRUD, рейтинга, статистики, избранного
+10. **Тестовая инфраструктура** — 177 тестов (148 API + 29 E2E), pytest-asyncio + Playwright, SQLite вместо PostgreSQL для изоляции

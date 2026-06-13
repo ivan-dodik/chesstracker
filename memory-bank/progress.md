@@ -24,7 +24,7 @@
   - ✅ .pre-commit-config.yaml: ruff hook для backend и telegram-bot
   - ✅ .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
   - ✅ ruff check проходит на всех файлах
-  - ✅ 20/20 тестов проходят
+   - ✅ 177/177 тестов проходят (148 API + 29 E2E)
 - ✅ **M11: Финальная документация**
   - ✅ README.md создан
   - ✅ ARCHITECTURE.md дополнен
@@ -42,7 +42,7 @@
 - **Циклический редирект после логина** — частично исправлено. Корневая причина: гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. При входе на дашборд HTMX-запросы к защищённым эндпоинтам (например, `/api/favorites`) могут уйти до того, как Alpine скроет секции для неаутентифицированных пользователей. Если запрос возвращает 401, старый обработчик `htmx:responseError` очищал токен и редиректил на `/login`. Исправлено: добавлено условие `&& localStorage.getItem('jwt_token')` в обработчик, улучшена обработка `/api/auth/me`, добавлена задержка 100ms. **Полный анализ: BUGS.md.**
 
 ## Доступные инструменты агента
-- **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов). Конфигурация: `skills-lock.json`.
+- **Агентские скиллы Cline**: установлены 6 пакетов (85+ скиллов). Конфигурация: `skills-lock.json`.
   - `use_skill` — активация любого установленного скилла по имени
   - Список всех скиллов: `skills-lock.json` (ключи `skills` → имена скиллов)
   - Правила документирования при установке скиллов: `.clinerules/memory-bank.md`
@@ -105,7 +105,7 @@
 - [Backend: все модули](backend/overview.md)
 - [Frontend: шаблоны, CSS, JS](frontend/overview.md)
 - [Telegram-bot](telegram-bot/overview.md)
-- [Testing: 36 тестов](testing/overview.md)
+- [Testing: 177 тестов](testing/overview.md)
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)
