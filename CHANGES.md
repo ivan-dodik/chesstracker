@@ -484,3 +484,26 @@
 **Результат:** Количество скиллов увеличено с 76 до 85. Все новые скиллы напрямую релевантны стеку проекта.
 
 **Итого:** 85 скиллов из 6 репозиториев
+
+## 2026-06-14 00:26 — Оптимизация агентских скиллов (85 → 32)
+
+**Причина:** 85 скиллов потребляли ~31% контекстного окна только в system prompt. Многие скиллы были дублирующимися, deprecated, или нерелевантны проекту.
+
+**Удалено 53 скилла:**
+- Дублирующиеся (8): `test-driven-development`, `systematic-debugging`, `requesting-code-review`, `receiving-code-review`, `write-a-skill`, `writing-skills`, `devops`, `template-skill`
+- Deprecated (3): `qa`, `request-refactor-plan`, `ubiquitous-language`
+- Творчество/визуал (6): `algorithmic-art`, `canvas-design`, `brand-guidelines`, `slack-gif-creator`, `theme-factory`, `web-artifacts-builder`
+- Документы (4): `docx`, `pptx`, `pdf`, `xlsx`
+- Контент/статьи (5): `edit-article`, `writing-beats`, `writing-fragments`, `writing-shape`, `internal-comms`
+- Внешние сервисы (5): `claude-api`, `mcp-builder`, `supabase`, `supabase-postgres-best-practices`, `running-claude-code-via-litellm-copilot`
+- Нишевые (8): `develop-userscripts`, `scaffold-exercises`, `obsidian-vault`, `use-my-browser`, `tzst`, `xdrop`, `xget`, `openclaw-secure-linux-cloud`
+- Процесс (2): `prototype`, `teach`
+- Управление задачами (4): `setup-matt-pocock-skills`, `to-prd`, `to-issues`, `triage`
+- Прочие (8): `secure-linux-web-hosting`, `git-guardrails-claude-code`, `migrate-to-shoehorn`, `opensource-guide-coach`, `grill-me`, `grill-with-docs`, `performance-optimization`, `using-superpowers`
+
+**Созданы/обновлены:**
+- `skills-lock.json` — обновлён до 32 скиллов
+- `skills-index.md` — индексный каталог с триггерами
+- `.clinerules/skills-usage.md` — правило использования скиллов (caveman always-on)
+
+**Итого:** 32 скилла из 6 репозиториев

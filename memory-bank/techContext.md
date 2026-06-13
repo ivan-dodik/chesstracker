@@ -146,15 +146,17 @@ dependencies = [
 - **Тесты**: `pytest -v` (async через pytest-asyncio)
 - **Миграции**: `alembic revision --autogenerate` / `alembic upgrade head`
 - **Docker**: `docker compose up --build`
-- **Агентские скиллы Cline**: установлено 6 пакетов (85 скиллов):
-  - `mattpocock/skills` (29) — архитектура, code review, TDD, диагностика, планирование
-  - `anthropics/skills` (18) — фронтенд-дизайн, документы, тестирование, PDF, PPTX
-  - `obra/superpowers` (14) — процессы разработки, дебаггинг, code review, parallel agents
-  - `supabase/agent-skills` (2) — PostgreSQL best practices
-  - `xixu-me/skills` (12) — GitHub Actions, безопасность, хостинг, CLI утилиты
-  - `mindrally/skills` (9) — FastAPI, PostgreSQL, Python testing, HTMX, Docker, performance-optimization, DevOps, security, web-scraping
-  - Файл конфигурации: `skills-lock.json` (закоммичен)
-  - Справочная информация: см. `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»)
+- **Агентские скиллы Cline**: установлено 32 скилла (оптимизировано с 85):
+  - `mattpocock/skills` (10) — тdd, diagnose, review, improve-codebase-architecture, frontend-design, zoom-out, handoff, skill-creator, setup-pre-commit, design-an-interface
+  - `obra/superpowers` (7) — brainstorming, writing-plans, executing-plans, finishing-a-development-branch, using-git-worktrees, verification-before-completion, dispatching-parallel-agents, subagent-driven-development
+  - `mindrally/skills` (5) — fastapi-python, postgresql-best-practices, python-testing, htmx, docker, security-best-practices, web-scraping
+  - `anthropics/skills` (3) — doc-coauthoring, skill-creator, webapp-testing
+  - `xixu-me/skills` (3) — github-actions-docs, readme-i18n, skills-cli
+  - `brettatoms/agent-skills` (1) — alpinejs
+  - Always-on: `caveman` (компактный стиль общения)
+  - Файл конфигурации: `skills-lock.json` (32 скилла)
+  - Индекс: `skills-index.md` (каталог с триггерами)
+  - Правило: `.clinerules/skills-usage.md` (caveman always-on, маппинг контекст→скилл)
 
 ## Ссылки на модули
 
