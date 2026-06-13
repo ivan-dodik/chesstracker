@@ -554,3 +554,19 @@
 - `ARCHITECTURE.md` — обновлена структура tests/ и майлстоуны
 - `.pre-commit-config.yaml` — добавлены ruff format и стандартные хуки
 - `.clinerules/update_prompts.md` — **удалён**
+
+## 2026-06-14 00:55 — Код-ревью проекта
+
+**Описание:** Проведён полный статический анализ всех исходных файлов проекта (backend, frontend, infrastructure, telegram-bot). Создан документ `CODE_REVIEW.md` с 22 находками, классифицированными по severity.
+
+**Найденные проблемы:**
+
+- 🔴 Critical (5): CORS wildcard + credentials, JWT cookie без HttpOnly, seed-пароли в коде, HS256 symmetric key, ValueError guard
+- 🟠 High (5): N+1 stats aggregation, auto-commit для GET, нет rate limiting, CSV import OOM, async для sync fn
+- 🟡 Medium (5): Дублирование wins/losses/draws, orphan FK, round как имя поля, console.log в prod, seed rating min
+- 🟢 Low (7): .dockerignore, tests в prod image, docker depends_on, passlib deprecated, SSE reconnect, duplicate Alpine code, healthcheck
+
+**Созданы/обновлены файлы:**
+- Создан: `CODE_REVIEW.md` — полный отчёт код-ревью
+
+**Результат:** 22 проблемы найдены, 9 позитивных замечаний. Приоритеты: P0 (2-3ч), P1 (3-4ч), P2 (4-6ч), P3 (6-8ч)

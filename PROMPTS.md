@@ -1037,3 +1037,24 @@ initialize memory bank
 - Обновлена документация (CHANGES.md, REPORT.md, memory-bank)
 
 **Вывод:** Удачно — сокращение 68%, экономия контекстного окна. Caveman теперь активен по умолчанию.
+
+---
+
+## 2026-06-14 00:50 — Код-ревью проекта
+
+**Режим:** Plan → Act
+
+**Промпт:**
+> Выполни код ревью проекта.
+
+**Результат:**
+- Исследованы все исходные файлы проекта через 5 параллельных subagent'ов + ручное чтение ключевых файлов (security.py, deps.py, stats_service.py, import_service.py, game_service.py, seed.py, main.js, sse.js)
+- Создан `CODE_REVIEW.md` — полный отчёт с 22 находками:
+  - 🔴 Critical (5): CORS, JWT cookie security, seed passwords, HS256, ValueError guard
+  - 🟠 High (5): N+1 aggregation, auto-commit, rate limiting, CSV OOM, async misuse
+  - 🟡 Medium (5): Code duplication, orphan FK, reserved word, console.log, seed rating
+  - 🟢 Low (7): Dockerignore, tests in image, depends_on, deprecated deps, SSE reconnect, Alpine duplication, healthcheck
+- 9 позитивных замечаний
+- Приоритезация: P0 (2-3ч), P1 (3-4ч), P2 (4-6ч), P3 (6-8ч)
+
+**Вывод:** Удачно — 22 проблемы найдены, классифицированы по severity и приоритету. Каждая проблема сопровождается примером кода и конкретной рекомендацией.
