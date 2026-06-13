@@ -36,7 +36,8 @@
 - **Alpine.js**: компоненты ratingChart, overallStatsChart, playerDetail, tournamentDetail, headToHead, accordion
 - **GameRead**: расширен полями white_player_name, black_player_name
 - **TournamentStandings**: расширен полями wins, draws, losses
-- **Агентские скиллы Cline**: установлены 5 пакетов (75+ скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
+- **Агентские скиллы Cline**: установлены 6 пакетов (85 скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
+  - Новые: `mindrally/skills` (9) — FastAPI, PostgreSQL, Python testing, HTMX, Docker, performance-optimization, DevOps, security, web-scraping
 - **MCP Browser Tools**: установлен `@agentdeskai/browser-tools-mcp@1.2.1` с Chrome-расширением. Инструменты: `takeScreenshot`, `getConsoleLogs`, `getConsoleErrors`, `getNetworkErrors`, `getNetworkLogs`, `runAccessibilityAudit`. Сервер работает на порту 3025.
 - **Проблема аутентификации**: Частично исправлена. Корневая причина — гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. Создан BUGS.md с полным анализом.
 

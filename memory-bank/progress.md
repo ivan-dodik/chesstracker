@@ -82,6 +82,24 @@
 - ✅ Обновлён `README.md` — примечание о авто-миграциях, entrypoint.sh в структуре
 - ✅ Дополнительные требования ДЗ проверены: docker compose up ✅, REPORT.md ✅, Swagger ✅
 
+## 2026-06-14: Установка дополнительных агентских скиллов
+
+**Статус:** ✅ Завершён.
+
+- ✅ Установлены 9 новых скиллов из `mindrally/skills`:
+  - `fastapi-python` — паттерны и best practices FastAPI
+  - `postgresql-best-practices` — оптимизация PostgreSQL
+  - `python-testing` — паттерны pytest и тестирования
+  - `htmx` — HTMX best practices
+  - `docker` — Docker и Docker Compose
+  - `performance-optimization` — оптимизация производительности Python
+  - `devops` — DevOps практики (CI/CD, мониторинг)
+  - `security-best-practices` — безопасность
+  - `web-scraping` — веб-скрапинг
+- ✅ Количество скиллов увеличено с 76 до 85
+- ⚠️ Firecrawl, wshobson/agents, sickn33/antigravity-awesome-skills — не удалось установить (нет SKILL.md формата)
+- ✅ Обновлены: CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank (techContext.md, activeContext.md, progress.md)
+
 ## Ссылки на модули
 Детальное описание каждого слоя — в соответствующих файлах (см. [полный индекс](index.md)):
 - [Backend: все модули](backend/overview.md)

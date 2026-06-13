@@ -55,6 +55,12 @@
       "skillPath": "skills/develop-userscripts/SKILL.md",
       "computedHash": "fe21aae92e5d399ad75c62ce76af27c79493d2d0badf382aa029e41fd955662b"
     },
+    "devops": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "devops/SKILL.md",
+      "computedHash": "aeae5544e6a258252e2af5df1f2629452ec333bde7d792eb648b13dd4c617500"
+    },
     "diagnose": {
       "source": "mattpocock/skills",
       "sourceType": "github",
@@ -73,6 +79,12 @@
       "skillPath": "skills/doc-coauthoring/SKILL.md",
       "computedHash": "b964e4c3ffe13f66f76dd7919073e60c7aec622cd8a8363bb36323188100cf8e"
     },
+    "docker": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "docker/SKILL.md",
+      "computedHash": "b2f646b339642b2597a244b0f508b4712ce0fa7bb3c7ad982e0bd11fddcc5630"
+    },
     "docx": {
       "source": "anthropics/skills",
       "sourceType": "github",
@@ -90,6 +102,12 @@
       "sourceType": "github",
       "skillPath": "skills/executing-plans/SKILL.md",
       "computedHash": "b41c919caf1bb07fbacb0e29899ac513f9eb11cd4dd695975ad352c2c03cc4d7"
+    },
+    "fastapi-python": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "fastapi-python/SKILL.md",
+      "computedHash": "1d7346210a6690d2faeb089f074c0dc20a7056c2c83ac1062a11c1b73158be72"
     },
     "finishing-a-development-branch": {
       "source": "obra/superpowers",
@@ -132,6 +150,12 @@
       "sourceType": "github",
       "skillPath": "skills/productivity/handoff/SKILL.md",
       "computedHash": "1a78d774f8a59db5daa6e65e20a6596872fa8cde769f9a6e3a09b678dd5ae8cc"
+    },
+    "htmx": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "htmx/SKILL.md",
+      "computedHash": "6e1f97a1af33384fe4e9ea60078770bacdacfb48d26a601c2bf17c61447c8532"
     },
     "improve-codebase-architecture": {
       "source": "mattpocock/skills",
@@ -181,6 +205,18 @@
       "skillPath": "skills/pdf/SKILL.md",
       "computedHash": "cfbc539377088ca7e44a813b30c306327385bbd973cd7a721e1743f60837dd62"
     },
+    "performance-optimization": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "performance-optimization/SKILL.md",
+      "computedHash": "847b7ba020e4f8da7548c4930d597c85c08abe6fd6e9e42a7229bbc766b3eb10"
+    },
+    "postgresql-best-practices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "postgresql-best-practices/SKILL.md",
+      "computedHash": "6667a273249881de45d74185b090c5b581abbd2b10e7c10eee1ac6f087c0f73a"
+    },
     "pptx": {
       "source": "anthropics/skills",
       "sourceType": "github",
@@ -192,6 +228,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/prototype/SKILL.md",
       "computedHash": "e4d0c8f8cb3fc096ee99405a15491da466545cf4a3694bee5a0c9db2fa621a43"
+    },
+    "python-testing": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "python-testing/SKILL.md",
+      "computedHash": "cfbc14bb9f2a95abdd54a464c2fdd066dc01628efcc931b863ed60b5316002f5"
     },
     "qa": {
       "source": "mattpocock/skills",
@@ -246,6 +288,12 @@
       "sourceType": "github",
       "skillPath": "skills/secure-linux-web-hosting/SKILL.md",
       "computedHash": "49e4837b94e43d1c9e50f7e73063a3c5ffa0fc6d1a0708145f50c432cafac2d4"
+    },
+    "security-best-practices": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "security-best-practices/SKILL.md",
+      "computedHash": "e5c1c8c66736acebe912250222a78d12e11488eda554d9a12b4e2487f4d1ac4e"
     },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",
@@ -390,6 +438,12 @@
       "sourceType": "github",
       "skillPath": "skills/web-artifacts-builder/SKILL.md",
       "computedHash": "d52d422ead3fa26859a6af129609841a8536b230a2d649f86e61771d063e05e2"
+    },
+    "web-scraping": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "skillPath": "web-scraping/SKILL.md",
+      "computedHash": "01ffcaaf7f9ec8c4fdf0b26fdab5d5db5d39c0ee6727f693ce09c10a991a0bf0"
     },
     "webapp-testing": {
       "source": "anthropics/skills",

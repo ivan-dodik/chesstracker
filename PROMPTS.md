@@ -988,3 +988,32 @@ initialize memory bank
 3. **Swagger-документация** — полностью соответствует (`/docs` с title/description/version в FastAPI, web-роуты скрыты через `include_in_schema=False`, README ссылается на Swagger).
 
 **Вывод:** Удачно — основная проблема (отсутствие авто-миграций) решена добавлением entrypoint-скрипта. REPORT.md и Swagger были уже готовы.
+
+---
+
+## 2026-06-14 00:00 — Установка дополнительных агентских скиллов
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Подумай, какие скиллы могут оказаться полезными для проекта. Посмотри, что уже установлено, что доступно на https://www.skills.sh/ и https://skillsmp.com/
+Предложи какие скиллы необходимо доустановить. Подготовь план по их установке.
+
+Затем: Напиши, какие скиллы ты установишь.
+Затем: Добавь в этот список firecrawl
+```
+
+**Что хотели получить:** Анализ установленных скиллов, рекомендации новых, план установки.
+
+**Результат:**
+- Проанализированы 76 существующих скиллов из 5 репозиториев
+- Проверены каталоги skills.sh (API search) и GitHub-репозитории
+- Выявлено, что многие скиллы на skills.sh не используют формат SKILL.md (не совместимы с `npx skills add`)
+- Репозиторий `mindrally/skills` оказался единственным с полной поддержкой SKILL.md формата
+- Установлено 9 новых скиллов из `mindrally/skills`: fastapi-python, postgresql-best-practices, python-testing, htmx, docker, performance-optimization, devops, security-best-practices, web-scraping
+- Firecrawl (firecrawl/cli, firecrawl/skills) — не удалось установить (нет SKILL.md)
+- wshobson/agents, sickn33/antigravity-awesome-skills — не удалось установить (нет SKILL.md)
+- Итого: 85 скиллов из 6 репозиториев
+
+**Вывод:** Удачно — установлены релевантные скиллы. Репозиторий mindrally/skills стал основным источником специализированных скиллов. Firecrawl недоступен через `npx skills add` — его CLI-утилиты можно использовать отдельно.

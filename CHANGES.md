@@ -457,3 +457,30 @@
 - Изменён: `README.md` — добавлено примечание об автоматических миграциях, entrypoint.sh в структуру проекта
 
 **Результат:** `docker compose up --build` теперь полностью готов к работе — миграции и seed выполняются автоматически
+
+---
+
+## 2026-06-14 00:02 — Установка дополнительных агентских скиллов
+
+**Описание:** Установлены 9 новых скиллов из репозитория `mindrally/skills` для покрытия потребностей проекта в FastAPI, PostgreSQL, Python-тестировании, Docker, HTMX, оптимизации, DevOps, безопасности и веб-скрапинге.
+
+**Изменены файлы:**
+- Изменён: `skills-lock.json` — добавлено 9 скиллов (fastapi-python, postgresql-best-practices, python-testing, htmx, docker, performance-optimization, devops, security-best-practices, web-scraping)
+- Созданы: `.agents/skills/*/SKILL.md` — файлы скиллов в формате, совместимом с Cline
+
+**Установленные скиллы:**
+1. `mindrally/skills/fastapi-python` — паттерны и best practices FastAPI
+2. `mindrally/skills/postgresql-best-practices` — оптимизация PostgreSQL
+3. `mindrally/skills/python-testing` — паттерны pytest и тестирования
+4. `mindrally/skills/htmx` — HTMX best practices
+5. `mindrally/skills/docker` — Docker и Docker Compose
+6. `mindrally/skills/performance-optimization` — оптимизация производительности Python
+7. `mindrally/skills/devops` — DevOps практики (CI/CD, мониторинг)
+8. `mindrally/skills/security-best-practices` — безопасность
+9. `mindrally/skills/web-scraping` — веб-скрапинг (альтернатива firecrawl)
+
+**Примечание:** Скиллы из `wshobson/agents`, `firecrawl/cli`, `vercel-labs/skills`, `sickn33/antigravity-awesome-skills` не удалось установить — они не используют формат SKILL.md, необходимый для `npx skills add`.
+
+**Результат:** Количество скиллов увеличено с 76 до 85. Все новые скиллы напрямую релевантны стеку проекта.
+
+**Итого:** 85 скиллов из 6 репозиториев
