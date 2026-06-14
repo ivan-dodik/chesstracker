@@ -341,9 +341,13 @@ document.addEventListener('alpine:init', () => {
 // to early HTMX requests (hx-trigger="load" elements processed via MutationObserver).
 // ============================================================
 
-// After HTMX swap, reinitialize components
-document.addEventListener('htmx:afterSwap', () => {
+// After HTMX swap, reinitialize components + Alpine.js re-scan
+document.addEventListener('htmx:afterSwap', (event) => {
   initComponents();
+  // Force Alpine.js to re-scan new DOM elements after HTMX swap
+  if (window.Alpine) {
+    Alpine.initTree(event.detail.target);
+  }
 });
 
 // Initial component init on DOMContentLoaded

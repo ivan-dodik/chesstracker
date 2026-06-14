@@ -71,7 +71,6 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
   Alpine.data('playerEditForm', (playerId) => ({
     playerId: playerId,
     form: { name: '', rating: 0, city: '' },
@@ -183,6 +182,5 @@ document.addEventListener('alpine:init', () => {
       }
     },
   }));
-});
 </script>
 {% endblock %}

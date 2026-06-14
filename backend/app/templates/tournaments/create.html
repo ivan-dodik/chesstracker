@@ -67,7 +67,6 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
   Alpine.data('tournamentCreateForm', () => ({
     form: {
       name: '', start_date: '', end_date: '',
@@ -137,6 +136,5 @@ document.addEventListener('alpine:init', () => {
       }
     },
   }));
-});
 </script>
 {% endblock %}

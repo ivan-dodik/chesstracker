@@ -80,7 +80,6 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
   Alpine.data('gameEditForm', (gameId) => ({
     gameId: gameId,
     form: { game_round: 1, white_player_id: '', black_player_id: '', result: '' },
@@ -184,6 +183,5 @@ document.addEventListener('alpine:init', () => {
       }
     },
   }));
-});
 </script>
 {% endblock %}

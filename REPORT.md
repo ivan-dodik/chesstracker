@@ -555,3 +555,34 @@ API-тесты не покрывают фронтенд-поведение. Ну
 - `beforeunload` handler в sse.js для закрытия SSE-соединений
 
 **Результат:** 160/160 тестов, ruff clean
+
+---
+
+## История работы
+
+### 2026-06-15 01:05 — Fix: Пустая страница после HTMX-навигации с форм редактирования
+
+**Проблема:** при нажатии "отмена" или "назад к профилю/турниру" на страницах редактирования URL в браузере менялся, но контент оставался пустой (только шапка). Ручное обновление страницы помогало.
+
+**Корневая причина:** `hx-boost="true"` в `base.html` → HTMX загружает все страницы через AJAX. При HTMX swap скрипты шаблонов добавляют `document.addEventListener('alpine:init', ...)` listener, но событие `alpine:init` уже сработало один раз при старте Alpine.js и больше не наступает. Как следствие `Alpine.data('componentName', ...)` не вызывается → компонент не зарегистрирован → Alpine не может инициализировать `x-data` элемент → контент пустой.
+
+**Затронутые шаблоны (8):** players/edit.html, players/detail.html, players/create.html, tournaments/edit.html, tournaments/detail.html, tournaments/create.html, games/edit.html, games/create.html.
+
+**Решение (2 части):**
+1. `main.js`: добавлен `Alpine.initTree(event.detail.target)` в обработчик `htmx:afterSwap` для принудительного re-scan Alpine.js после HTMX swap
+2. 8 шаблонов: убрана обёртка `document.addEventListener('alpine:init', ...)` — `Alpine.data()` вызывается напрямую (Alpine.js уже доступен глобально при HTMX swap)
+
+**Результат:** 160/160 тестов, ruff clean. Баг исправлен.
+
+**Ключевой инсайт:** HTMX `hx-boost` + Alpine.js требуют особого подхода к регистрации компонентов: обёртка `alpine:init` работает только при первичной загрузке страницы, при AJAX-навигации event не повторяется.
+
+---
+
+## Ключевые проблемы и решения
+
+### 2026-06-15 01:05 — Alpine.js компоненты не инициализируются после HTMX swap
+
+- **Суть:** пустая страница после HTMX-навигации
+- **Причина:** `alpine:init` event fired ОДИН раз при старте Alpine.js; при HTMX swap скрипты шаблона добавляют новые listeners, но event не повторяется
+- **Решение:** убрать обёртку `alpine:init`, вызывать `Alpine.data()` напрямую + `Alpine.initTree()` в `htmx:afterSwap`
+- **Результат:** работает

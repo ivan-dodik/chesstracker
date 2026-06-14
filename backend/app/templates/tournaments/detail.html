@@ -129,8 +129,7 @@
 
 {% block extra_head %}
 <script>
-  document.addEventListener('alpine:init', () => {
-    Alpine.data('tournamentDetail', (tournamentId) => ({
+  Alpine.data('tournamentDetail', (tournamentId) => ({
       tournamentId,
       tournament: null,
       standings: [],
@@ -221,7 +220,6 @@
           this.importing = false;
         }
       }
-    }));
-  });
+  }));
 </script>
 {% endblock %}

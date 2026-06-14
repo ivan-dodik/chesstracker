@@ -90,7 +90,6 @@
 </div>
 
 <script>
-document.addEventListener('alpine:init', () => {
   Alpine.data('tournamentEditForm', (tournamentId) => ({
     tournamentId: tournamentId,
     form: { name: '', start_date: '', end_date: '', type: 'classic', rounds: 0, status: 'active', location: '' },
@@ -210,6 +209,5 @@ document.addEventListener('alpine:init', () => {
       }
     },
   }));
-});
 </script>
 {% endblock %}

@@ -171,11 +171,10 @@
 
 {% block extra_head %}
 <script>
-  document.addEventListener('alpine:init', () => {
-    // Load all players for head-to-head selector
-    let allPlayersCache = [];
+  // Load all players for head-to-head selector
+  let allPlayersCache = [];
 
-    Alpine.data('playerDetail', (playerId) => ({
+  Alpine.data('playerDetail', (playerId) => ({
       playerId,
       player: null,
       overallStats: {},
@@ -349,7 +348,6 @@
           showFlash('Ошибка при изменении избранного', 'error');
         }
       }
-    }));
-  });
+  }));
 </script>
 {% endblock %}

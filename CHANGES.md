@@ -1020,3 +1020,16 @@
 
 - Затронутые файлы: `models/player.py`, `models/game.py`, `models/tournament.py`, `templates/players/detail.html`, `templates/players/edit.html`, `static/js/sse.js`, `tests/services/conftest.py`
 - 160/160 тестов проходят, ruff clean
+
+## 2026-06-15 01:05 — Исправление бага: пустая страница после HTMX-навигации
+
+**Причина:** `hx-boost="true"` в `base.html` → HTMX загружает страницы через AJAX. При swap скрипты шаблонов добавляют `alpine:init` listener, но event уже сработал → `Alpine.data()` не вызывается → компоненты не регистрируются → Alpine не инициализирует `x-data` элементы → контент пустой.
+
+**Исправления:**
+- `static/js/main.js`: добавлен `Alpine.initTree(event.detail.target)` в обработчик `htmx:afterSwap` для принудительной переинициализации Alpine.js компонентов после HTMX swap
+- 8 шаблонов: убрана обёртка `document.addEventListener('alpine:init', ...)` — `Alpine.data()` вызывается напрямую (Alpine.js уже загружен глобально при HTMX swap):
+  - `players/edit.html`, `players/detail.html`, `players/create.html`
+  - `tournaments/edit.html`, `tournaments/detail.html`, `tournaments/create.html`
+  - `games/edit.html`, `games/create.html`
+
+- 160/160 тестов проходят, ruff clean
