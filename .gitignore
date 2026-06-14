@@ -27,3 +27,4 @@ backend/test.db
 .agents/
 log.txt
 benchmark_results/
+backend/logs/
