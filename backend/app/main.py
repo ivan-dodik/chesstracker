@@ -28,22 +28,28 @@ logger = logging.getLogger(__name__)
 
 # ── File logging setup ──────────────────────────────────────────────
 LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
-LOG_DIR.mkdir(exist_ok=True)
-LOG_FILE = LOG_DIR / "backend.log"
+_log_handlers: list[logging.Handler] = [logging.StreamHandler()]
 
-file_handler = logging.handlers.RotatingFileHandler(
-    str(LOG_FILE), maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8",
-)
-file_handler.setLevel(logging.DEBUG)
-file_handler.setFormatter(
-    logging.Formatter("%(asctime)s %(levelname)-7s %(name)s — %(message)s"),
-)
+try:
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    LOG_FILE = LOG_DIR / "backend.log"
+    file_handler = logging.handlers.RotatingFileHandler(
+        str(LOG_FILE), maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8",
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)-7s %(name)s — %(message)s"),
+    )
+    _log_handlers.append(file_handler)
+except OSError as exc:
+    # Container volume may not be writable (e.g. permission denied on host dir).
+    # Fall back to stderr-only logging so the app still starts.
+    print(f"WARNING: Cannot create log file ({exc}). Logging to stderr only.")
 
-# Root logger: DEBUG to file, INFO to stderr
 logging.basicConfig(
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)-7s %(name)s — %(message)s",
-    handlers=[logging.StreamHandler(), file_handler],
+    handlers=_log_handlers,
 )
 
 # Quieten noisy libraries
