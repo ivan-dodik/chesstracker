@@ -152,3 +152,155 @@ async def test_login_page_contains_alpine_form(client: AsyncClient):
     response = await client.get("/login")
     assert 'x-data="loginForm()"' in response.text
     assert '@submit.prevent="submit()"' in response.text
+
+
+# --- CRUD Forms: Players ---
+
+
+@pytest.mark.asyncio
+async def test_player_create_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /players/create returns 200 for admin."""
+    response = await client.get(
+        "/players/create",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Добавить игрока" in response.text
+    assert 'x-data="playerCreateForm()"' in response.text
+
+
+@pytest.mark.asyncio
+async def test_player_create_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /players/create redirects non-admin to /players."""
+    response = await client.get(
+        "/players/create",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/players"
+
+
+@pytest.mark.asyncio
+async def test_player_edit_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /players/1/edit returns 200 for admin."""
+    response = await client.get(
+        "/players/1/edit",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Редактировать игрока" in response.text
+    assert 'playerEditForm' in response.text
+
+
+@pytest.mark.asyncio
+async def test_player_edit_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /players/1/edit redirects non-admin."""
+    response = await client.get(
+        "/players/1/edit",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/players"
+
+
+# --- CRUD Forms: Tournaments ---
+
+
+@pytest.mark.asyncio
+async def test_tournament_create_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /tournaments/create returns 200 for admin."""
+    response = await client.get(
+        "/tournaments/create",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Создать турнир" in response.text
+    assert 'tournamentCreateForm' in response.text
+
+
+@pytest.mark.asyncio
+async def test_tournament_create_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /tournaments/create redirects non-admin."""
+    response = await client.get(
+        "/tournaments/create",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/tournaments"
+
+
+@pytest.mark.asyncio
+async def test_tournament_edit_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /tournaments/1/edit returns 200 for admin."""
+    response = await client.get(
+        "/tournaments/1/edit",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Редактировать турнир" in response.text
+    assert 'tournamentEditForm' in response.text
+
+
+@pytest.mark.asyncio
+async def test_tournament_edit_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /tournaments/1/edit redirects non-admin."""
+    response = await client.get(
+        "/tournaments/1/edit",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert response.headers.get("location") == "/tournaments"
+
+
+# --- CRUD Forms: Games ---
+
+
+@pytest.mark.asyncio
+async def test_game_create_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /tournaments/1/games/create returns 200 for admin."""
+    response = await client.get(
+        "/tournaments/1/games/create",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Добавить партию" in response.text
+    assert 'gameCreateForm' in response.text
+
+
+@pytest.mark.asyncio
+async def test_game_create_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /tournaments/1/games/create redirects non-admin."""
+    response = await client.get(
+        "/tournaments/1/games/create",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303
+    assert "/tournaments/1" in response.headers.get("location", "")
+
+
+@pytest.mark.asyncio
+async def test_game_edit_page_admin(client: AsyncClient, admin_token: str):
+    """Test GET /games/1/edit returns 200 for admin."""
+    response = await client.get(
+        "/games/1/edit",
+        headers={"Authorization": f"Bearer {admin_token}"},
+    )
+    assert response.status_code == 200
+    assert "Редактировать партию" in response.text
+    assert 'gameEditForm' in response.text
+
+
+@pytest.mark.asyncio
+async def test_game_edit_page_non_admin_redirects(client: AsyncClient, user_token: str):
+    """Test GET /games/1/edit redirects non-admin."""
+    response = await client.get(
+        "/games/1/edit",
+        headers={"Authorization": f"Bearer {user_token}"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 303

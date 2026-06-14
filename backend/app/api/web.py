@@ -64,7 +64,7 @@ async def player_create_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Player create form (admin only)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/players", status_code=303)
     return template_response("players/create.html", {"request": request})
 
@@ -76,7 +76,7 @@ async def player_edit_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Player edit form (admin only)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/players", status_code=303)
     return template_response("players/edit.html", {"request": request, "player_id": player_id})
 
@@ -88,7 +88,7 @@ async def player_delete_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Player delete confirmation (admin only, redirects after delete)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/players", status_code=303)
     return RedirectResponse(url=f"/players/{player_id}", status_code=303)
 
@@ -118,7 +118,7 @@ async def tournament_create_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Tournament create form (admin only)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/tournaments", status_code=303)
     return template_response("tournaments/create.html", {"request": request})
 
@@ -130,7 +130,7 @@ async def tournament_edit_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Tournament edit form (admin only)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/tournaments", status_code=303)
     return template_response("tournaments/edit.html", {"request": request, "tournament_id": tournament_id})
 
@@ -142,7 +142,7 @@ async def game_create_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Game create form (admin only, redirects back to tournament)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url=f"/tournaments/{tournament_id}", status_code=303)
     return template_response("games/create.html", {"request": request, "tournament_id": tournament_id})
 
@@ -154,7 +154,7 @@ async def game_edit_page(
     current_user: dict = Depends(get_current_user_for_web),
 ) -> HTMLResponse:
     """Game edit form (admin only)."""
-    if not current_user.is_admin:
+    if current_user.role != "admin":
         return RedirectResponse(url="/", status_code=303)
     return template_response("games/edit.html", {"request": request, "game_id": game_id})
 
