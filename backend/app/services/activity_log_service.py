@@ -21,6 +21,13 @@ class _DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 
+def _make_json_safe(data: dict[str, Any] | None) -> dict[str, Any] | None:
+    """Convert datetime objects in dict to ISO strings for JSON storage."""
+    if data is None:
+        return None
+    return json.loads(json.dumps(data, cls=_DateTimeEncoder))
+
+
 async def log_activity(
     db: AsyncSession,
     user_id: int | None,
@@ -36,8 +43,8 @@ async def log_activity(
         action=action,
         entity_type=entity_type,
         entity_id=entity_id,
-        old_values=json.dumps(old_values, cls=_DateTimeEncoder) if old_values else None,
-        new_values=json.dumps(new_values, cls=_DateTimeEncoder) if new_values else None,
+        old_values=_make_json_safe(old_values),
+        new_values=_make_json_safe(new_values),
     )
     db.add(log_entry)
     await db.flush()
@@ -91,8 +98,8 @@ async def get_activity_log(
             "action": log.action,
             "entity_type": log.entity_type,
             "entity_id": log.entity_id,
-            "old_values": json.loads(log.old_values) if log.old_values else None,
-            "new_values": json.loads(log.new_values) if log.new_values else None,
+            "old_values": log.old_values,
+            "new_values": log.new_values,
             "timestamp": log.timestamp.isoformat() if log.timestamp else None,
         }
         result_list.append(log_dict)

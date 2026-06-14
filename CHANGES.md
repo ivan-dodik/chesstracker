@@ -697,3 +697,22 @@
 
 - Затронутые файлы: `backend/app/seed.py`, `backend/entrypoint.sh`, `backend/app/main.py`, `docker-compose.override.yml`
 - 148/148 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 15:35 — Исправление seed JSONB mismatch и возврат healthcheck API
+
+**Проблема:**
+1. `/health` API был скрыт из Swagger и логи подавлялись — нужно было только убрать Docker healthcheck
+2. Seed падал с ошибкой `column "old_values" is of type jsonb but expression is of type character varying` → все данные откатывались → users пуста → login 401
+
+**Корневая причина:** Модель `ActivityLog` определяла `old_values`/`new_values` как `Text`, а Alembic миграция создавала их как `JSONB`. При bulk-вставке SQLAlchemy отправлял `VARCHAR` вместо `JSONB` → PostgreSQL отклонял.
+
+**Изменения:**
+- `backend/app/models/activity_log.py` — тип колонок изменён `Text` → `JSON` (portable, работает и с SQLite в тестах, и с PostgreSQL). Методы `set_old_values`/`set_new_values` теперь принимают dict напрямую, `get_old_values`/`get_new_values` возвращают dict.
+- `backend/app/services/activity_log_service.py` — добавлена `_make_json_safe()` для конвертации datetime в ISO-строки. Убран `json.loads()` при чтении (данные уже dict).
+- `backend/app/main.py` — убран `HealthCheckFilter`, убрано `include_in_schema=False` для `/health`
+- `docker-compose.yml` — убран healthcheck секцию для backend; `telegram-bot.depends_on` изменён с `service_healthy` на простой `- backend`
+
+- Затронутые файлы: `backend/app/models/activity_log.py`, `backend/app/services/activity_log_service.py`, `backend/app/main.py`, `docker-compose.yml`
+- 148/148 тестов проходят, ruff clean
