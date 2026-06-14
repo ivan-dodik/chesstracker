@@ -1242,3 +1242,22 @@ column "old_values" is of type jsonb but expression is of type character varying
 **Результат:**
 - Финальный план из 5 майлстоунов утверждён
 - Начало реализации в Act mode
+
+---
+
+## 2026-06-14 16:15 — Исправление CRUD-бага + реализация M1–M4
+
+**Режим:** Act (продолжение)
+
+**Промпт пользователя:**
+```
+Я залогинен как админ. Нахожусь на странице "Игроки". Кликаю "добавить" и вместо страницы добавления игрока возвращается JSON: {"detail":[{"type":"int_parsing","loc":["path","player_id"],"msg":"Input should be a valid integer, unable to parse string as an integer","input":"create"}]}. В серверном логе - `chess-tracker-backend  | INFO:     172.19.0.1:41968 - "GET /players/create HTTP/1.1" 422 Unprocessable Entity`
+```
+
+**Результат:**
+- Исправлен баг: `/players/create` ловился как `/{player_id}` → 422. Добавлены маршруты ДО catch-all
+- M1: CRUD формы игроков (create/edit/delete шаблоны + routes + PlayerUpdate schema)
+- M2: CRUD формы турниров (create/edit/delete шаблоны + routes + TournamentUpdate schema)
+- M3: CRUD формы партий (create/edit/delete шаблоны + routes + GameUpdate schema)
+- M4: 12 тестов (admin/non-admin access), исправлен is_admin → role != "admin"
+- Итого: 148 → 160 тестов, ruff clean, 4 коммита (98f9e30, 2c358ad, 57a1a2a)

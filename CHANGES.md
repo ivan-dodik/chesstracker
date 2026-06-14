@@ -726,6 +726,80 @@
 
 ---
 
+## 2026-06-14 16:15 — M2: Турниры — CRUD формы (Create/Edit/Delete)
+
+**Описание:** Добавлены CRUD формы для турниров: создание, редактирование, удаление.
+
+**Изменения:**
+- `backend/app/schemas/tournament.py` — добавлена схема `TournamentUpdate` (name, start_date, end_date, location, rounds, type, status — все опциональные, с валидацией type и dates)
+- `backend/app/api/web.py` — добавлены маршруты: `GET /tournaments/create` (admin only), `GET /tournaments/{id}/edit` (admin only), размещены ДО `GET /tournaments/{tournament_id}`
+- `backend/app/templates/tournaments/create.html` — новый шаблон: форма создания турнира (name*, start_date*, end_date*, type, rounds, location), Alpine.js `tournamentCreateForm`, POST → `/api/tournaments`
+- `backend/app/templates/tournaments/edit.html` — новый шаблон: форма редактирования с предзаполнением, PUT → `/api/tournaments/{id}`, кнопка удаления с подтверждением, переключение статуса (active/completed)
+- `backend/app/templates/tournaments/detail.html` — добавлена кнопка «✏️ Редактировать» для админов
+
+**Затронутые файлы:**
+- `backend/app/schemas/tournament.py`
+- `backend/app/api/web.py`
+- `backend/app/templates/tournaments/create.html` (новый)
+- `backend/app/templates/tournaments/edit.html` (новый)
+- `backend/app/templates/tournaments/detail.html`
+
+- 148/148 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 16:22 — M3: Партии — CRUD формы (Create/Edit/Delete)
+
+**Описание:** Добавлены CRUD формы для партий: создание, редактирование, удаление.
+
+**Изменения:**
+- `backend/app/schemas/game.py` — добавлена схема `GameUpdate` (game_round, white_player_id, black_player_id, result, played_at — все опциональные, с валидацией result)
+- `backend/app/api/web.py` — добавлены маршруты: `GET /tournaments/{id}/games/create` (admin only), `GET /games/{id}/edit` (admin only)
+- `backend/app/templates/games/create.html` — новый шаблон: форма создания партии (тур, белые, чёрные, результат), Alpine.js `gameCreateForm`, динамический список игроков из API
+- `backend/app/templates/games/edit.html` — новый шаблон: форма редактирования с предзаполнением, PUT → `/api/games/{id}`, удаление с подтверждением
+- `backend/app/templates/tournaments/detail.html` — добавлена кнопка «+ Добавить партию» для админов, иконка ✏️ для редактирования каждой партии в аккордеоне
+
+**Затронутые файлы:**
+- `backend/app/schemas/game.py`
+- `backend/app/api/web.py`
+- `backend/app/templates/games/create.html` (новый)
+- `backend/app/templates/games/edit.html` (новый)
+- `backend/app/templates/tournaments/detail.html`
+
+- 148/148 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 16:28 — M4: Тесты CRUD форм + исправление is_admin
+
+**Описание:** Добавлены 12 тестов на проверку доступа к CRUD-формам (admin vs non-admin). Исправлена ошибка авторизации.
+
+**Исправления:**
+- `backend/app/api/web.py` — заменено `current_user.is_admin` → `current_user.role != "admin"` во всех CRUD-маршрутах (атрибут `is_admin` не существует в модели User, поле — `role`)
+- `backend/app/schemas/game.py` — добавлена `GameUpdate` схема (перенесена из M3, до этого не была закоммичена из-за ошибки ruff)
+
+**Тесты (12 новых в tests/test_web.py):**
+- `test_player_create_page_admin` — 200 для admin
+- `test_player_create_page_non_admin_redirects` — 303 → /players
+- `test_player_edit_page_admin` — 200 для admin
+- `test_player_edit_page_non_admin_redirects` — 303 → /players
+- `test_tournament_create_page_admin` — 200 для admin
+- `test_tournament_create_page_non_admin_redirects` — 303 → /tournaments
+- `test_tournament_edit_page_admin` — 200 для admin
+- `test_tournament_edit_page_non_admin_redirects` — 303 → /tournaments
+- `test_game_create_page_admin` — 200 для admin
+- `test_game_create_page_non_admin_redirects` — 303 → /tournaments/{id}
+- `test_game_edit_page_admin` — 200 для admin
+- `test_game_edit_page_non_admin_redirects` — 303 → /
+
+**Затронутые файлы:**
+- `backend/app/api/web.py`
+- `backend/tests/test_web.py`
+
+**Результат:** 160/160 тестов проходят, ruff clean
+
+---
+
 ## 2026-06-14 15:35 — Исправление seed JSONB mismatch и возврат healthcheck API
 
 **Проблема:**
