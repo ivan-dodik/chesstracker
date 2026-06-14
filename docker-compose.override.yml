@@ -12,7 +12,3 @@ services:
 
   telegram-bot:
     user: "${UID:-1000}:${GID:-1000}"
-    volumes:
-      - ./telegram-bot:/app
-    command: >
-      uv run python bot.py

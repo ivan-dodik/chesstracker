@@ -8,7 +8,9 @@ import datetime
 import os
 import random
 
-from app.core.database import Base, async_session_factory, engine
+from sqlalchemy import text
+
+from app.core.database import async_session_factory
 from app.core.security import hash_password
 from app.models import ActivityLog, Favorite, Game, Player, RatingHistory, Tournament, User
 
@@ -92,22 +94,20 @@ def random_games_for_tournament(players: list[Player], tournament_id: int, round
 
 
 async def seed() -> None:
-    """Run the seed script."""
+    """Run the seed script (idempotent — skips if data already exists)."""
     if os.getenv("ENVIRONMENT") == "production":
         raise RuntimeError("Seed script must not run in production")
 
     admin_password = os.getenv("SEED_ADMIN_PASSWORD", "admin123")
     user_password = os.getenv("SEED_USER_PASSWORD", "user123")
 
-    print("Dropping tables...", flush=True)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.drop_all)
-    print("Tables dropped.", flush=True)
-
-    print("Creating tables...", flush=True)
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    print("Tables created.", flush=True)
+    async with async_session_factory() as session:
+        # Skip seeding if data already exists
+        result = await session.execute(text("SELECT COUNT(*) FROM users"))
+        count = result.scalar()
+        if count > 0:
+            print(f"Database already has {count} users, skipping seed.", flush=True)
+            return
 
     print("Seeding data...", flush=True)
     async with async_session_factory() as session:

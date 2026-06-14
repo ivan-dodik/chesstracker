@@ -682,3 +682,18 @@
 - `.clinerules/implementation_plan.md` — убраны условные формулировки ("если пришёл новый промпт", "если были новые") в шагах 3 и 4.
 
 - Затронутые файлы: `.clinerules/git_commit.md`, `.clinerules/implementation_plan.md`
+
+---
+
+## 2026-06-14 15:22 — Исправление seed, health check логов и telegram-bot
+
+**Проблема:** Seed дропал таблицы при каждом запуске, логи /health засоряли вывод, telegram-bot падал с Permission denied.
+
+**Изменения:**
+- `backend/app/seed.py` — убраны `drop_all`/`create_all`, seed стал идемпотентным (пропуск при наличии данных). Таблицы создаются через Alembic миграции.
+- `backend/entrypoint.sh` — увеличен таймаут seed с 60с до 120с.
+- `backend/app/main.py` — добавлен `HealthCheckFilter` для подавления логов `/health` в uvicorn access logs. Добавлено `include_in_schema=False` для эндпоинта `/health`.
+- `docker-compose.override.yml` — убран volume mount и command override для telegram-bot (причина Permission denied: `.venv/.lock` от root).
+
+- Затронутые файлы: `backend/app/seed.py`, `backend/entrypoint.sh`, `backend/app/main.py`, `docker-compose.override.yml`
+- 148/148 тестов проходят, ruff clean

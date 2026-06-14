@@ -22,6 +22,13 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
+
+class HealthCheckFilter(logging.Filter):
+    """Suppress access logs for /health endpoint."""
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        return "/health" not in record.getMessage()
+
 BASE_DIR = Path(__file__).resolve().parent
 
 
@@ -73,7 +80,11 @@ app.include_router(web_router)
 app.include_router(api_router)
 
 
-@app.get("/health")
+@app.get("/health", include_in_schema=False)
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok"}
+
+
+# Suppress /health access logs from uvicorn
+logging.getLogger("uvicorn.access").addFilter(HealthCheckFilter())

@@ -7,8 +7,8 @@ set -e
 echo "⏳ Running database migrations..."
 uv run alembic upgrade head
 
-echo "🌱 Seeding database if empty (timeout 60s)..."
-timeout 60 uv run python -c "
+echo "🌱 Seeding database if empty (timeout 120s)..."
+timeout 120 uv run python -c "
 import asyncio, sys
 from sqlalchemy import text
 from app.core.database import async_session_factory
