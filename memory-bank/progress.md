@@ -46,11 +46,10 @@
   - `use_skill` — активация любого установленного скилла по имени
   - Список всех скиллов: `skills-lock.json` (ключи `skills` → имена скиллов)
   - Правила документирования при установке скиллов: `.clinerules/memory-bank.md`
-- **MCP Browser Tools**: `@agentdeskai/browser-tools-mcp@1.2.1` с Chrome-расширением.
-  - Сервер: порт 3025, процесс: `browser-tools-server`
-  - Инструменты: `takeScreenshot`, `getConsoleLogs`, `getConsoleErrors`, `getNetworkErrors`, `getNetworkLogs`, `runAccessibilityAudit`, `runPerformanceAudit`, `runSEOAudit`
+- **Playwright MCP**: `@executeautomation/playwright-mcp-server` — браузерная автоматизация.
+  - MCP-сервер: `github.com/executeautomation/mcp-playwright`
+  - Инструменты: `playwright_navigate`, `playwright_screenshot`, `playwright_click`, `playwright_fill`, `playwright_select`, `playwright_evaluate`, `playwright_resize`, `playwright_drag`, `playwright_upload_file` и др.
   - Настройки: `cline_mcp_settings.json`
-  - **Проверка формы логина (03:15)**: логин admin/admin123 → редирект на дашборд → все API 200 OK → 0 ошибок → аудит 80/100
 
 ## Эволюция проектных решений
 - **2026-06-06**: Инициализация
@@ -69,8 +68,8 @@
 - **2026-06-07 00:00**: Исправлены Alpine.js ошибки (порядок загрузки скриптов)
 - **2026-06-07 01:24**: Исправлена проблема аутентификации (htmx:responseError, логирование)
 - **2026-06-07 02:20**: Создан BUGS.md — полная документация проблемы циклического редиректа после логина
-- **2026-06-07 02:40**: Установлен MCP Browser Tools (`browser-tools-mcp`, `browser-tools-server` v1.2.1)
-- **2026-06-07 03:15**: Проверена форма логина через MCP Browser Tools в реальном Chrome — аутентификация работает корректно
+- **2026-06-07 02:40**: ~~Установлен MCP Browser Tools~~ → заменён на Playwright MCP (2026-06-14)
+- **2026-06-14 17:33**: Установлен Playwright MCP (`@executeautomation/playwright-mcp-server`) — браузерная автоматизация
 
 ## 2026-06-13: Docker entrypoint — авто-миграции и seed
 

@@ -97,6 +97,12 @@
       "skillPath": "skills/engineering/improve-codebase-architecture/SKILL.md",
       "computedHash": "ef32aea0a8fab9b365ff9e08a95f8d353e20ca21ea46ec2e73587c86dd341351"
     },
+    "playwright-cli": {
+      "source": "microsoft/playwright-cli",
+      "sourceType": "github",
+      "skillPath": "skills/playwright-cli/SKILL.md",
+      "computedHash": "32cf6cf8733ae75ae41f5241347bca74459629f90bcfbd4e25540ede5d4b8f95"
+    },
     "postgresql-best-practices": {
       "source": "mindrally/skills",
       "sourceType": "github",
@@ -176,10 +182,10 @@
       "computedHash": "01ffcaaf7f9ec8c4fdf0b26fdab5d5db5d39c0ee6727f693ce09c10a991a0bf0"
     },
     "webapp-testing": {
-      "source": "anthropics/skills",
+      "source": "github/awesome-copilot",
       "sourceType": "github",
       "skillPath": "skills/webapp-testing/SKILL.md",
-      "computedHash": "ad5b1fc52807e9afa4635e59218a026b164dc58b6c3f41b0f7c644dcd6ccf572"
+      "computedHash": "e386cf78f5a002c8fa684066f933c670571f3cfb43b0d66bfc82050d74d6ea64"
     },
     "writing-plans": {
       "source": "obra/superpowers",

@@ -854,3 +854,18 @@
 - Добавлен сервер в `cline_mcp_settings.json` с именем `github.com/executeautomation/mcp-playwright`
 
 - Затронутый файл: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
+
+---
+
+## 2026-06-14 17:56 — Обновление скиллов и инструкций: playwright-cli + Playwright MCP
+
+**Описание:** Добавлен новый скилл `playwright-cli` в индекс скиллов. Заменены все упоминания MCP Browser Tools на Playwright MCP в документации. Добавлен Playwright MCP в маппинг контекст→скилл.
+
+**Изменения:**
+- `skills-index.md` — добавлен скилл `playwright-cli` (microsoft/playwright-cli) в «Инфраструктура и качество», обновлен счётчик 32→33
+- `.clinerules/skills-usage.md` — добавлена строка «Browser/скриншоты → Playwright MCP» в маппинг контекст→скилл
+- `REPORT.md` — заменена строка «MCP Browser Tools» → «Playwright MCP» в таблице AI-инструментов
+- `memory-bank/activeContext.md` — заменено описание Browser Tools на Playwright MCP
+- `memory-bank/progress.md` — заменено описание Browser Tools на Playwright MCP, обновлена хронология
+
+- Затронутые файлы: `skills-index.md`, `.clinerules/skills-usage.md`, `REPORT.md`, `memory-bank/activeContext.md`, `memory-bank/progress.md`

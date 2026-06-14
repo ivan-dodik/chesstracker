@@ -64,7 +64,8 @@
 | Новая фича (сложная) | `brainstorming` → `writing-plans` → `executing-plans` |
 | Завершение ветки | `finishing-a-development-branch` → `verification-before-completion` |
 | Архитектурное улучшение | `zoom-out` → `improve-codebase-architecture` |
-| E2E тесты | `webapp-testing` |
+| E2E тесты | `webapp-testing` (pytest + Playwright) |
+| Browser/скриншоты | **Playwright MCP** (`playwright_navigate`, `playwright_screenshot`, `playwright_click`) |
 | CI/CD | `github-actions-docs` |
 | Документация | `doc-coauthoring` |
 | Параллельные задачи | `dispatching-parallel-agents` |

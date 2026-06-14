@@ -1,7 +1,7 @@
 # Skills Index — Chess Tracker
 
-> Каталог установленных агентских скиллов (32 шт.)
-> Автоматически сгенерирован: 2026-06-14
+> Каталог установленных агентских скиллов (33 шт.)
+> Автоматически сгенерирован: 2026-06-14 (обновлён: 2026-06-14)
 
 ## Стек технологий (7)
 
@@ -42,13 +42,14 @@
 | `doc-coauthoring` | anthropics | Структурированное написание docs | docs, documentation, spec |
 | `readme-i18n` | xixu-me | Мультиязычный README | i18n, translate, README |
 
-## Инфраструктура и качество (5)
+## Инфраструктура и качество (6)
 
 | Скилл | Источник | Описание | Триггер |
 |-------|----------|----------|---------|
 | `security-best-practices` | mindrally | Безопасность бэкенда | security, vulnerability |
 | `setup-pre-commit` | mattpocock | Husky + lint-staged настройка | pre-commit, husky |
 | `webapp-testing` | anthropics | Playwright E2E тестирование | E2E, playwright, browser |
+| `playwright-cli` | microsoft | Playwright MCP: навигация, клики, скриншоты, формы | playwright, browser, screenshot, navigate |
 | `github-actions-docs` | xixu-me | GitHub Actions workflow | CI, GitHub Actions, workflow |
 | `skills-cli` | xixu-me | Управление скиллами | install skill, find skill |
 
@@ -91,4 +92,4 @@
 | anthropics/skills | 4 | Frontend, документы, skill-creator |
 | xixu-me/skills | 3 | GitHub Actions, i18n, skills-cli |
 | brettatoms/agent-skills | 1 | Alpine.js |
-| **Итого** | **32** | |
+| **Итого** | **33** | |

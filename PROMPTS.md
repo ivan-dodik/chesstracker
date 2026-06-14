@@ -1324,3 +1324,25 @@ Set up the MCP server from https://github.com/executeautomation/mcp-playwright w
 - Установлен `@executeautomation/playwright-mcp-server` глобально через `npm install -g`
 - Добавлен сервер в `cline_mcp_settings.json` с именем `github.com/executeautomation/mcp-playwright`
 - Продемонстрирована работа: `playwright_navigate` → загрузка https://example.com, `playwright_screenshot` → скриншот страницы
+
+---
+
+## 2026-06-14 17:52 — Обновление скиллов и инструкций
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Я установил новые скиллы. Проверь папку со скиллами и добавь их в индекс и в инструкции по использованию. Также удали MCP Browser Tools. Пропиши в инструкциях использование Playwright MCP (установил недавно, проверь что работает), а упоминания Browser Tools удали.
+```
+
+**Ответ/план (Plan mode):**
+- Добавить `playwright-cli` (microsoft/playwright-cli) в skills-index.md
+- Заменить Browser Tools → Playwright MCP в REPORT.md, memory-bank/activeContext.md, memory-bank/progress.md
+- Playwright MCP уже подключён и работает (Connected MCP Server: github.com/executeautomation/mcp-playwright)
+
+**Результат:**
+- Добавлен скилл `playwright-cli` (microsoft/playwright-cli) в skills-index.md (32→33)
+- Добавлена строка «Browser/скриншоты → Playwright MCP» в маппинг контекст→скилл (.clinerules/skills-usage.md)
+- Заменены все упоминания Browser Tools → Playwright MCP в REPORT.md, memory-bank/activeContext.md, memory-bank/progress.md
+- Playwright MCP подключён и работает (github.com/executeautomation/mcp-playwright)
