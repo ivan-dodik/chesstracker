@@ -716,3 +716,13 @@
 
 - Затронутые файлы: `backend/app/models/activity_log.py`, `backend/app/services/activity_log_service.py`, `backend/app/main.py`, `docker-compose.yml`
 - 148/148 тестов проходят, ruff clean
+
+## 2026-06-14 15:50 — Фильтрация соперников в head-to-head
+
+**Описание:** В выпадающем списке соперников на странице игрока (head-to-head) теперь отображаются только те игроки, с которыми текущий игрок уже сыграл хотя бы одну партию. Ранее показывались все игроки из БД.
+
+**Изменения:**
+- `backend/app/templates/players/detail.html` — в методе `init()` изменён порядок загрузки: `loadGames()` теперь вызывается до `loadPlayersList()`. Метод `loadPlayersList()` извлекает уникальные ID оппонентов из загруженных игр и фильтрует `allPlayersCache` только по ним (вместо показа всех игроков кроме текущего).
+
+- Затронутый файл: `backend/app/templates/players/detail.html`
+- 148/148 тестов проходят, ruff clean

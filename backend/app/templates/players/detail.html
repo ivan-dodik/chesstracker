@@ -187,8 +187,8 @@
       async init() {
         await this.loadPlayer();
         await this.loadOverallStats();
-        await this.loadPlayersList();
         await this.loadGames();
+        await this.loadPlayersList();
         await this.loadTournaments();
         this.$nextTick(() => this.renderRatingChart());
       },
@@ -216,7 +216,13 @@
           const resp = await fetch('/api/players?per_page=200', { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           allPlayersCache = data.items || [];
-          this.otherPlayers = allPlayersCache.filter(p => p.id !== this.playerId);
+          // Extract unique opponent IDs from games
+          const opponentIds = new Set();
+          for (const g of this.games) {
+            if (g.white_player_id !== this.playerId) opponentIds.add(g.white_player_id);
+            if (g.black_player_id !== this.playerId) opponentIds.add(g.black_player_id);
+          }
+          this.otherPlayers = allPlayersCache.filter(p => opponentIds.has(p.id));
         } catch(e) {
           console.error('Failed to load players', e);
         }
