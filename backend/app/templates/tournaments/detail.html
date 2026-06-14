@@ -143,9 +143,11 @@
       importType: 'info',
 
       async init() {
-        await this.loadTournament();
-        await this.loadStandings();
-        await this.loadGames();
+        await Promise.all([
+          this.loadTournament(),
+          this.loadStandings(),
+          this.loadGames(),
+        ]);
       },
 
       async loadTournament() {

@@ -37,6 +37,14 @@ async def lifespan(app: FastAPI):
         async with engine.connect() as conn:
             await conn.execute(text("SELECT 1"))
     logger.info("Database pool warmed up (3 connections).")
+
+    # Warmup Jinja2 templates — compile all templates on startup to avoid
+    # ~50s first-request latency from lazy compilation in Docker overlay fs.
+    from app.api.web import env
+    for tpl_name in env.list_templates():
+        env.get_template(tpl_name)
+    logger.info("Jinja2 templates warmed up (%d templates).", len(list(env.list_templates())))
+
     yield
     await engine.dispose()
     logger.info("Shutting down Chess Tracker Backend...")
