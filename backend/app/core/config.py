@@ -41,6 +41,7 @@ class Settings(BaseSettings):
     # Backend
     BACKEND_URL: str = "http://backend:8000"
     DEBUG: bool = True
+    SQL_ECHO: bool = False
 
     @field_validator("DEBUG", mode="before")
     @classmethod

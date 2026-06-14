@@ -914,3 +914,17 @@
 - **.dockerignore:** расширен (memory-bank, scripts, compose files, LICENSE, .venv, *.pyc)
 - 160/160 тестов проходят, ruff clean
 - Затронутые файлы: `backend/Dockerfile`, `telegram-bot/Dockerfile`, `docker-compose.yml`, `backend/entrypoint.sh`, `.dockerignore`
+
+---
+
+## 2026-06-14 22:37 — Устранение задержки при первом запуске и спама в логах
+
+- **Причина:** `DEBUG=True` → `create_async_engine(echo=True)` → SQLAlchemy логировал каждый SQL-запрос (200+ строк при загрузке dashboard)
+- **Причина задержки:** asyncpg pool cold start — пул соединений создавался при первом запросе к БД
+- **Исправления:**
+  - `config.py`: добавлен `SQL_ECHO: bool = False` — отдельный флаг от DEBUG
+  - `database.py`: `echo=settings.SQL_ECHO` вместо `echo=settings.DEBUG`, добавлен `pool_pre_ping=True`
+  - `main.py`: pool warmup в lifespan (`SELECT 1` при старте) + `engine.dispose()` при shutdown
+  - `docker-compose.yml`: убран явный `DEBUG: "true"` из environment
+- Затронутые файлы: `backend/app/core/config.py`, `backend/app/core/database.py`, `backend/app/main.py`, `docker-compose.yml`
+- 160/160 тестов проходят, ruff clean

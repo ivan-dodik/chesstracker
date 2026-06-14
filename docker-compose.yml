@@ -27,7 +27,6 @@ services:
       - .env
     environment:
       DATABASE_URL: postgresql+asyncpg://ct_user:ct_password@db:5432/ct_database
-      DEBUG: "true"
     ports:
       - "8000:8000"
     depends_on:

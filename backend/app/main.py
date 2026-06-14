@@ -14,11 +14,13 @@ from fastapi.staticfiles import StaticFiles
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from sqlalchemy import text
 
 from app.api.deps import RedirectToLoginError
 from app.api.router import api_router
 from app.api.web import router as web_router
 from app.core.config import settings
+from app.core.database import engine
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +32,12 @@ BASE_DIR = Path(__file__).resolve().parent
 async def lifespan(app: FastAPI):
     """Application lifespan context."""
     logger.info("Starting Chess Tracker Backend...")
+    # Warmup DB connection pool to avoid cold-start latency on first request
+    async with engine.connect() as conn:
+        await conn.execute(text("SELECT 1"))
+    logger.info("Database pool warmed up.")
     yield
+    await engine.dispose()
     logger.info("Shutting down Chess Tracker Backend...")
 
 
