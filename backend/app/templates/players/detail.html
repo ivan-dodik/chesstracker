@@ -109,7 +109,8 @@
           </label>
         </div>
         <div x-show="!h2hPlayerId" style="padding:1rem;color:var(--color-text-light);">Выберите соперника для просмотра статистики личных встреч</div>
-        <div x-show="h2hPlayerId && h2hData" class="h2h-stats">
+        <template x-if="h2hPlayerId && h2hData">
+          <div class="h2h-stats">
           <div class="h2h-grid">
             <div class="h2h-item">
               <div class="h2h-label">Всего игр</div>
@@ -129,6 +130,7 @@
             </div>
           </div>
         </div>
+        </template>
       </div>
 
       <!-- Tournaments List -->
@@ -262,6 +264,9 @@
           const data = await resp.json();
           if (!data.length) return;
 
+          if (this.ratingChart) {
+            this.ratingChart.destroy();
+          }
           const ctx = canvas.getContext('2d');
           const labels = data.map(r => new Date(r.date).toLocaleDateString('ru-RU'));
           const ratings = data.map(r => r.rating);

@@ -224,6 +224,26 @@ initialize memory bank
 
 ---
 
+## 2026-06-14 23:16 — Исправление ошибок на странице игрока (h2hData null + Chart.js canvas)
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+При открытии страницы игрока http://localhost:8000/players/18  в консоли браузера выводятся ошибки:
+- Alpine Expression Error: Cannot read properties of null (reading 'total_games') / 'player1_wins' / 'player2_wins' / 'draws'
+- Failed to load rating chart: Canvas is already in use
+```
+
+**План (Plan mode):**
+1. x-show с h2hData=null не блокирует вычисление x-text → замена на x-if
+2. renderRatingChart не вызывает destroy перед new Chart → добавить destroy
+
+**Результат:**
+- (в процессе)
+
+---
+
 ## 2026-06-14 22:52 — Диагностика и исправление фризов при первом запуске
 
 **Режим:** Plan → Act

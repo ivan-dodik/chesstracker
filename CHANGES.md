@@ -931,6 +931,15 @@
 
 ---
 
+## 2026-06-14 23:16 — Исправление ошибок на странице игрока
+
+- **Alpine h2hData null:** `x-show` → `x-if` для контейнера head-to-head (Alpine вычисляет x-text внутри x-show даже при false)
+- **Chart.js canvas:** добавлен `this.ratingChart?.destroy()` перед `new Chart()` (предотвращает "Canvas is already in use")
+- Затронутые файлы: `backend/app/templates/players/detail.html`
+- 32/32 тестов (web + stats) проходят
+
+---
+
 ## 2026-06-14 23:05 — Оптимизация API endpoints (N+1, pool, cache)
 
 - **Бенчмарк DO:** standings=80.2ms, tournaments=35.8ms, players=38.6ms
