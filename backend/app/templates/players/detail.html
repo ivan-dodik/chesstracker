@@ -22,7 +22,7 @@
             <span x-show="player.city" style="margin-left:1rem;color:var(--color-text-light);" x-text="'🏙 ' + player.city"></span>
           </div>
         </div>
-        <div class="player-header-actions" x-data="{ isAdmin: Auth.isAdmin() }">
+        <div class="player-header-actions">
           <button class="btn btn-outline" @click="toggleFavorite()" x-text="isFavorite ? '★ В избранном' : '☆ В избранное'"></button>
           <a x-show="isAdmin" :href="'/players/' + playerId + '/edit'" class="btn btn-outline">✏️ Редактировать</a>
         </div>
@@ -178,6 +178,10 @@
       player: null,
       overallStats: {},
       isFavorite: false,
+
+      get isAdmin() {
+        return Auth.isAdmin();
+      },
       ratingChart: null,
       h2hPlayerId: '',
       h2hData: null,

@@ -1,7 +1,7 @@
 # Active Context: Chess Tracker
 
 ## Текущее состояние проекта
-Проект полностью реализован. Добавлена TDD-инфраструктура. Задокументирована проблема с циклическим редиректом после логина (см. BUGS.md).
+Проект полностью реализован. Исправлены ошибки P1/P2/P3 из FRONTEND_TEST_REPORT.md. 160/160 тестов, ruff clean. Все фиксы проверены через Playwright MCP.
 
 ## Последние изменения
 - **Обязательная авторизация (11:17)**:
@@ -39,6 +39,7 @@
 - **Агентские скиллы Cline**: установлены 6 пакетов (85 скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
   - Новые: `mindrally/skills` (9) — FastAPI, PostgreSQL, Python testing, HTMX, Docker, performance-optimization, DevOps, security, web-scraping
 - **Playwright MCP**: установлен `@executeautomation/playwright-mcp-server`. Инструменты: `playwright_navigate`, `playwright_screenshot`, `playwright_click`, `playwright_fill`, `playwright_select`, `playwright_evaluate`, `playwright_resize` и др. Подключён как MCP-сервер `github.com/executeautomation/mcp-playwright`.
+- **Исправления P1/P2/P3 (2026-06-14):** P1 Critical — кнопка "Редактировать" скрыта для user (вынесен `isAdmin` геттер в `playerDetail`, убран вложенный `x-data`); P2 Medium — колонка "Турнир" отображает название (добавлено `tournament_name` в `GameRead`); P3 Medium — избранные показывают имена/рейтинги (создана `FavoritePlayerInfo`, добавлено `player` в `FavoriteRead`).
 - **Проблема аутентификации**: Частично исправлена. Корневая причина — гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. Создан BUGS.md с полным анализом.
 
 ## Ссылки на модули

@@ -881,3 +881,18 @@
   - P3 (Medium): Избранные игроки отображают "—" вместо данных на дашборде
 - Созданы файлы: `FRONTEND_TEST_PLAN.md`, `FRONTEND_TEST_REPORT.md`
 - Затронутые файлы: `FRONTEND_TEST_PLAN.md`, `FRONTEND_TEST_REPORT.md`, `PROMPTS.md`
+
+## 2026-06-14 18:43 — Исправление ошибок из FRONTEND_TEST_REPORT.md (P1, P2, P3)
+
+- **P1 (Critical):** Кнопка "Редактировать" скрыта для обычного пользователя
+  - Причина: вложенный `x-data="{ isAdmin: Auth.isAdmin() }"` внутри `<template x-if>` некорректно работал с Alpine.js scoping
+  - Решение: вынесен геттер `isAdmin` в компонент `playerDetail`, убран вложенный `x-data`
+- **P2 (Medium):** Колонка "Турнир" отображает название турнира вместо "—"
+  - Причина: `GameRead` схема не содержала поле `tournament_name`
+  - Решение: добавлено `tournament_name: str | None = None` в `GameRead`
+- **P3 (Medium):** Избранные игроки отображают имена и рейтинги
+  - Причина: `FavoriteRead` схема не возвращала данные игрока
+  - Решение: создана `FavoritePlayerInfo` модель, добавлено поле `player` в `FavoriteRead`
+- Проверены через Playwright MCP: все 3 фикса подтверждены
+- 160/160 тестов проходят, ruff clean
+- Затронутые файлы: `backend/app/templates/players/detail.html`, `backend/app/schemas/game.py`, `backend/app/schemas/favorite.py`, `PROMPTS.md`

@@ -31,6 +31,7 @@ class GameRead(BaseModel):
     """Schema for reading game details."""
     id: int
     tournament_id: int
+    tournament_name: str | None = None
     game_round: int
     white_player_id: int
     black_player_id: int
