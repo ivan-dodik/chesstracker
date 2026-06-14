@@ -35,6 +35,33 @@ class TournamentCreate(BaseModel):
         return v
 
 
+class TournamentUpdate(BaseModel):
+    """Schema for updating tournament data."""
+    name: str | None = None
+    start_date: datetime | None = None
+    end_date: datetime | None = None
+    location: str | None = None
+    rounds: int | None = None
+    type: str | None = None
+    status: str | None = None
+
+    @field_validator("type")
+    @classmethod
+    def validate_type(cls, v: str | None) -> str | None:
+        if v is not None and v not in {"classic", "blitz", "rapid"}:
+            raise ValueError("Tournament type must be one of: classic, blitz, rapid")
+        return v
+
+    @field_validator("end_date")
+    @classmethod
+    def validate_dates(cls, v: datetime | None, info) -> datetime | None:
+        if v is not None:
+            start = info.data.get("start_date")
+            if start and v < start:
+                raise ValueError("End date must be after start date")
+        return v
+
+
 class TournamentRead(BaseModel):
     """Schema for reading tournament details."""
     id: int

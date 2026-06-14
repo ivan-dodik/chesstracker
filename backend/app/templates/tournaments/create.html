@@ -1,0 +1,142 @@
+<!-- SPDX-FileCopyrightText: 2026 Ivan Dodik -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+
+{% extends "base.html" %}
+{% block title %}Создать турнир — Chess Tracker{% endblock %}
+{% block content %}
+<div class="container" x-data="tournamentCreateForm()" x-init="init()">
+  <div class="page-header">
+    <h1>Создать турнир</h1>
+    <a href="/tournaments" class="btn btn-outline">← Назад к списку</a>
+  </div>
+
+  <div x-show="errorMessage" x-cloak class="alert alert-danger" x-text="errorMessage"></div>
+
+  <form @submit.prevent="submitForm()" class="card" style="max-width: 700px;">
+    <div class="form-group">
+      <label for="name">Название <span class="text-danger">*</span></label>
+      <input type="text" id="name" x-model="form.name" required maxlength="200"
+             class="form-control" placeholder="Название турнира">
+      <small class="text-muted" x-show="errors.name" x-text="errors.name"></small>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label for="start_date">Дата начала <span class="text-danger">*</span></label>
+        <input type="datetime-local" id="start_date" x-model="form.start_date" required
+               class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="end_date">Дата окончания <span class="text-danger">*</span></label>
+        <input type="datetime-local" id="end_date" x-model="form.end_date" required
+               class="form-control">
+        <small class="text-muted" x-show="errors.end_date" x-text="errors.end_date"></small>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+      <div class="form-group">
+        <label for="type">Тип</label>
+        <select id="type" x-model="form.type" class="form-control">
+          <option value="classic">Классика</option>
+          <option value="blitz">Блиц</option>
+          <option value="rapid">Рапид</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rounds">Количество туров</label>
+        <input type="number" id="rounds" x-model.number="form.rounds" min="0"
+               class="form-control" placeholder="0">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Место проведения</label>
+      <input type="text" id="location" x-model="form.location" maxlength="200"
+             class="form-control" placeholder="Город / зал (необязательно)">
+    </div>
+
+    <div class="form-actions" style="margin-top: 1.5rem;">
+      <button type="submit" class="btn btn-success" :disabled="loading">
+        <span x-show="!loading">✅ Создать турнир</span>
+        <span x-show="loading">⏳ Создание...</span>
+      </button>
+      <a href="/tournaments" class="btn btn-outline">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('tournamentCreateForm', () => ({
+    form: {
+      name: '', start_date: '', end_date: '',
+      type: 'classic', rounds: 0, location: '',
+    },
+    errors: {},
+    errorMessage: '',
+    loading: false,
+
+    init() {},
+
+    validate() {
+      this.errors = {};
+      let valid = true;
+      if (!this.form.name || !this.form.name.trim()) {
+        this.errors.name = 'Название обязательно';
+        valid = false;
+      }
+      if (!this.form.start_date) {
+        valid = false;
+      }
+      if (!this.form.end_date) {
+        valid = false;
+      } else if (this.form.start_date && this.form.end_date < this.form.start_date) {
+        this.errors.end_date = 'Дата окончания должна быть позже даты начала';
+        valid = false;
+      }
+      return valid;
+    },
+
+    async submitForm() {
+      this.errorMessage = '';
+      if (!this.validate()) return;
+
+      this.loading = true;
+      try {
+        const body = {
+          name: this.form.name.trim(),
+          start_date: new Date(this.form.start_date).toISOString(),
+          end_date: new Date(this.form.end_date).toISOString(),
+          type: this.form.type,
+          rounds: this.form.rounds || 0,
+        };
+        if (this.form.location && this.form.location.trim()) body.location = this.form.location.trim();
+
+        const res = await fetch('/api/tournaments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeaders() },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          window.location.href = '/tournaments/' + data.id;
+        } else {
+          const err = await res.json();
+          if (err.detail && Array.isArray(err.detail)) {
+            this.errorMessage = err.detail.map(e => e.msg).join('; ');
+          } else {
+            this.errorMessage = 'Ошибка создания турнира';
+          }
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+  }));
+});
+</script>
+{% endblock %}

@@ -1,0 +1,215 @@
+<!-- SPDX-FileCopyrightText: 2026 Ivan Dodik -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+
+{% extends "base.html" %}
+{% block title %}Редактировать турнир — Chess Tracker{% endblock %}
+{% block content %}
+<div class="container" x-data="tournamentEditForm({{ tournament_id }})" x-init="init()">
+  <div class="page-header">
+    <h1>Редактировать турнир</h1>
+    <a :href="'/tournaments/' + tournamentId" class="btn btn-outline">← Назад к турниру</a>
+  </div>
+
+  <div x-show="loadingData" x-cloak class="text-center" style="padding:2rem;">
+    <p>⏳ Загрузка данных...</p>
+  </div>
+
+  <div x-show="errorMessage" x-cloak class="alert alert-danger" x-text="errorMessage"></div>
+  <div x-show="successMessage" x-cloak class="alert alert-success" x-text="successMessage"></div>
+
+  <form x-show="!loadingData" @submit.prevent="submitForm()" class="card" style="max-width: 700px;">
+    <div class="form-group">
+      <label for="name">Название <span class="text-danger">*</span></label>
+      <input type="text" id="name" x-model="form.name" required maxlength="200" class="form-control">
+      <small class="text-muted" x-show="errors.name" x-text="errors.name"></small>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="start_date">Дата начала</label>
+        <input type="datetime-local" id="start_date" x-model="form.start_date" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="end_date">Дата окончания</label>
+        <input type="datetime-local" id="end_date" x-model="form.end_date" class="form-control">
+        <small class="text-muted" x-show="errors.end_date" x-text="errors.end_date"></small>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="type">Тип</label>
+        <select id="type" x-model="form.type" class="form-control">
+          <option value="classic">Классика</option>
+          <option value="blitz">Блиц</option>
+          <option value="rapid">Рапид</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="rounds">Туров</label>
+        <input type="number" id="rounds" x-model.number="form.rounds" min="0" class="form-control">
+      </div>
+      <div class="form-group">
+        <label for="status">Статус</label>
+        <select id="status" x-model="form.status" class="form-control">
+          <option value="active">Активен</option>
+          <option value="completed">Завершён</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="location">Место проведения</label>
+      <input type="text" id="location" x-model="form.location" maxlength="200" class="form-control">
+    </div>
+
+    <div class="form-actions" style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <button type="submit" class="btn btn-success" :disabled="loading">
+        <span x-show="!loading">💾 Сохранить</span>
+        <span x-show="loading">⏳ Сохранение...</span>
+      </button>
+      <a :href="'/tournaments/' + tournamentId" class="btn btn-outline">Отмена</a>
+      <button type="button" class="btn btn-danger" style="margin-left:auto;"
+              @click="showDeleteConfirm = true" x-show="!showDeleteConfirm">
+        🗑 Удалить
+      </button>
+    </div>
+
+    <div x-show="showDeleteConfirm" x-cloak class="alert alert-danger" style="margin-top:1rem;">
+      <p><strong>Вы уверены, что хотите удалить этот турнир?</strong></p>
+      <p>Все связанные партии и результаты также будут удалены.</p>
+      <div style="display:flex; gap:0.5rem;">
+        <button type="button" class="btn btn-danger" @click="deleteTournament()" :disabled="deleting">
+          <span x-show="!deleting">Да, удалить</span>
+          <span x-show="deleting">⏳ Удаление...</span>
+        </button>
+        <button type="button" class="btn btn-outline" @click="showDeleteConfirm = false">Отмена</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('tournamentEditForm', (tournamentId) => ({
+    tournamentId: tournamentId,
+    form: { name: '', start_date: '', end_date: '', type: 'classic', rounds: 0, status: 'active', location: '' },
+    errors: {},
+    errorMessage: '',
+    successMessage: '',
+    loadingData: true,
+    loading: false,
+    deleting: false,
+    showDeleteConfirm: false,
+
+    async init() {
+      try {
+        const res = await fetch('/api/tournaments/' + this.tournamentId, {
+          headers: Auth.getAuthHeaders(),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          this.form.name = data.name || '';
+          this.form.start_date = this.toLocalDatetime(data.start_date);
+          this.form.end_date = this.toLocalDatetime(data.end_date);
+          this.form.type = data.type || 'classic';
+          this.form.rounds = data.rounds || 0;
+          this.form.status = data.status || 'active';
+          this.form.location = data.location || '';
+        } else {
+          this.errorMessage = 'Ошибка загрузки данных турнира';
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loadingData = false;
+      }
+    },
+
+    toLocalDatetime(iso) {
+      if (!iso) return '';
+      const d = new Date(iso);
+      const pad = n => String(n).padStart(2, '0');
+      return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) +
+             'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    },
+
+    toISO(local) {
+      if (!local) return null;
+      return new Date(local).toISOString();
+    },
+
+    validate() {
+      this.errors = {};
+      let valid = true;
+      if (!this.form.name || !this.form.name.trim()) {
+        this.errors.name = 'Название обязательно';
+        valid = false;
+      }
+      if (this.form.end_date && this.form.start_date && this.form.end_date < this.form.start_date) {
+        this.errors.end_date = 'Дата окончания должна быть позже даты начала';
+        valid = false;
+      }
+      return valid;
+    },
+
+    async submitForm() {
+      this.errorMessage = '';
+      this.successMessage = '';
+      if (!this.validate()) return;
+
+      this.loading = true;
+      try {
+        const body = { name: this.form.name.trim(), type: this.form.type, rounds: this.form.rounds || 0, status: this.form.status };
+        if (this.form.start_date) body.start_date = this.toISO(this.form.start_date);
+        if (this.form.end_date) body.end_date = this.toISO(this.form.end_date);
+        body.location = this.form.location && this.form.location.trim() ? this.form.location.trim() : null;
+
+        const res = await fetch('/api/tournaments/' + this.tournamentId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeaders() },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          this.successMessage = 'Турнир обновлён!';
+          setTimeout(() => { this.successMessage = ''; }, 2000);
+        } else {
+          const err = await res.json();
+          if (err.detail && Array.isArray(err.detail)) {
+            this.errorMessage = err.detail.map(e => e.msg).join('; ');
+          } else {
+            this.errorMessage = 'Ошибка обновления турнира';
+          }
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteTournament() {
+      this.deleting = true;
+      try {
+        const res = await fetch('/api/tournaments/' + this.tournamentId, {
+          method: 'DELETE',
+          headers: Auth.getAuthHeaders(),
+        });
+        if (res.ok || res.status === 204) {
+          window.location.href = '/tournaments';
+        } else {
+          this.errorMessage = 'Ошибка удаления турнира';
+          this.showDeleteConfirm = false;
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+        this.showDeleteConfirm = false;
+      } finally {
+        this.deleting = false;
+      }
+    },
+  }));
+});
+</script>
+{% endblock %}
