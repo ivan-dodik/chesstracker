@@ -989,3 +989,14 @@
 - **Создан:** `scripts/benchmark.sh` — скрипт бенчмарка на свежих Docker-контейнерах
 - Затронутые файлы: `standings_service.py`, `database.py`, `web.py`, `main.py`, `scripts/benchmark.sh`
 - 160/160 тестов проходят, ruff clean
+
+## 2026-06-15 00:30 — Fix: JSON вместо HTML на /players и /tournaments (hx-boost side-effect)
+
+**Проблема:** после добавления `hx-boost="true"` на `<body>` (коммит fc3993e) страницы `/players` и `/tournaments` отображали raw JSON вместо HTML.
+
+**Причина:** `hx-boost` перехватывает навигацию по `<a>` ссылкам и делает AJAX swap `<body>`. При swap HTMX не выполняет `<script>` из `<head>` (защита от дублирования). Обработчики `htmx:afterSwap` и функции рендера находились в `{% block extra_head %}` → при AJAX-навигации не регистрировались → JSON из API отображался как raw text.
+
+**Решение:** перемещены `<script>` блоки из `{% block extra_head %}` в конец `{% block content %}` — HTMX выполняет скрипты в swap-нутом `<body>`-контенте.
+
+- Затронутые файлы: `backend/app/templates/players/list.html`, `backend/app/templates/tournaments/list.html`, `backend/app/templates/index.html`
+- 160/160 тестов проходят, ruff clean

@@ -224,6 +224,28 @@ initialize memory bank
 
 ---
 
+## 2026-06-15 00:26 — Исправление JSON вместо HTML на /players и /tournaments
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+После последних изменений на странице игроков и турниров отображается JSON вместо HTML.
+http://localhost:8000/players 
+{"items":[{"id":28,"name":"Alexei Gustafsson","rating":2615,...
+```
+
+**План (Plan mode):**
+- Причина: `hx-boost="true"` на `<body>` (коммит fc3993e) → HTMX перехватывает навигацию, swap `<body>`, но не выполняет `<script>` из `<head>` → обработчик `htmx:afterSwap` не зарегистрирован → JSON отображается как raw text
+- Решение: переместить `<script>` из `{% block extra_head %}` в конец `{% block content %}` в 3 шаблонах (players/list.html, tournaments/list.html, index.html)
+
+**Результат:**
+- Причина: `hx-boost="true"` на `<body>` → HTMX не выполняет `<script>` из `<head>` при AJAX-swap → обработчики `htmx:afterSwap` не регистрировались
+- Исправлены 3 шаблона: `players/list.html`, `tournaments/list.html`, `index.html` — `<script>` перемещён из `{% block extra_head %}` в конец `{% block content %}`
+- 160/160 тестов проходят, ruff clean
+
+---
+
 ## 2026-06-14 23:40 — Глубокий ревью и оптимизация фризов (50s не ушли)
 
 **Режим:** Plan → Act
