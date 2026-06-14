@@ -99,12 +99,17 @@ async def seed() -> None:
     admin_password = os.getenv("SEED_ADMIN_PASSWORD", "admin123")
     user_password = os.getenv("SEED_USER_PASSWORD", "user123")
 
-    print("Creating tables...")
+    print("Dropping tables...", flush=True)
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
-        await conn.run_sync(Base.metadata.create_all)
+    print("Tables dropped.", flush=True)
 
-    print("Seeding data...")
+    print("Creating tables...", flush=True)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    print("Tables created.", flush=True)
+
+    print("Seeding data...", flush=True)
     async with async_session_factory() as session:
         # --- Users ---
         admin = User(

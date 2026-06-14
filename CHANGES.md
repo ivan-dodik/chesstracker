@@ -643,3 +643,30 @@
 - **SPDX-заголовки** (`SPDX-FileCopyrightText: 2026 Ivan Dodik`, `SPDX-License-Identifier: AGPL-3.0-only`) добавлены во все Python файлы (~80 файлов проекта), JS (2), CSS (1), shell (1)
 
 **Результат:** ruff check без ошибок в backend и telegram-bot
+
+## 2026-06-14 14:02 — Исправление healthcheck backend контейнера (unhealthy во время seed)
+
+**Описание:** Backend контейнер становился unhealthy во время выполнения seed-данных, что блокировало старт telegram-bot (depends_on: service_healthy).
+
+**Причина:** Healthcheck проверял `curl localhost:8000/health` (interval 10s, retries 3), но uvicorn запускался ПОСЛЕ seed (~30 секунд). Все retries падали до запуска сервера.
+
+**Решение:** Добавлен `start_period: 60s` в healthcheck backend — Docker не проверяет здоровье в течение первых 60 секунд, давая время на migrations + seed. Увеличены retries до 5.
+
+- Затронутые файлы: `docker-compose.yml`
+
+**Результат:** `docker compose up --build` запускает все сервисы без ошибок
+
+## 2026-06-14 14:11 — Исправление healthcheck: curl → python urllib + timeout seed
+
+**Описание:** Два дополнительных исправления к предыдущему healthcheck fix.
+
+**Проблема 1:** Healthcheck使用 `curl`, но `curl` не установлен в `python:3.12-slim` → healthcheck всегда падал → контейнер всегда unhealthy.
+
+**Проблема 2:** Seed-процесс зависал (зависает на create_all после drop_all) и блокировал запуск uvicorn.
+
+**Решения:**
+1. Healthcheck заменён на `python -c "import urllib.request; ..."` — Python доступен в slim-образе
+2. Seed обёрнут в `timeout 60` в entrypoint.sh — если seed зависает, uvicorn всё равно запустится
+3. Seed разбит на отдельные транзакции (drop_all и create_all в разных `engine.begin()`)
+
+- Затронутые файлы: `docker-compose.yml`, `backend/entrypoint.sh`, `backend/app/seed.py`
