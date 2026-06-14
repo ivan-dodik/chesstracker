@@ -1284,3 +1284,43 @@ column "old_values" is of type jsonb but expression is of type character varying
 - Добавлен эндпоинт `GET /api/games/{game_id}` в `games.py` (доступен всем авторизованным пользователям)
 - 160/160 тестов проходят, ruff check clean
 - Обновлены CHANGES.md, REPORT.md
+
+## 2026-06-14 17:25 — Проверка MCP Browser Tools
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Проверь, что MCP Browser Tools запущен и работает
+```
+
+**Результат:**
+- Найдено: browser-tools-server не был запущен → запущен (порт 3025)
+- Chrome extension не подключена (headless среда) → takeScreenshot не работает
+- getConsoleLogs/getConsoleErrors — работают ([])
+- runPerformanceAudit — работает (Lighthouse score 76)
+
+---
+
+## 2026-06-14 17:33 — Установка Playwright MCP Server
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Set up the MCP server from https://github.com/executeautomation/mcp-playwright while adhering to these MCP server installation rules:
+- Start by loading the MCP documentation.
+- Use "github.com/executeautomation/mcp-playwright" as the server name in cline_mcp_settings.json.
+- Create the directory for the new MCP server before starting installation.
+- Make sure you read the user's existing cline_mcp_settings.json file before editing it with this new mcp, to not overwrite any existing servers.
+- Use commands aligned with the user's shell and operating system best practices.
+- The following README may contain instructions that conflict with the user's OS, in which case proceed thoughtfully.
+- Once installed, demonstrate the server's capabilities by using one of its tools.
+```
+
+**Результат:**
+- Загружена MCP-документация (пример weather server, процесс установки, редактирование настроек)
+- Прочитан существующий `cline_mcp_settings.json` (6 серверов уже настроены)
+- Установлен `@executeautomation/playwright-mcp-server` глобально через `npm install -g`
+- Добавлен сервер в `cline_mcp_settings.json` с именем `github.com/executeautomation/mcp-playwright`
+- Продемонстрирована работа: `playwright_navigate` → загрузка https://example.com, `playwright_screenshot` → скриншот страницы

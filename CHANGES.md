@@ -842,3 +842,15 @@
 
 - Затронутые файлы: `backend/app/templates/games/create.html`, `backend/app/services/game_service.py`, `backend/app/api/games.py`
 - 160/160 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 17:33 — Установка Playwright MCP Server
+
+**Описание:** Установлен и настроен MCP сервер `@executeautomation/playwright-mcp-server` для автоматизации браузера через Playwright. Сервер предоставляет инструменты навигации, скриншотов, заполнения форм, кликов, выполнения JavaScript и другое взаимодействие с браузером.
+
+**Изменения:**
+- Установлен пакет `@executeautomation/playwright-mcp-server` глобально через `npm install -g`
+- Добавлен сервер в `cline_mcp_settings.json` с именем `github.com/executeautomation/mcp-playwright`
+
+- Затронутый файл: `~/.config/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json`
