@@ -843,6 +843,21 @@
 - Затронутые файлы: `backend/app/templates/games/create.html`, `backend/app/services/game_service.py`, `backend/app/api/games.py`
 - 160/160 тестов проходят, ruff clean
 
+## 2026-06-14 23:54 — Диагностическое логирование + оптимизации
+
+**Проблема:** 50s фризы не ушли после прогрева шаблонов. Нужна инструментация для точной диагностики.
+
+**Изменения:**
+- `middleware/__init__.py`, `middleware/timing.py`: ASGI TimingMiddleware — логируетmethod, path, status, client, elapsed time для каждого запроса. Добавляет `X-Process-Time` header
+- `main.py`: настроен file logging → `/logs/backend.log` (RotatingFileHandler 5MB × 3). Подключен TimingMiddleware. Подавлены шумные логгеры (uvicorn.access, sqlalchemy.engine)
+- `docker-compose.override.yml`: добавлен volume `./logs:/app/logs`, добавлен `--log-level info`
+- `database.py`: добавлен `pool_pre_ping=True` — отлов мёртвых DB-соединений
+- `security.py`: `decode_access_token` перенесён в thread pool через `asyncio.to_thread` (синхронный `jose.jwt.decode` больше не блокирует event loop)
+- `deps.py`: добавлен timing для DB session creation и JWT decode
+
+- Затронутые файлы: `middleware/__init__.py`, `middleware/timing.py`, `main.py`, `database.py`, `security.py`, `deps.py`, `docker-compose.override.yml`
+- 160/160 тестов проходят, ruff clean
+
 ## 2026-06-14 23:32 — Исправление фризов: прогрев шаблонов + pool_recycle + параллельные fetch
 
 **Проблема:** ~50s задержка при первом открытии каждой страницы (Jinja2 lazy compilation в Docker overlay fs), sequential fetch на tournament detail (~3.3s).

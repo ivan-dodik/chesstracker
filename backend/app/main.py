@@ -4,6 +4,7 @@
 """Chess Tracker Backend — FastAPI application entry point."""
 
 import logging
+import logging.handlers
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -21,8 +22,34 @@ from app.api.router import api_router
 from app.api.web import router as web_router
 from app.core.config import settings
 from app.core.database import engine
+from app.middleware.timing import TimingMiddleware
 
 logger = logging.getLogger(__name__)
+
+# ── File logging setup ──────────────────────────────────────────────
+LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOG_DIR / "backend.log"
+
+file_handler = logging.handlers.RotatingFileHandler(
+    str(LOG_FILE), maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8",
+)
+file_handler.setLevel(logging.DEBUG)
+file_handler.setFormatter(
+    logging.Formatter("%(asctime)s %(levelname)-7s %(name)s — %(message)s"),
+)
+
+# Root logger: DEBUG to file, INFO to stderr
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)-7s %(name)s — %(message)s",
+    handlers=[logging.StreamHandler(), file_handler],
+)
+
+# Quieten noisy libraries
+logging.getLogger("uvicorn.access").setLevel(logging.WARNING)
+logging.getLogger("uvicorn.error").setLevel(logging.INFO)
+logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -60,6 +87,9 @@ app = FastAPI(
 )
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Timing middleware (outermost — measures total request time)
+app.add_middleware(TimingMiddleware)
 
 # CORS middleware
 app.add_middleware(

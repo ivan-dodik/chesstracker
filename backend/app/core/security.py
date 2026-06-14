@@ -29,10 +29,21 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return jwt.encode(to_encode, settings.SECRET_KEY, algorithm="HS256")
 
 
-def decode_access_token(token: str) -> dict | None:
-    """Decode and validate a JWT access token. Returns the payload or None."""
+def _decode_jwt_sync(token: str) -> dict | None:
+    """Synchronous JWT decode (runs in thread pool)."""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
         return payload
     except JWTError:
         return None
+
+
+async def decode_access_token(token: str) -> dict | None:
+    """Decode and validate a JWT access token. Returns the payload or None.
+
+    Uses ``asyncio.to_thread`` to avoid blocking the event loop with
+    synchronous cryptography operations from ``python-jose``.
+    """
+    import asyncio
+
+    return await asyncio.to_thread(_decode_jwt_sync, token)

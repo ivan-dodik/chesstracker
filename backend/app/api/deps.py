@@ -3,6 +3,8 @@
 
 """FastAPI dependencies: database session, current user, admin check."""
 
+import logging
+import time
 from collections.abc import AsyncGenerator
 
 from fastapi import Depends, HTTPException, Request, status
@@ -14,6 +16,8 @@ from app.core.database import async_session_factory
 from app.core.security import decode_access_token
 from app.models import User
 
+logger = logging.getLogger("chesstracker.deps")
+
 security_scheme = HTTPBearer(auto_error=True)
 web_security_scheme = HTTPBearer(auto_error=False)
 
@@ -24,7 +28,9 @@ class RedirectToLoginError(Exception):
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Provide an async database session."""
+    start = time.perf_counter()
     async with async_session_factory() as session:
+        logger.debug("DB session created in %.3fs", time.perf_counter() - start)
         try:
             yield session
             if session.is_modified:
@@ -38,7 +44,9 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
 
 async def _get_user_from_token(db: AsyncSession, token: str) -> User:
     """Helper: decode JWT token and return user or raise 401."""
-    payload = decode_access_token(token)
+    start = time.perf_counter()
+    payload = await decode_access_token(token)
+    logger.debug("JWT decoded in %.3fs", time.perf_counter() - start)
     if payload is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
