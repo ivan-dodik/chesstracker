@@ -1089,3 +1089,33 @@ initialize memory bank
 - Коммит `ddfa48e`, push в main
 
 **Вывод:** Удачно. Единственная проблема — скрипт добавил SPDX в .venv (依赖) файлы из-за отсутствия исключения. Решено пересозданием venv. В следующий раз добавить `exclude=[".venv"]` в скрипт.
+
+---
+
+## 2026-06-14 14:02 — Исправление ошибки запуска docker compose up
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Пытаюсь запустить приложение и получаю ошибку:
+[лог docker compose up --build с ошибкой "dependency failed to start: container chess-tracker-backend is unhealthy"]
+```
+
+**Результат Plan-режима:**
+- Проанализированы entrypoint.sh, seed.py, docker-compose.yml
+- Найдена причина: healthcheck проверял `curl localhost:8000/health`, но uvicorn запускался ПОСЛЕ seed (~30 сек) — все retries падали до запуска сервера
+- Предложено решение: добавить `start_period: 60s` в healthcheck
+
+**Результат Act-режима:**
+- Исправление 1: `start_period: 60s` + retries 5 в healthcheck backend
+- Исправление 2: **Критический баг** — `curl` не установлен в `python:3.12-slim` → healthcheck ВСЕГДА падал. Заменён на `python -c "import urllib.request; ..."`
+- Исправление 3: seed обёрнут в `timeout 60` в entrypoint.sh (зависал на create_all)
+- Исправление 4: seed разбит на отдельные DDL-транзакции (drop_all и create_all в разных `engine.begin()`)
+- Добавлен flush=True во все print в seed.py
+- Затронутые файлы: docker-compose.yml, backend/entrypoint.sh, backend/app/seed.py
+- Все 3 сервиса (db, backend, telegram-bot) запускаются healthy
+- Записи добавлены в CHANGES.md, REPORT.md
+- Коммит `ca3d325`, push в main
+
+**Вывод:** Удачно. Основная проблема оказалась не в seed (хотя seed тоже зависает), а в отсутствии curl в slim-образе. Healthcheck никогда не мог пройти. Исправление urllib + timeout + start_period решило все три проблемы.
