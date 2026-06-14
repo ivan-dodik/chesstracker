@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Favorites API — manage favorite players."""
 
 from fastapi import APIRouter, Depends, HTTPException, status

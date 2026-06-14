@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Tests to verify that seed data meets the requirements from project_task.md.
 
 These tests programmatically create data matching the seed specification

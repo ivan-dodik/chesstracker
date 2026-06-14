@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """E2E tests: Authentication — login, logout, page protection."""
 
 from e2e.conftest import login, login_and_set_token

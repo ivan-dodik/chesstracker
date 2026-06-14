@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """E2E tests: Dashboard page."""
 
 from e2e.conftest import login_and_set_token

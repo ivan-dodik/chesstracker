@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: 2026 Ivan Dodik
+// SPDX-License-Identifier: AGPL-3.0-only
+
 /**
  * Chess Tracker — SSE Client
  * Real-time event streaming with toast notifications

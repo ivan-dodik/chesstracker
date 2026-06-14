@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Handlers for /subscribe and /unsubscribe commands."""
 
 import json

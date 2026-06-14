@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """FastAPI dependencies: database session, current user, admin check."""
 
 from collections.abc import AsyncGenerator

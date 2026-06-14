@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Standings service — shared logic for calculating tournament standings.
 
 Extracted from tournament_service and export_service to eliminate duplication.

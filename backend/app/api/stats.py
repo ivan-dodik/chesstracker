@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Stats API — head-to-head, top-rated, overall statistics."""
 
 from fastapi import APIRouter, Depends, Query

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """E2E tests: Player detail page — profile, chart, stats, favorites, head-to-head."""
 
 import json

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Unit tests for tournament service.
 
 Tests business logic for tournament CRUD and standings calculation.

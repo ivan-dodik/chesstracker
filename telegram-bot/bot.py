@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Chess Tracker Telegram Bot — entry point.
 
 Long-polling bot that notifies subscribed users about new games and results.

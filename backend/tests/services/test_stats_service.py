@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Unit tests for stats service.
 
 Tests head-to-head, top-rated, and overall stats.

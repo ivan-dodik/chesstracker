@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Import API — CSV import endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, status

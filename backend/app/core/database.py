@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Database engine, session factory, and dependency."""
 
 from collections.abc import AsyncGenerator

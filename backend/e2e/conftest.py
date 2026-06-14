@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """E2E test configuration — Playwright browser tests against a real FastAPI server.
 
 The server runs on a random port with a temporary SQLite database.

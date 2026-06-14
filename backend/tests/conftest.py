@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Test configuration and fixtures.
 
 IMPORTANT: The engine and session are created using SQLite (aiosqlite)

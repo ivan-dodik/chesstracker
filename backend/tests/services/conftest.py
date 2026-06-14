@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Test configuration for service-layer unit tests.
 
 Uses SQLite (aiosqlite) for isolated, fast tests without Docker.

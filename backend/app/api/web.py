@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """Web page routes — Jinja2 templates for the frontend."""
 
 from pathlib import Path

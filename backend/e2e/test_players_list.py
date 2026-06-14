@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
 """E2E tests: Players list page — loading, pagination, search, navigation."""
 
 from e2e.conftest import login_and_set_token

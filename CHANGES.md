@@ -629,3 +629,17 @@
 - 8+ test-файлов обновлены: `round` → `game_round`
 
 **Результат:** 148/148 тестов проходят, ruff check без ошибок
+
+---
+
+## 2026-06-14 13:46 — Лицензирование проекта под AGPL-3.0-only
+
+**Описание:** Замена лицензии GPL v3 → AGPL-3.0-only. Добавление SPDX-заголовков во все файлы проекта.
+
+- **LICENSE** — заменён на текст GNU Affero General Public License v3.0
+- **README.md** — секция "Лицензия" обновлена: MIT → AGPL-3.0-only
+- **backend/pyproject.toml** — добавлено поле `license = "AGPL-3.0-only"`
+- **telegram-bot/pyproject.toml** — добавлено поле `license = "AGPL-3.0-only"`
+- **SPDX-заголовки** (`SPDX-FileCopyrightText: 2026 Ivan Dodik`, `SPDX-License-Identifier: AGPL-3.0-only`) добавлены во все Python файлы (~80 файлов проекта), JS (2), CSS (1), shell (1)
+
+**Результат:** ruff check без ошибок в backend и telegram-bot
