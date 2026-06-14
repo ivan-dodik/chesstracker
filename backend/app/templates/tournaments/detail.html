@@ -70,7 +70,10 @@
 
       <!-- Games by Round (Accordion) -->
       <div class="card">
-        <h3 class="card-header">🎮 Партии по турам</h3>
+        <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="margin:0;">🎮 Партии по турам</h3>
+          <a x-show="Auth.isAdmin()" :href="'/tournaments/' + tournament.id + '/games/create'" class="btn btn-success">+ Добавить партию</a>
+        </div>
         <template x-if="!rounds.length">
           <p style="color:var(--color-text-light);text-align:center;padding:1rem;">Партии не найдены</p>
         </template>
@@ -88,6 +91,9 @@
                       <td><a :href="'/players/' + g.white_player_id" x-text="g.white_player_name || '?'"></a></td>
                       <td style="text-align:center;padding:0 0.75rem;font-weight:600;" x-text="g.result || '—'"></td>
                       <td><a :href="'/players/' + g.black_player_id" x-text="g.black_player_name || '?'"></a></td>
+                      <td x-show="Auth.isAdmin()" style="white-space:nowrap;">
+                        <a :href="'/games/' + g.id + '/edit'" style="font-size:0.75rem;margin-right:0.5rem;">✏️</a>
+                      </td>
                     </tr>
                   </template>
                 </tbody>

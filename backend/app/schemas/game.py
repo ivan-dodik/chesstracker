@@ -51,6 +51,22 @@ class GameList(BaseModel):
     per_page: int
 
 
+class GameUpdate(BaseModel):
+    """Schema for updating game data."""
+    game_round: int | None = None
+    white_player_id: int | None = None
+    black_player_id: int | None = None
+    result: str | None = None
+    played_at: datetime | None = None
+
+    @field_validator("result")
+    @classmethod
+    def validate_result(cls, v: str | None) -> str | None:
+        if v is not None and v not in VALID_GAME_RESULTS:
+            raise ValueError(f"Invalid game result: {v}. Must be one of: {', '.join(sorted(VALID_GAME_RESULTS))}")
+        return v
+
+
 class GameResult(BaseModel):
     """Schema for updating game result."""
     result: str

@@ -135,6 +135,30 @@ async def tournament_edit_page(
     return template_response("tournaments/edit.html", {"request": request, "tournament_id": tournament_id})
 
 
+@router.get("/tournaments/{tournament_id}/games/create", response_class=HTMLResponse, include_in_schema=False)
+async def game_create_page(
+    request: Request,
+    tournament_id: int,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Game create form (admin only, redirects back to tournament)."""
+    if not current_user.is_admin:
+        return RedirectResponse(url=f"/tournaments/{tournament_id}", status_code=303)
+    return template_response("games/create.html", {"request": request, "tournament_id": tournament_id})
+
+
+@router.get("/games/{game_id}/edit", response_class=HTMLResponse, include_in_schema=False)
+async def game_edit_page(
+    request: Request,
+    game_id: int,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Game edit form (admin only)."""
+    if not current_user.is_admin:
+        return RedirectResponse(url="/", status_code=303)
+    return template_response("games/edit.html", {"request": request, "game_id": game_id})
+
+
 @router.get("/tournaments/{tournament_id}", response_class=HTMLResponse, include_in_schema=False)
 async def tournament_detail(
     request: Request,

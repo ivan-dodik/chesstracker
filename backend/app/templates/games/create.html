@@ -1,0 +1,132 @@
+<!-- SPDX-FileCopyrightText: 2026 Ivan Dodik -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+
+{% extends "base.html" %}
+{% block title %}Добавить партию — Chess Tracker{% endblock %}
+{% block content %}
+<div class="container" x-data="gameCreateForm({{ tournament_id }})" x-init="init()">
+  <div class="page-header">
+    <h1>Добавить партию</h1>
+    <a :href="'/tournaments/' + tournamentId" class="btn btn-outline">← Назад к турниру</a>
+  </div>
+
+  <div x-show="errorMessage" x-cloak class="alert alert-danger" x-text="errorMessage"></div>
+
+  <form @submit.prevent="submitForm()" class="card" style="max-width: 700px;">
+    <div class="form-group">
+      <label for="game_round">Тур <span class="text-danger">*</span></label>
+      <input type="number" id="game_round" x-model.number="form.game_round" required min="1"
+             class="form-control" placeholder="1">
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="white_player_id">Белые <span class="text-danger">*</span></label>
+        <select id="white_player_id" x-model.number="form.white_player_id" required class="form-control">
+          <option value="">— выбрать —</option>
+          <template x-for="p in players" :key="p.id">
+            <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+          </template>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="black_player_id">Чёрные <span class="text-danger">*</span></label>
+        <select id="black_player_id" x-model.number="form.black_player_id" required class="form-control">
+          <option value="">— выбрать —</option>
+          <template x-for="p in players" :key="p.id">
+            <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+          </template>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="result">Результат</label>
+      <select id="result" x-model="form.result" class="form-control">
+        <option value="">— не определён —</option>
+        <option value="1-0">1-0 (победа белых)</option>
+        <option value="0-1">0-1 (победа чёрных)</option>
+        <option value="½-½">½-½ (ничья)</option>
+      </select>
+    </div>
+
+    <div class="form-actions" style="margin-top:1.5rem;">
+      <button type="submit" class="btn btn-success" :disabled="loading">
+        <span x-show="!loading">✅ Добавить партию</span>
+        <span x-show="loading">⏳ Добавление...</span>
+      </button>
+      <a :href="'/tournaments/' + tournamentId" class="btn btn-outline">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('gameCreateForm', (tournamentId) => ({
+    tournamentId: tournamentId,
+    form: { game_round: 1, white_player_id: '', black_player_id: '', result: '' },
+    players: [],
+    errorMessage: '',
+    loading: false,
+
+    async init() {
+      try {
+        const res = await fetch('/api/players?per_page=500', { headers: Auth.getAuthHeaders() });
+        const data = await res.json();
+        this.players = data.items || [];
+      } catch (e) {
+        this.errorMessage = 'Ошибка загрузки игроков: ' + e.message;
+      }
+    },
+
+    async submitForm() {
+      this.errorMessage = '';
+      if (!this.form.white_player_id || !this.form.black_player_id) {
+        this.errorMessage = 'Выберите обоих игроков';
+        return;
+      }
+      if (this.form.white_player_id === this.form.black_player_id) {
+        this.errorMessage = 'Игроки должны быть разными';
+        return;
+      }
+      if (!this.form.game_round || this.form.game_round < 1) {
+        this.errorMessage = 'Номер тура должен быть ≥ 1';
+        return;
+      }
+
+      this.loading = true;
+      try {
+        const body = {
+          tournament_id: this.tournamentId,
+          game_round: this.form.game_round,
+          white_player_id: this.form.white_player_id,
+          black_player_id: this.form.black_player_id,
+        };
+        if (this.form.result) body.result = this.form.result;
+
+        const res = await fetch('/api/games', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeaders() },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          window.location.href = '/tournaments/' + this.tournamentId;
+        } else {
+          const err = await res.json();
+          if (err.detail && Array.isArray(err.detail)) {
+            this.errorMessage = err.detail.map(e => e.msg).join('; ');
+          } else {
+            this.errorMessage = 'Ошибка создания партии';
+          }
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+  }));
+});
+</script>
+{% endblock %}

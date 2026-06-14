@@ -1,0 +1,189 @@
+<!-- SPDX-FileCopyrightText: 2026 Ivan Dodik -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+
+{% extends "base.html" %}
+{% block title %}Редактировать партию — Chess Tracker{% endblock %}
+{% block content %}
+<div class="container" x-data="gameEditForm({{ game_id }})" x-init="init()">
+  <div class="page-header">
+    <h1>Редактировать партию</h1>
+    <a href="javascript:history.back()" class="btn btn-outline">← Назад</a>
+  </div>
+
+  <div x-show="loadingData" x-cloak class="text-center" style="padding:2rem;">
+    <p>⏳ Загрузка данных...</p>
+  </div>
+
+  <div x-show="errorMessage" x-cloak class="alert alert-danger" x-text="errorMessage"></div>
+  <div x-show="successMessage" x-cloak class="alert alert-success" x-text="successMessage"></div>
+
+  <form x-show="!loadingData" @submit.prevent="submitForm()" class="card" style="max-width: 700px;">
+    <div class="form-group">
+      <label for="game_round">Тур</label>
+      <input type="number" id="game_round" x-model.number="form.game_round" required min="1" class="form-control">
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+      <div class="form-group">
+        <label for="white_player_id">Белые</label>
+        <select id="white_player_id" x-model.number="form.white_player_id" required class="form-control">
+          <option value="">— выбрать —</option>
+          <template x-for="p in players" :key="p.id">
+            <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+          </template>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="black_player_id">Чёрные</label>
+        <select id="black_player_id" x-model.number="form.black_player_id" required class="form-control">
+          <option value="">— выбрать —</option>
+          <template x-for="p in players" :key="p.id">
+            <option :value="p.id" x-text="p.name + ' (' + p.rating + ')'"></option>
+          </template>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="result">Результат</label>
+      <select id="result" x-model="form.result" class="form-control">
+        <option value="">— не определён —</option>
+        <option value="1-0">1-0 (победа белых)</option>
+        <option value="0-1">0-1 (победа чёрных)</option>
+        <option value="½-½">½-½ (ничья)</option>
+      </select>
+    </div>
+
+    <div class="form-actions" style="margin-top:1.5rem; display:flex; gap:0.5rem; flex-wrap:wrap;">
+      <button type="submit" class="btn btn-success" :disabled="loading">
+        <span x-show="!loading">💾 Сохранить</span>
+        <span x-show="loading">⏳ Сохранение...</span>
+      </button>
+      <a href="javascript:history.back()" class="btn btn-outline">Отмена</a>
+      <button type="button" class="btn btn-danger" style="margin-left:auto;"
+              @click="showDeleteConfirm = true" x-show="!showDeleteConfirm">
+        🗑 Удалить
+      </button>
+    </div>
+
+    <div x-show="showDeleteConfirm" x-cloak class="alert alert-danger" style="margin-top:1rem;">
+      <p><strong>Вы уверены, что хотите удалить эту партию?</strong></p>
+      <div style="display:flex; gap:0.5rem;">
+        <button type="button" class="btn btn-danger" @click="deleteGame()" :disabled="deleting">
+          <span x-show="!deleting">Да, удалить</span>
+          <span x-show="deleting">⏳ Удаление...</span>
+        </button>
+        <button type="button" class="btn btn-outline" @click="showDeleteConfirm = false">Отмена</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('gameEditForm', (gameId) => ({
+    gameId: gameId,
+    form: { game_round: 1, white_player_id: '', black_player_id: '', result: '' },
+    players: [],
+    errorMessage: '',
+    successMessage: '',
+    loadingData: true,
+    loading: false,
+    deleting: false,
+    showDeleteConfirm: false,
+
+    async init() {
+      try {
+        const [gameRes, playersRes] = await Promise.all([
+          fetch('/api/games/' + this.gameId, { headers: Auth.getAuthHeaders() }),
+          fetch('/api/players?per_page=500', { headers: Auth.getAuthHeaders() }),
+        ]);
+        if (gameRes.ok) {
+          const game = await gameRes.json();
+          this.form.game_round = game.game_round || 1;
+          this.form.white_player_id = game.white_player_id;
+          this.form.black_player_id = game.black_player_id;
+          this.form.result = game.result || '';
+        } else {
+          this.errorMessage = 'Ошибка загрузки партии';
+        }
+        if (playersRes.ok) {
+          const data = await playersRes.json();
+          this.players = data.items || [];
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loadingData = false;
+      }
+    },
+
+    async submitForm() {
+      this.errorMessage = '';
+      this.successMessage = '';
+      if (!this.form.white_player_id || !this.form.black_player_id) {
+        this.errorMessage = 'Выберите обоих игроков';
+        return;
+      }
+      if (this.form.white_player_id === this.form.black_player_id) {
+        this.errorMessage = 'Игроки должны быть разными';
+        return;
+      }
+
+      this.loading = true;
+      try {
+        const body = {
+          game_round: this.form.game_round,
+          white_player_id: this.form.white_player_id,
+          black_player_id: this.form.black_player_id,
+        };
+        if (this.form.result) body.result = this.form.result;
+
+        const res = await fetch('/api/games/' + this.gameId, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeaders() },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          this.successMessage = 'Партия обновлена!';
+          setTimeout(() => { this.successMessage = ''; }, 2000);
+        } else {
+          const err = await res.json();
+          if (err.detail && Array.isArray(err.detail)) {
+            this.errorMessage = err.detail.map(e => e.msg).join('; ');
+          } else {
+            this.errorMessage = 'Ошибка обновления партии';
+          }
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async deleteGame() {
+      this.deleting = true;
+      try {
+        const res = await fetch('/api/games/' + this.gameId, {
+          method: 'DELETE',
+          headers: Auth.getAuthHeaders(),
+        });
+        if (res.ok || res.status === 204) {
+          window.history.back();
+        } else {
+          this.errorMessage = 'Ошибка удаления партии';
+          this.showDeleteConfirm = false;
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+        this.showDeleteConfirm = false;
+      } finally {
+        this.deleting = false;
+      }
+    },
+  }));
+});
+</script>
+{% endblock %}
