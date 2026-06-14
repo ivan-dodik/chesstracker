@@ -71,7 +71,7 @@
 </div>
 
 <script>
-  Alpine.data('playerEditForm', (playerId) => ({
+  const playerEditFormDef = (playerId) => ({
     playerId: playerId,
     form: { name: '', rating: 0, city: '' },
     errors: {},
@@ -181,6 +181,14 @@
         this.deleting = false;
       }
     },
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('playerEditForm', playerEditFormDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('playerEditForm', playerEditFormDef);
+    });
+  }
 </script>
 {% endblock %}

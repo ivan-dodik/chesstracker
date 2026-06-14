@@ -67,7 +67,7 @@
 </div>
 
 <script>
-  Alpine.data('tournamentCreateForm', () => ({
+  const tournamentCreateFormDef = () => ({
     form: {
       name: '', start_date: '', end_date: '',
       type: 'classic', rounds: 0, location: '',
@@ -135,6 +135,14 @@
         this.loading = false;
       }
     },
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('tournamentCreateForm', tournamentCreateFormDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('tournamentCreateForm', tournamentCreateFormDef);
+    });
+  }
 </script>
 {% endblock %}

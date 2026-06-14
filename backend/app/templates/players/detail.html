@@ -174,7 +174,7 @@
   // Load all players for head-to-head selector
   let allPlayersCache = [];
 
-  Alpine.data('playerDetail', (playerId) => ({
+  const playerDetailDef = (playerId) => ({
       playerId,
       player: null,
       overallStats: {},
@@ -348,6 +348,14 @@
           showFlash('Ошибка при изменении избранного', 'error');
         }
       }
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('playerDetail', playerDetailDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('playerDetail', playerDetailDef);
+    });
+  }
 </script>
 {% endblock %}

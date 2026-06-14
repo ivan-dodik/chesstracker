@@ -61,7 +61,7 @@
 </div>
 
 <script>
-  Alpine.data('gameCreateForm', (tournamentId) => ({
+  const gameCreateFormDef = (tournamentId) => ({
     tournamentId: tournamentId,
     form: { game_round: 1, white_player_id: '', black_player_id: '', result: '' },
     players: [],
@@ -124,6 +124,14 @@
         this.loading = false;
       }
     },
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('gameCreateForm', gameCreateFormDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('gameCreateForm', gameCreateFormDef);
+    });
+  }
 </script>
 {% endblock %}

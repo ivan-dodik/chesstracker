@@ -46,7 +46,7 @@
 </div>
 
 <script>
-  Alpine.data('playerCreateForm', () => ({
+  const playerCreateFormDef = () => ({
     form: { name: '', rating: 0, city: '' },
     errors: {},
     errorMessage: '',
@@ -103,6 +103,14 @@
         this.loading = false;
       }
     },
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('playerCreateForm', playerCreateFormDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('playerCreateForm', playerCreateFormDef);
+    });
+  }
 </script>
 {% endblock %}

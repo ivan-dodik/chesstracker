@@ -1027,7 +1027,7 @@
 
 **Исправления:**
 - `static/js/main.js`: добавлен `Alpine.initTree(event.detail.target)` в обработчик `htmx:afterSwap` для принудительной переинициализации Alpine.js компонентов после HTMX swap
-- 8 шаблонов: убрана обёртка `document.addEventListener('alpine:init', ...)` — `Alpine.data()` вызывается напрямую (Alpine.js уже загружен глобально при HTMX swap):
+- 8 шаблонов: компоненты определяются как `const XDef = (...) => ({...})`, затем регистрация через guard: `if (window.Alpine) { Alpine.data(..., XDef) } else { document.addEventListener('alpine:init', ...) }` — покрывает оба сценария (initial load + HTMX swap):
   - `players/edit.html`, `players/detail.html`, `players/create.html`
   - `tournaments/edit.html`, `tournaments/detail.html`, `tournaments/create.html`
   - `games/edit.html`, `games/create.html`

@@ -90,7 +90,7 @@
 </div>
 
 <script>
-  Alpine.data('tournamentEditForm', (tournamentId) => ({
+  const tournamentEditFormDef = (tournamentId) => ({
     tournamentId: tournamentId,
     form: { name: '', start_date: '', end_date: '', type: 'classic', rounds: 0, status: 'active', location: '' },
     errors: {},
@@ -208,6 +208,14 @@
         this.deleting = false;
       }
     },
-  }));
+  });
+
+  if (window.Alpine) {
+    Alpine.data('tournamentEditForm', tournamentEditFormDef);
+  } else {
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('tournamentEditForm', tournamentEditFormDef);
+    });
+  }
 </script>
 {% endblock %}
