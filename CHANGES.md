@@ -869,3 +869,15 @@
 - `memory-bank/progress.md` — заменено описание Browser Tools на Playwright MCP, обновлена хронология
 
 - Затронутые файлы: `skills-index.md`, `.clinerules/skills-usage.md`, `REPORT.md`, `memory-bank/activeContext.md`, `memory-bank/progress.md`
+
+## 2026-06-14 18:20 — Комплексное тестирование фронтенда через Playwright MCP
+
+- Проведено комплексное тестирование фронтенда Chess Tracker через Playwright MCP (headless Chromium)
+- Протестированы 50 тест-кейсов в 11 модулях: аутентификация, навигация, дашборд, CRUD игроков/турниров/игр, RBAC
+- **Результат:** 47/50 пройдено, 2 провалено, 1 замечание
+- **Найденные проблемы:**
+  - P1 (Critical): Кнопка "Редактировать" видна для обычного пользователя на странице игрока
+  - P2 (Medium): Колонка "Турнир" пуста в списке игр игрока
+  - P3 (Medium): Избранные игроки отображают "—" вместо данных на дашборде
+- Созданы файлы: `FRONTEND_TEST_PLAN.md`, `FRONTEND_TEST_REPORT.md`
+- Затронутые файлы: `FRONTEND_TEST_PLAN.md`, `FRONTEND_TEST_REPORT.md`, `PROMPTS.md`
