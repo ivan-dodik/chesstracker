@@ -1184,7 +1184,13 @@ column "old_values" is of type jsonb but expression is of type character varying
 - Корневая причина login 41: модель ActivityLog определяет old_values/new_values как Text, а миграция создаёт как JSONB → seed падает при commit → данные не сохраняются → users пуста
 - Исправление: Text → JSONB в модели, обновить геттеры/сеттеры
 
-**Результат:** (в работе)
+**Результат:**
+- Модель ActivityLog: `Text` → `JSON` (portable для SQLite + PostgreSQL)
+- Методы `set_new_values`/`get_new_values` работают с dict напрямую
+- Добавлена `_make_json_safe()` для конвертации datetime → ISO-строки
+- `/health` вернулся в Swagger, убран `HealthCheckFilter`
+- Убран Docker healthcheck для backend, `telegram-bot.depends_on` изменён на `- backend`
+- 148/148 тестов, ruff clean, коммит `a7b566f`
 
 ---
 
