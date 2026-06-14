@@ -13,6 +13,37 @@ from app.services.activity_log_service import log_activity
 from app.services.sse_service import publish_event
 
 
+async def get_game_by_id(
+    db: AsyncSession,
+    game_id: int,
+) -> dict | None:
+    """Get a single game by ID with player names."""
+    query = (
+        select(Game)
+        .options(
+            selectinload(Game.white_player),
+            selectinload(Game.black_player),
+        )
+        .where(Game.id == game_id)
+    )
+    result = await db.execute(query)
+    game = result.scalar_one_or_none()
+    if not game:
+        return None
+    return {
+        "id": game.id,
+        "tournament_id": game.tournament_id,
+        "game_round": game.game_round,
+        "white_player_id": game.white_player_id,
+        "black_player_id": game.black_player_id,
+        "white_player_name": game.white_player.name if game.white_player else None,
+        "black_player_name": game.black_player.name if game.black_player else None,
+        "result": game.result,
+        "played_at": game.played_at,
+        "created_at": game.created_at,
+    }
+
+
 async def get_games_by_tournament(
     db: AsyncSession,
     tournament_id: int,

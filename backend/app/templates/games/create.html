@@ -97,14 +97,13 @@ document.addEventListener('alpine:init', () => {
       this.loading = true;
       try {
         const body = {
-          tournament_id: this.tournamentId,
           game_round: this.form.game_round,
           white_player_id: this.form.white_player_id,
           black_player_id: this.form.black_player_id,
         };
         if (this.form.result) body.result = this.form.result;
 
-        const res = await fetch('/api/games', {
+        const res = await fetch(`/api/tournaments/${this.tournamentId}/games`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', ...Auth.getAuthHeaders() },
           body: JSON.stringify(body),

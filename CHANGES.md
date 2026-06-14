@@ -826,3 +826,19 @@
 
 - Затронутый файл: `backend/app/templates/players/detail.html`
 - 148/148 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 17:13 — Исправление бага POST /api/games → 404
+
+**Описание:** При попытке добавить партию через UI форма отправляла POST-запрос на несуществующий маршрут `/api/games`, что приводило к ошибке 404. Дополнительно: страница редактирования партии пыталась загрузить данные через GET `/api/games/{id}`, которого тоже не существовало.
+
+**Корневая причина:** В шаблоне `games/create.html` fetch-запрос был направлен на `/api/games`, но API-эндпоинт создания партии расположен по адресу `POST /api/tournaments/{tournament_id}/games`.
+
+**Изменения:**
+- `backend/app/templates/games/create.html` — исправлен URL POST-запроса: `'/api/games'` → `/api/tournaments/${this.tournamentId}/games`, убран `tournament_id` из тела запроса (он уже в URL)
+- `backend/app/services/game_service.py` — добавлена функция `get_game_by_id()` для получения одной партии по ID с именами игроков
+- `backend/app/api/games.py` — добавлен эндпоинт `GET /api/games/{game_id}` (доступен всем авторизованным пользователям)
+
+- Затронутые файлы: `backend/app/templates/games/create.html`, `backend/app/services/game_service.py`, `backend/app/api/games.py`
+- 160/160 тестов проходят, ruff clean

@@ -1261,3 +1261,26 @@ column "old_values" is of type jsonb but expression is of type character varying
 - M3: CRUD формы партий (create/edit/delete шаблоны + routes + GameUpdate schema)
 - M4: 12 тестов (admin/non-admin access), исправлен is_admin → role != "admin"
 - Итого: 148 → 160 тестов, ruff clean, 4 коммита (98f9e30, 2c358ad, 57a1a2a)
+
+---
+
+## 2026-06-14 17:13 — Исправление бага POST /api/games → 404
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+При попытке добавить партию в уже существующий, но активный турнир возникает "Ошибка создания партии", в логе сервера chess-tracker-backend | INFO: 172.19.0.1:50510 - "POST /api/games HTTP/1.1" 404 Not Found
+```
+
+**Результат Plan-режима:**
+- Найдена корневая причина: games/create.html отправляет POST на `/api/games`, а API-эндпоинт: `POST /api/tournaments/{tournament_id}/games`
+- Дополнительно: games/edit.html использует `GET /api/games/{id}`, которого тоже нет в API
+- План: исправить URL во фронте + добавить GET-эндпоинт в бэкенд
+
+**Результат Act-режима:**
+- Исправлен `games/create.html`: URL POST-запроса изменён с `/api/games` на `/api/tournaments/${this.tournamentId}/games`, убран `tournament_id` из тела запроса
+- Добавлена функция `get_game_by_id()` в `game_service.py` — получение одной партии по ID с именами игроков
+- Добавлен эндпоинт `GET /api/games/{game_id}` в `games.py` (доступен всем авторизованным пользователям)
+- 160/160 тестов проходят, ruff check clean
+- Обновлены CHANGES.md, REPORT.md

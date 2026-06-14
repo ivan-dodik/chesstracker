@@ -14,6 +14,19 @@ from app.services import game_service
 router = APIRouter(tags=["games"])
 
 
+@router.get("/api/games/{game_id}", response_model=GameRead)
+async def get_game(
+    game_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> GameRead:
+    """Get a single game by ID."""
+    game = await game_service.get_game_by_id(db, game_id)
+    if not game:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")
+    return game
+
+
 @router.get("/api/tournaments/{tournament_id}/games", response_model=GameList)
 async def list_games(
     tournament_id: int,
