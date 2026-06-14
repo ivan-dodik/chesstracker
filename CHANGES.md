@@ -928,3 +928,18 @@
   - `docker-compose.yml`: убран явный `DEBUG: "true"` из environment
 - Затронутые файлы: `backend/app/core/config.py`, `backend/app/core/database.py`, `backend/app/main.py`, `docker-compose.yml`
 - 160/160 тестов проходят, ruff clean
+
+---
+
+## 2026-06-14 23:05 — Оптимизация API endpoints (N+1, pool, cache)
+
+- **Бенчмарк DO:** standings=80.2ms, tournaments=35.8ms, players=38.6ms
+- **Бенчмарк ПОСЛЕ:** standings=47.8ms (-40%), tournaments=36.8ms, players=38.4ms
+- **Исправления:**
+  - `standings_service.py`: N+1 → batch `WHERE id IN (...)` (31 запрос → 2)
+  - `database.py`: убран `pool_pre_ping=True`, добавлены `pool_size=10`, `max_overflow=20`
+  - `web.py`: Jinja2 `cache_size=0` → `cache_size=400`
+  - `main.py`: warmup 1 → 3 соединения в lifespan
+- **Создан:** `scripts/benchmark.sh` — скрипт бенчмарка на свежих Docker-контейнерах
+- Затронутые файлы: `standings_service.py`, `database.py`, `web.py`, `main.py`, `scripts/benchmark.sh`
+- 160/160 тестов проходят, ruff clean

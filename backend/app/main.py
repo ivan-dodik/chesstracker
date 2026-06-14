@@ -32,10 +32,11 @@ BASE_DIR = Path(__file__).resolve().parent
 async def lifespan(app: FastAPI):
     """Application lifespan context."""
     logger.info("Starting Chess Tracker Backend...")
-    # Warmup DB connection pool to avoid cold-start latency on first request
-    async with engine.connect() as conn:
-        await conn.execute(text("SELECT 1"))
-    logger.info("Database pool warmed up.")
+    # Warmup DB connection pool (fill 3 of 10 slots to avoid cold-start latency)
+    for _ in range(3):
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+    logger.info("Database pool warmed up (3 connections).")
     yield
     await engine.dispose()
     logger.info("Shutting down Chess Tracker Backend...")

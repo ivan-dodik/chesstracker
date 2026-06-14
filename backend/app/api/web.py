@@ -19,7 +19,7 @@ template_dir = str(BASE_DIR / "templates")
 env = Environment(
     loader=FileSystemLoader(template_dir),
     auto_reload=False,
-    cache_size=0,  # Disable template cache
+    cache_size=400,
 )
 JINJA2_GLOBALS: dict[str, Any] = {}
 

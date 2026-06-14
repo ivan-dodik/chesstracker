@@ -54,23 +54,27 @@ async def calculate_standings(
             draws[game.white_player_id] += 1
             draws[game.black_player_id] += 1
 
-    # Get player names
-    player_ids = set(points.keys()) | set(games_played.keys())
+    # Get all player names in ONE batch query (avoid N+1)
+    player_ids = list(set(points.keys()) | set(games_played.keys()))
     standings = []
-    for pid in player_ids:
-        player_result = await db.execute(select(Player).where(Player.id == pid))
-        player = player_result.scalar_one_or_none()
-        if player:
-            standings.append({
-                "player_id": pid,
-                "player_name": player.name,
-                "rating": player.rating,
-                "points": points.get(pid, 0.0),
-                "games_played": games_played.get(pid, 0),
-                "wins": wins.get(pid, 0),
-                "draws": draws.get(pid, 0),
-                "losses": losses.get(pid, 0),
-            })
+    if player_ids:
+        players_result = await db.execute(
+            select(Player).where(Player.id.in_(player_ids))
+        )
+        players_map = {p.id: p for p in players_result.scalars().all()}
+        for pid in player_ids:
+            player = players_map.get(pid)
+            if player:
+                standings.append({
+                    "player_id": pid,
+                    "player_name": player.name,
+                    "rating": player.rating,
+                    "points": points.get(pid, 0.0),
+                    "games_played": games_played.get(pid, 0),
+                    "wins": wins.get(pid, 0),
+                    "draws": draws.get(pid, 0),
+                    "losses": losses.get(pid, 0),
+                })
 
     # Sort by points descending, then player name
     standings.sort(key=lambda x: (-x["points"], x["player_name"]))
