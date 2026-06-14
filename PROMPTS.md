@@ -224,6 +224,25 @@ initialize memory bank
 
 ---
 
+## 2026-06-14 21:56 — Оптимизация скорости сборки и запуска Docker-контейнеров
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Сейчас построение и запуск докер контейнеров необходимых для работы приложения происходит довольно долго. Посмотри, можно ли как-то ускорить/оптимизировать этот процесс?
+```
+
+**План (Plan mode):**
+- Проанализированы: docker-compose.yml, Dockerfiles (backend, telegram-bot), entrypoint.sh, docker-compose.override.yml, .dockerignore
+- Выявлены узкие места: `pip install uv` в каждом образе, нет BuildKit cache mounts, долгий healthcheck PostgreSQL, последовательная сборка, entrypoint на каждый запуск
+- Составлен план: замена base image, cache mounts, оптимизация healthcheck, параллельная сборка, расширение .dockerignore
+
+**Результат:**
+- (в процессе реализации)
+
+---
+
 ## 2026-06-14 18:27 — Исправление ошибок из FRONTEND_TEST_REPORT.md
 
 **Режим:** Plan → Act

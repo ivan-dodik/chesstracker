@@ -22,35 +22,43 @@
 ## Dockerfiles
 
 ### `backend/Dockerfile`
-- Base: `python:3.12-slim`
-- Package manager: `uv` (installed via pip)
-- Copies `pyproject.toml`, `uv.lock`, then `app/` directory
-- Command: `uv run uvicorn app.main:app --host 0.0.0.0 --port 8000`
+- Base: `ghcr.io/astral-sh/uv:python3.12-bookworm-slim` (uv предустановлен)
+- BuildKit cache mount: `--mount=type=cache,target=/root/.cache/uv`
+- Copies `pyproject.toml`, `uv.lock`, then `app/`, `alembic/`, `entrypoint.sh`
+- Command: `./entrypoint.sh` (alembic migrations → seed check → uvicorn)
+- Прямой вызов `.venv/bin/` вместо `uv run` (без dev-deps)
 
 ### `telegram-bot/Dockerfile`
-- Base: `python:3.12-slim`
-- Package manager: `uv`
+- Base: `ghcr.io/astral-sh/uv:python3.12-bookworm-slim` (uv предустановлен)
+- BuildKit cache mount: `--mount=type=cache,target=/root/.cache/uv`
 - Copies `pyproject.toml`, `uv.lock`, then `bot.py`, `config.py`, `handlers/`, `services/`
-- Command: `uv run python bot.py`
+- Command: `.venv/bin/python bot.py` (прямой вызов без uv run)
 
 ## Override (`docker-compose.override.yml`)
-- Mounts volumes for hot reload: `./backend/app:/app/app`, `./telegram-bot:/app`
-- Sets `DEBUG=true`
+- Mounts volumes for hot reload: `./backend/app:/app/app`
+- Sets `DEBUG=true` with `--reload`
 
 ## Useful commands
 ```bash
-# Start all services
-docker compose up -d
-
-# Run seed data
-docker compose run --rm backend python -m app.seed
-
-# Run tests
-docker compose run --rm backend uv run pytest -v
+# Start all services (parallel build)
+docker compose build --parallel && docker compose up -d
 
 # View logs
 docker compose logs -f backend
+
+# Run tests (outside Docker)
+cd backend && uv run pytest -v
+
+# Ruff check
+cd backend && uv run ruff check && cd ../telegram-bot && uv run ruff check
 ```
+
+## Optimization (2026-06-14)
+- Base image: `ghcr.io/astral-sh/uv:python3.12-bookworm-slim` (no pip install)
+- BuildKit cache mounts for uv packages
+- PostgreSQL healthcheck: interval 2s, start_period 5s
+- Direct `.venv/bin/` calls instead of `uv run` (no dev-deps download)
+- Extended `.dockerignore` (memory-bank, scripts, .venv, *.pyc)
 
 ## Links
 - → `backend/core-layer.md` — config.py reads env vars

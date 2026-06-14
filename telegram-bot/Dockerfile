@@ -1,7 +1,4 @@
-FROM python:3.12-slim
-
-# Install uv
-RUN pip install uv --no-cache-dir
+FROM ghcr.io/astral-sh/uv:python3.12-bookworm-slim
 
 # Set working directory
 WORKDIR /app
@@ -12,8 +9,8 @@ RUN adduser --disabled-password --gecos '' appuser
 # Copy dependency files first for better caching
 COPY pyproject.toml uv.lock ./
 
-# Install dependencies
-RUN uv sync --frozen --no-dev
+# Install dependencies (with BuildKit cache mount for uv)
+RUN --mount=type=cache,target=/root/.cache/uv uv sync --frozen --no-dev
 
 # Copy application code
 COPY bot.py config.py ./
@@ -26,8 +23,5 @@ RUN chown -R appuser:appuser /app
 # Switch to non-root user
 USER appuser
 
-# Configure uv cache directory (writable by appuser)
-ENV UV_CACHE_DIR=/home/appuser/.cache/uv
-
 # Run the bot
-CMD ["uv", "run", "python", "bot.py"]
+CMD [".venv/bin/python", "bot.py"]

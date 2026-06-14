@@ -5,10 +5,10 @@
 set -e
 
 echo "⏳ Running database migrations..."
-uv run alembic upgrade head
+.venv/bin/alembic upgrade head
 
 echo "🌱 Seeding database if empty (timeout 120s)..."
-timeout 120 uv run python -c "
+timeout 120 .venv/bin/python -c "
 import asyncio, sys
 from sqlalchemy import text
 from app.core.database import async_session_factory
@@ -29,4 +29,4 @@ asyncio.run(check_and_seed())
 
 echo "🚀 Starting backend server..."
 UVICORN_OPTS="${UVICORN_OPTS:---host 0.0.0.0 --port 8000}"
-exec uv run uvicorn app.main:app $UVICORN_OPTS
+exec .venv/bin/uvicorn app.main:app $UVICORN_OPTS

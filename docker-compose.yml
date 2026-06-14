@@ -10,15 +10,18 @@ services:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ct_user -d ct_database"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 2s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     restart: unless-stopped
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      cache_from:
+        - chess-tracker-backend:latest
     container_name: chess-tracker-backend
     env_file:
       - .env
@@ -36,6 +39,8 @@ services:
     build:
       context: ./telegram-bot
       dockerfile: Dockerfile
+      cache_from:
+        - chess-tracker-bot:latest
     container_name: chess-tracker-bot
     env_file:
       - .env

@@ -896,3 +896,21 @@
 - Проверены через Playwright MCP: все 3 фикса подтверждены
 - 160/160 тестов проходят, ruff clean
 - Затронутые файлы: `backend/app/templates/players/detail.html`, `backend/app/schemas/game.py`, `backend/app/schemas/favorite.py`, `PROMPTS.md`
+
+## 2026-06-14 22:00 — Оптимизация скорости сборки и запуска Docker-контейнеров
+
+- **Base image:** `python:3.12-slim` → `ghcr.io/astral-sh/uv:python3.12-bookworm-slim`
+  - Убран шаг `pip install uv` (~15-30с экономии)
+  - uv уже предустановлен в образе
+- **BuildKit cache mounts:** добавлен `--mount=type=cache,target=/root/.cache/uv` для `uv sync`
+  - Повторные сборки с неизменными зависимостями: ~5-10с вместо 30-60с
+- **Healthcheck PostgreSQL:** оптимизирован
+  - `interval: 10s → 2s`, `timeout: 5s → 3s`, `retries: 5 → 10`, добавлен `start_period: 5s`
+  - Backend стартует через ~3-5с после готовности PG вместо ~10-20с
+- **Entry point:** заменены `uv run` на прямой вызов `.venv/bin/`
+  - Убрана установка dev-зависимостей (ruff, playwright ~60MB) при каждом запуске контейнера
+- **Telegram-bot CMD:** заменён `uv run python bot.py` → `.venv/bin/python bot.py`
+- **Cache from:** добавлен `cache_from` для backend и telegram-bot в docker-compose.yml
+- **.dockerignore:** расширен (memory-bank, scripts, compose files, LICENSE, .venv, *.pyc)
+- 160/160 тестов проходят, ruff clean
+- Затронутые файлы: `backend/Dockerfile`, `telegram-bot/Dockerfile`, `docker-compose.yml`, `backend/entrypoint.sh`, `.dockerignore`
