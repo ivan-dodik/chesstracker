@@ -1000,3 +1000,23 @@
 
 - Затронутые файлы: `backend/app/templates/players/list.html`, `backend/app/templates/tournaments/list.html`, `backend/app/templates/index.html`
 - 160/160 тестов проходят, ruff clean
+
+## 2026-06-15 00:50 — Fix: Фризы на странице профиля и редактирования игрока
+
+**Проблема:** множественные дублирующиеся API-запросы при загрузке страницы профиля `/players/1` и редактирования `/players/1/edit`. Каждый endpoint вызывался 2+ раза.
+
+**Причины:**
+1. **Каскадный eager loading** (`lazy="selectin"`) на моделях Player/Game/Tournament — экспоненциальная загрузка связанных объектов
+2. **Дублирование запросов** — Alpine.js `playerDetail.init()` + HTMX `hx-trigger="load"` инициировали одни и те же fetch-запросы
+3. **Незакрытые SSE-соединения** — orphaned EventSource connections при навигации
+
+**Решения:**
+- `player.py`, `game.py`, `tournament.py`: `lazy="selectin"` → `lazy="raise"` (explicit loading только через `selectinload()` в сервисах)
+- `tournament.py`: добавлен `cascade="all, delete-orphan"` на `games` relationship
+- `players/detail.html`: guard `this._initialized` от двойной инициализации + `Promise.all()` для параллельных запросов
+- `players/edit.html`: guard `this._initialized` от двойной инициализации
+- `sse.js`: `beforeunload` handler для закрытия SSE-соединений
+- `tests/services/conftest.py`: убран несовместимый `PRAGMA foreign_keys=ON`
+
+- Затронутые файлы: `models/player.py`, `models/game.py`, `models/tournament.py`, `templates/players/detail.html`, `templates/players/edit.html`, `static/js/sse.js`, `tests/services/conftest.py`
+- 160/160 тестов проходят, ruff clean

@@ -24,23 +24,20 @@
 - ✅ Устранить гонку между HTMX `hx-trigger="load"` и Alpine.js `x-show` на дашборде
 
 ## Активные решения и considerations
-- **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL, чтобы избежать проблем с event loop'ами. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.
+- **Тесты**: SQLite (aiosqlite) используется для тестов вместо PostgreSQL. `settings.DATABASE_URL` переопределяется в conftest.py перед импортом app модулей.
+- **Models lazy="raise"**: все relationships в Player/Game/Tournament используют `lazy="raise"` вместо `lazy="selectin"`. Это предотвращает каскадную загрузку и N+1. Сервисы используют явный `selectinload()` только для необходимых данных.
+- **Tournament.games cascade**: `cascade="all, delete-orphan"` для корректного каскадного удаления через SQLAlchemy ORM.
 - **bcrypt**: зафиксирована версия 4.0.1 из-за несовместимости passlib с bcrypt 5.x
 - **Alembic**: настроен на async режим через asyncio.run()
 - **Seed-данные**: пересоздают таблицы (drop_all + create_all) при каждом запуске
-- **SSE**: реализован in-memory pub/sub через asyncio.Queue, подходит для одного процесса
-- **ActivityLog**: JSON-поля (old_values, new_values) хранятся как сериализованные строки в SQLite/PostgreSQL
-- **Jinja2**: используется кастомный Environment с cache_size=0 (обход несовместимости Jinja2 3.1.x со Starlette Jinja2Templates)
-- **Шаблоны**: не используют Flask-специфичные функции (get_flashed_messages заменён на JS-управление flash-сообщениями)
-- **Chart.js**: подключён через CDN (chart.umd.min.js v4.4.7), используется для line chart (история рейтинга) и doughnut chart (общая статистика)
+- **SSE**: реализован in-memory pub/sub через asyncio.Queue, подходит для одного процесса. `beforeunload` handler закрывает SSE-соединения.
+- **Alpine.js guards**: компоненты playerDetail и editForm используют `this._initialized` guard от двойной инициализации при HTMX swap.
+- **Promise.all()**: параллельные fetch-запросы в playerDetail.init() вместо последовательных await.
+- **Chart.js**: подключён через CDN (chart.umd.min.js v4.4.7)
 - **Alpine.js**: компоненты ratingChart, overallStatsChart, playerDetail, tournamentDetail, headToHead, accordion
-- **GameRead**: расширен полями white_player_name, black_player_name
-- **TournamentStandings**: расширен полями wins, draws, losses
-- **Агентские скиллы Cline**: установлены 6 пакетов (85 скиллов). Доступны через `use_skill`. Подробнее: `memory-bank/techContext.md` (раздел «Инструменты разработки»), `.clinerules/memory-bank.md` (раздел «Установка агентских скиллов»).
-  - Новые: `mindrally/skills` (9) — FastAPI, PostgreSQL, Python testing, HTMX, Docker, performance-optimization, DevOps, security, web-scraping
-- **Playwright MCP**: установлен `@executeautomation/playwright-mcp-server`. Инструменты: `playwright_navigate`, `playwright_screenshot`, `playwright_click`, `playwright_fill`, `playwright_select`, `playwright_evaluate`, `playwright_resize` и др. Подключён как MCP-сервер `github.com/executeautomation/mcp-playwright`.
-- **Исправления P1/P2/P3 (2026-06-14):** P1 Critical — кнопка "Редактировать" скрыта для user (вынесен `isAdmin` геттер в `playerDetail`, убран вложенный `x-data`); P2 Medium — колонка "Турнир" отображает название (добавлено `tournament_name` в `GameRead`); P3 Medium — избранные показывают имена/рейтинги (создана `FavoritePlayerInfo`, добавлено `player` в `FavoriteRead`).
-- **Проблема аутентификации**: Частично исправлена. Корневая причина — гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. Создан BUGS.md с полным анализом.
+- **Агентские скиллы Cline**: установлены 6 пакетов (85 скиллов).
+- **Playwright MCP**: установлен `@executeautomation/playwright-mcp-server`.
+- **Исправления P1/P2/P3 (2026-06-14):** P1 Critical, P2 Medium, P3 Medium — все исправлены.
 
 ## Ссылки на модули
 

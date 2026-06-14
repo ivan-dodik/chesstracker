@@ -537,3 +537,21 @@ API-тесты не покрывают фронтенд-поведение. Ну
 | 2026-06-14 23:32 | **Исправление фризов: прогрев шаблонов + pool_recycle + параллельные fetch** — ~50s задержка при первом открытии каждой страницы (Jinja2 lazy compilation в Docker overlay fs), sequential fetch на tournament detail (~3.3s). Решения: (1) main.py — прогрев всех Jinja2 шаблонов в lifespan startup; (2) database.py — pool_recycle=1800 для предотвращения протухания DB соединений; (3) tournaments/detail.html — три последовательных await заменены на Promise.all() (~1.65s вместо ~3.3s). 160/160 тестов, ruff clean. Затронуты: main.py, database.py, tournaments/detail.html. |
 | 2026-06-15 00:18 | **Fix SSE bottleneck (50s page freeze)** — при навигации между страницами браузер зависал ~50s из-за SSE-соединений, блокирующих HTTP/1.1 connection pool. Причина: навигационные ссылки `<a>` были plain (без `hx-boost`) → каждая навигация = полный page reload = новое SSE-соединение к `/api/events`. Решения: (1) base.html — `hx-boost="true"` на `<body>` (HTMX перехватывает все `<a>`, swap только `<main>`, SSE не переисполняется); (2) sse.js — singleton guard + `htmx:afterSwap` handler. 160/160 тестов. Затронуты: base.html, sse.js. |
 | 2026-06-15 00:30 | **Fix: JSON вместо HTML на /players и /tournaments (hx-boost side-effect)** — после добавления `hx-boost="true"` страницы /players и /tournaments отображали raw JSON вместо HTML. Причина: `hx-boost` делает AJAX swap `<body>`, но не выполняет `<script>` из `<head>` → обработчики `htmx:afterSwap` не регистрировались → JSON отображался как raw text. Решение: перемещены `<script>` из `{% block extra_head %}` в конец `{% block content %}` в 3 шаблонах (players/list.html, tournaments/list.html, index.html) — HTMX выполняет скрипты в swap-нутом `<body>`-контенте. 160/160 тестов, ruff clean. Затронуты: players/list.html, tournaments/list.html, index.html. |
+
+### 2026-06-15 00:50 — Fix: Фризы на странице профиля и редактирования игрока
+
+**Проблема:** множественные дублирующиеся API-запросы при загрузке страницы профиля `/players/1` и редактирования `/players/1/edit`. Каждый endpoint вызывался 2+ раза, создавая избыточную нагрузку на сервер и браузер.
+
+**Причины:**
+1. Каскадный eager loading (`lazy="selectin"`) на моделях Player/Game/Tournament — экспоненциальная загрузка связанных объектов
+2. Дублирование запросов — Alpine.js `playerDetail.init()` + HTMX `hx-trigger="load"` инициировали одни и те же fetch-запросы
+3. Незакрытые SSE-соединения — orphaned EventSource connections при навигации
+
+**Решения:**
+- `lazy="selectin"` → `lazy="raise"` на всех relationships моделей (explicit loading через `selectinload()` в сервисах)
+- `cascade="all, delete-orphan"` на Tournament.games для корректного каскадного удаления
+- Guard `this._initialized` в Alpine.js компонентах detail.html и edit.html
+- `Promise.all()` для параллельных fetch-запросов в detail.html
+- `beforeunload` handler в sse.js для закрытия SSE-соединений
+
+**Результат:** 160/160 тестов, ruff clean

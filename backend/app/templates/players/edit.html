@@ -84,6 +84,10 @@ document.addEventListener('alpine:init', () => {
     showDeleteConfirm: false,
 
     async init() {
+      // Guard: prevent double init (HTMX swap + Alpine re-scan)
+      if (this._initialized) return;
+      this._initialized = true;
+
       try {
         const res = await fetch('/api/players/' + this.playerId, {
           headers: Auth.getAuthHeaders(),

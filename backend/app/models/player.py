@@ -22,7 +22,7 @@ class Player(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
-    games_as_white: Mapped[list["Game"]] = relationship("Game", foreign_keys="Game.white_player_id", back_populates="white_player", lazy="selectin")  # noqa: F821
-    games_as_black: Mapped[list["Game"]] = relationship("Game", foreign_keys="Game.black_player_id", back_populates="black_player", lazy="selectin")  # noqa: F821
-    rating_history: Mapped[list["RatingHistory"]] = relationship("RatingHistory", back_populates="player", lazy="selectin")  # noqa: F821
-    favorites: Mapped[list["Favorite"]] = relationship("Favorite", back_populates="player", lazy="selectin")  # noqa: F821
+    games_as_white: Mapped[list["Game"]] = relationship("Game", foreign_keys="Game.white_player_id", back_populates="white_player", lazy="raise")  # noqa: F821
+    games_as_black: Mapped[list["Game"]] = relationship("Game", foreign_keys="Game.black_player_id", back_populates="black_player", lazy="raise")  # noqa: F821
+    rating_history: Mapped[list["RatingHistory"]] = relationship("RatingHistory", back_populates="player", lazy="raise")  # noqa: F821
+    favorites: Mapped[list["Favorite"]] = relationship("Favorite", back_populates="player", lazy="raise")  # noqa: F821

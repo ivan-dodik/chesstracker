@@ -32,7 +32,11 @@ from app.models import (  # noqa: E402
 
 TEST_DATABASE_URL = f"sqlite+aiosqlite:///{_test_db_path}"
 
-engine = create_async_engine(TEST_DATABASE_URL, echo=False)
+engine = create_async_engine(
+    TEST_DATABASE_URL, echo=False,
+    connect_args={"check_same_thread": False},
+)
+
 TestSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

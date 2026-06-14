@@ -224,6 +224,25 @@ initialize memory bank
 
 ---
 
+## 2026-06-15 00:38 — Фризы на странице профиля игрока и редактирования
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Теперь фризы на странице профиля игрока, его редактировании. Лог - 'log2.txt' (see below for file content)
+```
+
+**План (Plan mode):**
+- Анализ лога log2.txt: множественные дублирующиеся API-запросы, каскадный eager loading через selectin, SSE-подключения
+- Найдены 3 проблемы: (1) дублирование запросов при HTMX swap + Alpine.js reinit, (2) каскадный selectin в моделях Player/Game/Tournament, (3) множественные SSE-connections
+- План исправлений: guard от reinit в Alpine.js, замена selectin→noload, guard SSE, Promise.all() для parallel fetch
+
+**Результат:**
+- (в процессе)
+
+---
+
 ## 2026-06-15 00:26 — Исправление JSON вместо HTML на /players и /tournaments
 
 **Режим:** Plan → Act

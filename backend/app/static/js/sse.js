@@ -99,9 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-// After HTMX swap, ensure SSE connection is alive
+// After HTMX swap, ensure SSE connection is alive (only reconnect if closed)
 document.addEventListener('htmx:afterSwap', () => {
   if (window.sseClient && !window.sseClient.eventSource) {
     window.sseClient.connect();
+  }
+});
+
+// Disconnect SSE when leaving the app (prevents orphaned connections)
+window.addEventListener('beforeunload', () => {
+  if (window.sseClient) {
+    window.sseClient.close();
   }
 });

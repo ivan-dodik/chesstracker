@@ -25,7 +25,7 @@ class Tournament(Base):
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
 
-    games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament", lazy="selectin")  # noqa: F821
+    games: Mapped[list["Game"]] = relationship("Game", back_populates="tournament", lazy="raise", cascade="all, delete-orphan")  # noqa: F821
     rating_history: Mapped[list["RatingHistory"]] = relationship(  # noqa: F821
-        "RatingHistory", back_populates="tournament", lazy="selectin"
+        "RatingHistory", back_populates="tournament", lazy="raise"
     )

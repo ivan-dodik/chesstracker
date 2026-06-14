@@ -23,6 +23,6 @@ class Game(Base):
     played_at: Mapped[datetime.datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games", lazy="selectin")  # noqa: F821
-    white_player: Mapped["Player"] = relationship("Player", foreign_keys=[white_player_id], back_populates="games_as_white", lazy="selectin")  # noqa: F821
-    black_player: Mapped["Player"] = relationship("Player", foreign_keys=[black_player_id], back_populates="games_as_black", lazy="selectin")  # noqa: F821
+    tournament: Mapped["Tournament"] = relationship("Tournament", back_populates="games", lazy="raise")  # noqa: F821
+    white_player: Mapped["Player"] = relationship("Player", foreign_keys=[white_player_id], back_populates="games_as_white", lazy="raise")  # noqa: F821
+    black_player: Mapped["Player"] = relationship("Player", foreign_keys=[black_player_id], back_populates="games_as_black", lazy="raise")  # noqa: F821

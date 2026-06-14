@@ -192,11 +192,23 @@
       playerTournaments: [],
 
       async init() {
-        await this.loadPlayer();
-        await this.loadOverallStats();
-        await this.loadGames();
-        await this.loadPlayersList();
-        await this.loadTournaments();
+        // Guard: prevent double init (HTMX swap + Alpine re-scan)
+        if (this._initialized) return;
+        this._initialized = true;
+
+        // Parallel fetch for independent requests
+        const [playerResult, statsResult, gamesResult] = await Promise.all([
+          this.loadPlayer(),
+          this.loadOverallStats(),
+          this.loadGames(),
+        ]);
+
+        // Sequential: players list depends on games data, tournaments independent
+        await Promise.all([
+          this.loadPlayersList(),
+          this.loadTournaments(),
+        ]);
+
         this.$nextTick(() => this.renderRatingChart());
       },
 
@@ -223,7 +235,6 @@
           const resp = await fetch('/api/players?per_page=200', { headers: Auth.getAuthHeaders() });
           const data = await resp.json();
           allPlayersCache = data.items || [];
-          // Extract unique opponent IDs from games
           const opponentIds = new Set();
           for (const g of this.games) {
             if (g.white_player_id !== this.playerId) opponentIds.add(g.white_player_id);
