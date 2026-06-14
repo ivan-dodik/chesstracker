@@ -700,6 +700,32 @@
 
 ---
 
+## 2026-06-14 16:10 — M1: Игроки — CRUD формы (Create/Edit/Delete)
+
+**Описание:** Исправлен баг `/players/create` → 422. Добавлены CRUD формы для игроков: создание, редактирование, удаление. Добавлена Pydantic-схема `PlayerUpdate`.
+
+**Изменения:**
+- `backend/app/schemas/player.py` — добавлена схема `PlayerUpdate` (name, rating, city, avatar_url — все опциональные, с валидацией rating ≥ 0)
+- `backend/app/api/web.py` — добавлены маршруты: `GET /players/create` (admin only), `GET /players/{id}/edit` (admin only), `GET /players/{id}/delete` (admin only, redirect). Маршруты размещены ДО `GET /players/{player_id}` для корректного матчинга
+- `backend/app/templates/players/create.html` — новый шаблон: форма создания игрока (name*, rating, city), Alpine.js компонент `playerCreateForm`, клиентская валидация, POST через fetch → `/api/players`
+- `backend/app/templates/players/edit.html` — новый шаблон: форма редактирования с предзаполнением данных, PUT через fetch → `/api/players/{id}`, кнопка удаления с подтверждением
+- `backend/app/templates/players/detail.html` — добавлена кнопка «✏️ Редактировать» для админов (x-show="isAdmin") в `player-header-actions`
+
+**Затронутые файлы:**
+- `backend/app/schemas/player.py`
+- `backend/app/api/web.py`
+- `backend/app/templates/players/create.html` (новый)
+- `backend/app/templates/players/edit.html` (новый)
+- `backend/app/templates/players/detail.html`
+
+**Валидация:**
+- Клиентская: required поля, min=0 для rating, maxlength
+- Серверная: Pydantic PlayerUpdate с field_validator
+
+- 148/148 тестов проходят, ruff check без ошибок
+
+---
+
 ## 2026-06-14 15:35 — Исправление seed JSONB mismatch и возврат healthcheck API
 
 **Проблема:**

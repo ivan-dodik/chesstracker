@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from jinja2 import Environment, FileSystemLoader, Template
 
 from app.api.deps import get_current_user_for_web
@@ -56,6 +56,41 @@ async def players_list(
 ) -> HTMLResponse:
     """Players list page."""
     return template_response("players/list.html", {"request": request})
+
+
+@router.get("/players/create", response_class=HTMLResponse, include_in_schema=False)
+async def player_create_page(
+    request: Request,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Player create form (admin only)."""
+    if not current_user.is_admin:
+        return RedirectResponse(url="/players", status_code=303)
+    return template_response("players/create.html", {"request": request})
+
+
+@router.get("/players/{player_id}/edit", response_class=HTMLResponse, include_in_schema=False)
+async def player_edit_page(
+    request: Request,
+    player_id: int,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Player edit form (admin only)."""
+    if not current_user.is_admin:
+        return RedirectResponse(url="/players", status_code=303)
+    return template_response("players/edit.html", {"request": request, "player_id": player_id})
+
+
+@router.get("/players/{player_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+async def player_delete_page(
+    request: Request,
+    player_id: int,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Player delete confirmation (admin only, redirects after delete)."""
+    if not current_user.is_admin:
+        return RedirectResponse(url="/players", status_code=303)
+    return RedirectResponse(url=f"/players/{player_id}", status_code=303)
 
 
 @router.get("/players/{player_id}", response_class=HTMLResponse, include_in_schema=False)

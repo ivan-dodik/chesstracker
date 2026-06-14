@@ -1,0 +1,110 @@
+<!-- SPDX-FileCopyrightText: 2026 Ivan Dodik -->
+<!-- SPDX-License-Identifier: AGPL-3.0-only -->
+
+{% extends "base.html" %}
+{% block title %}Добавить игрока — Chess Tracker{% endblock %}
+{% block content %}
+<div class="container" x-data="playerCreateForm()" x-init="init()">
+  <div class="page-header">
+    <h1>Добавить игрока</h1>
+    <a href="/players" class="btn btn-outline">← Назад к списку</a>
+  </div>
+
+  <!-- Error message -->
+  <div x-show="errorMessage" x-cloak class="alert alert-danger" x-text="errorMessage"></div>
+
+  <form @submit.prevent="submitForm()" class="card" style="max-width: 600px;">
+    <div class="form-group">
+      <label for="name">Имя <span class="text-danger">*</span></label>
+      <input type="text" id="name" x-model="form.name" required
+             minlength="1" maxlength="100" class="form-control"
+             placeholder="Введите имя игрока">
+      <small class="text-muted" x-show="errors.name" x-text="errors.name"></small>
+    </div>
+
+    <div class="form-group">
+      <label for="rating">Рейтинг</label>
+      <input type="number" id="rating" x-model.number="form.rating" min="0"
+             class="form-control" placeholder="0">
+      <small class="text-muted" x-show="errors.rating" x-text="errors.rating"></small>
+    </div>
+
+    <div class="form-group">
+      <label for="city">Город</label>
+      <input type="text" id="city" x-model="form.city" maxlength="100"
+             class="form-control" placeholder="Город (необязательно)">
+    </div>
+
+    <div class="form-actions" style="margin-top: 1.5rem;">
+      <button type="submit" class="btn btn-success" :disabled="loading">
+        <span x-show="!loading">✅ Создать игрока</span>
+        <span x-show="loading">⏳ Создание...</span>
+      </button>
+      <a href="/players" class="btn btn-outline">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('alpine:init', () => {
+  Alpine.data('playerCreateForm', () => ({
+    form: { name: '', rating: 0, city: '' },
+    errors: {},
+    errorMessage: '',
+    loading: false,
+
+    init() {},
+
+    validate() {
+      this.errors = {};
+      let valid = true;
+      if (!this.form.name || this.form.name.trim().length === 0) {
+        this.errors.name = 'Имя обязательно для заполнения';
+        valid = false;
+      }
+      if (this.form.rating < 0) {
+        this.errors.rating = 'Рейтинг не может быть отрицательным';
+        valid = false;
+      }
+      return valid;
+    },
+
+    async submitForm() {
+      this.errorMessage = '';
+      if (!this.validate()) return;
+
+      this.loading = true;
+      try {
+        const body = { name: this.form.name.trim(), rating: this.form.rating || 0 };
+        if (this.form.city && this.form.city.trim()) body.city = this.form.city.trim();
+
+        const res = await fetch('/api/players', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...Auth.getAuthHeaders(),
+          },
+          body: JSON.stringify(body),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          window.location.href = '/players/' + data.id;
+        } else {
+          const err = await res.json();
+          if (err.detail && Array.isArray(err.detail)) {
+            this.errorMessage = err.detail.map(e => e.msg).join('; ');
+          } else {
+            this.errorMessage = 'Ошибка создания игрока';
+          }
+        }
+      } catch (e) {
+        this.errorMessage = 'Ошибка сети: ' + e.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+  }));
+});
+</script>
+{% endblock %}

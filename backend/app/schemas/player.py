@@ -23,6 +23,21 @@ class PlayerCreate(BaseModel):
         return v
 
 
+class PlayerUpdate(BaseModel):
+    """Schema for updating player data."""
+    name: str | None = None
+    rating: int | None = None
+    city: str | None = None
+    avatar_url: str | None = None
+
+    @field_validator("rating")
+    @classmethod
+    def validate_rating(cls, v: int | None) -> int | None:
+        if v is not None and v < 0:
+            raise ValueError("Rating cannot be negative")
+        return v
+
+
 class PlayerRead(BaseModel):
     """Schema for reading player details."""
     id: int
