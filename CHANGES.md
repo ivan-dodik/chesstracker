@@ -843,6 +843,16 @@
 - Затронутые файлы: `backend/app/templates/games/create.html`, `backend/app/services/game_service.py`, `backend/app/api/games.py`
 - 160/160 тестов проходят, ruff clean
 
+## 2026-06-15 00:18 — Fix SSE bottleneck (50s page freeze)
+
+- **Проблема:** при навигации между страницами браузер зависал на ~50s из-за SSE-соединений, блокирующих HTTP/1.1 connection pool
+- **Причина:** навигационные ссылки (`<a>`) были plain — без `hx-boost`. Каждая навигация = полный page reload = новое SSE-соединение к `/api/events`
+- **Решение:**
+  - `base.html`: добавлен `hx-boost="true"` на `<body>` → HTMX перехватывает все `<a>` и делает AJAX swap (только `<main>` перезагружается, `<head>` и SSE не переисполняются)
+  - `sse.js`: singleton guard (`if (!window.sseClient)`) + `htmx:afterSwap` handler для reconnect если SSE-соединение упало
+- **Затронутые файлы:** `backend/app/templates/base.html`, `backend/app/static/js/sse.js`
+- 160/160 тестов проходят
+
 ## 2026-06-14 23:54 — Диагностическое логирование + оптимизации
 
 **Проблема:** 50s фризы не ушли после прогрева шаблонов. Нужна инструментация для точной диагностики.

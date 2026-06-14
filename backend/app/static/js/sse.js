@@ -92,7 +92,16 @@ class SSEClient {
   }
 }
 
-// Auto-initialize on DOM ready
+// Auto-initialize on DOM ready (singleton — guard against duplicate connections)
 document.addEventListener('DOMContentLoaded', () => {
-  window.sseClient = new SSEClient();
+  if (!window.sseClient) {
+    window.sseClient = new SSEClient();
+  }
+});
+
+// After HTMX swap, ensure SSE connection is alive
+document.addEventListener('htmx:afterSwap', () => {
+  if (window.sseClient && !window.sseClient.eventSource) {
+    window.sseClient.connect();
+  }
 });
