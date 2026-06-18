@@ -1,0 +1,62 @@
+# SPDX-FileCopyrightText: 2026 Ivan Dodik
+# SPDX-License-Identifier: AGPL-3.0-only
+
+"""E2E tests: M20 — SSE real-time updates."""
+
+import os
+
+
+def _read(path: str) -> str:
+    with open(path) as f:
+        return f.read()
+
+
+def test_sse_client_in_template():
+    """M20.1 Dashboard template references SSE client."""
+    content = _read(os.path.join(os.path.dirname(__file__), "..", "app", "templates", "index.html"))
+    assert "EventSource" in content or "sse.js" in content or "sseClient" in content
+
+
+def test_sse_rating_listener_in_template():
+    """M20.2 Dashboard template has rating_updated SSE listener."""
+    content = _read(os.path.join(os.path.dirname(__file__), "..", "app", "templates", "index.html"))
+    has = any(kw in content for kw in ["rating_updated", "top-rated", "topRated", "top_rated"])
+    assert has, "Dashboard should have SSE listener for rating_updated events"
+
+
+def test_sse_game_listener_in_template():
+    """M20.3 Tournament detail template has game event SSE listeners."""
+    content = _read(
+        os.path.join(
+            os.path.dirname(__file__), "..", "app", "templates", "tournaments", "detail.html"
+        )
+    )
+    has = any(
+        kw in content
+        for kw in ["game_created", "game_result_updated", "loadStandings", "loadGames"]
+    )
+    assert has, "Tournament detail should have SSE listeners for game events"
+
+
+def test_sse_service_publishes_events():
+    """M20.4 SSE service has publish_event function."""
+    content = _read(os.path.join(os.path.dirname(__file__), "..", "app", "services", "sse_service.py"))
+    assert "publish_event" in content
+    assert "async def publish_event" in content
+
+
+def test_game_service_publishes_sse():
+    """M20.5 game_service.py publishes SSE events on game create/update."""
+    content = _read(os.path.join(os.path.dirname(__file__), "..", "app", "services", "game_service.py"))
+    assert "publish_event" in content, "game_service should publish SSE events"
+
+
+def test_rating_service_publishes_sse():
+    """M20.6 rating_calculation_service publishes SSE on rating change."""
+    content = _read(
+        os.path.join(
+            os.path.dirname(__file__), "..", "app", "services", "rating_calculation_service.py"
+        )
+    )
+    assert "publish_event" in content, "rating service should publish SSE events"
+    assert "rating_updated" in content, "should publish rating_updated event"

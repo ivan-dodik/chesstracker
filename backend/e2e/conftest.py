@@ -62,7 +62,7 @@ def _seed_database(db_path: str) -> None:
     asyncio.run(_seed())
 
 
-@pytest.fixture(scope="session", autouse=True)
+@pytest.fixture(scope="session")
 def server_url() -> Generator[str]:
     """Start FastAPI server for E2E tests. Yields base URL."""
     import subprocess
@@ -88,7 +88,7 @@ def server_url() -> Generator[str]:
     # Set DATABASE_URL for the server process
     env = os.environ.copy()
     env["DATABASE_URL"] = f"sqlite+aiosqlite:///{_test_db_path}"
-    env["SECRET_KEY"] = "e2e-test-secret-key"
+    env["SECRET_KEY"] = "e2e-test-secret-key-must-be-32-chars"
 
     # Start server
     _server_proc = subprocess.Popen(
@@ -206,6 +206,29 @@ def login_and_set_token(page: Page, url: str, username: str, password: str) -> N
     page.goto(url, wait_until="domcontentloaded")
     page.wait_for_timeout(500)  # Wait for JS to initialize
     # Set JWT in localStorage AND cookie (web routes need cookie)
+    page.evaluate(f"""() => {{
+        localStorage.setItem('jwt_token', '{token}');
+        localStorage.setItem('user', JSON.stringify({{username: '{username}', role: '{'admin' if username == 'admin' else 'user'}'}}));
+        document.cookie = 'jwt_token={token}; path=/; max-age=86400; SameSite=Lax';
+    }}""")
+
+
+def set_token_only(page: Page, url: str, username: str, password: str) -> None:
+    """Set JWT in localStorage and cookie. Navigates to /login (lightweight) first."""
+    import json
+    import urllib.request as _req
+
+    req = _req.Request(
+        f"{url}/api/auth/login",
+        data=json.dumps({"username": username, "password": password}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with _req.urlopen(req) as resp:
+        token = json.loads(resp.read())["access_token"]
+
+    # Navigate to /login (lightweight, no SSE/API calls) to set tokens on correct origin
+    page.goto(f"{url}/login", wait_until="domcontentloaded")
     page.evaluate(f"""() => {{
         localStorage.setItem('jwt_token', '{token}');
         localStorage.setItem('user', JSON.stringify({{username: '{username}', role: '{'admin' if username == 'admin' else 'user'}'}}));

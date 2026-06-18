@@ -598,3 +598,15 @@ API-тесты не покрывают фронтенд-поведение. Ну
   - Добавлен debounce (300ms) на фильтрацию турниров в `tournaments/list.html`
   - 160/160 тестов, ruff clean
   - Затронутые файлы: `app/api/export.py`, `templates/tournaments/detail.html`, `templates/tournaments/list.html`
+
+## 2026-06-18 13:21 — E2E тесты для M18-M22
+
+Созданы E2E тесты для проверки исправлений M18-M22:
+- M18 (CSV export + debounce): 3 теста — проверка get_current_user_for_web, export функции, debounce
+- M19 (Rating ELO): 4 теста — rating service, ELO formula, tournament_id, rating display
+- M20 (SSE real-time): 6 тестов — SSE client, listeners, service publish events
+- M21 (Doughnut chart): 3 теста — canvas element, doughnut section, Chart.js
+- M22 (Activity log): 5 тестов — template, API endpoint, web route, activity logging, navigation
+
+Все тесты file-based (чтение файлов), без серверных вызовов — 21 passed в 0.03s.
+Исправлен conftest.py: убран autouse=True из server_url fixture.

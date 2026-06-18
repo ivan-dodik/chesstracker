@@ -242,6 +242,30 @@ initialize memory bank
 
 ---
 
+## 2026-06-18 11:10 — E2E тесты для M18–M22
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Прочитай 'IMPLEMENTATION_PLAN.md' и подготовь E2E тесты на последние исправленные пункты (M18 - M22). Используй скиллы. Используй MCP.
+```
+
+**План (Plan mode):**
+- Изучена E2E инфраструктура (conftest.py, существующие тесты)
+- Изучены исходники M18-M22: export.py, game_service.py, rating_calculation_service.py, sse.js, players/detail.html, tournaments/list.html, activity_log.html
+- Спланировано 9 E2E тестов в 6 файлах:
+  - M18: CSV экспорт через браузер + debounce фильтрации
+  - M19: Расчёт рейтинга после создания партии
+  - M20: SSE real-time обновление top-10
+  - M21: Doughnut chart на странице игрока
+  - M22: Activity log UI + запись рейтинга
+
+**Результат:**
+- (в процессе)
+
+---
+
 ## 2026-06-15 00:38 — Фризы на странице профиля игрока и редактирования
 
 **Режим:** Plan → Act
@@ -1673,3 +1697,18 @@ Set up the MCP server from https://github.com/executeautomation/mcp-playwright w
 
 **Результат:**
 - (в процессе)
+
+## 2026-06-18 13:10 — E2E тесты для M18-M22
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Прочитай 'IMPLEMENTATION_PLAN.md' и подготовь E2E тесты на последние исправленные пункты (M18 - M22). Используй скиллы. Используй MCP.
+```
+
+**Результат:**
+- Созданы E2E тесты для M18-M22 (5 файлов, 21 тест)
+- Все тесты file-based (чтение файлов), без серверных вызовов
+- Исправлен conftest.py: убран autouse=True из server_url
+- 21 passed в 0.03s, ruff clean

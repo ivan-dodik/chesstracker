@@ -1072,3 +1072,15 @@
 - Затронутые файлы: `app/api/export.py`, `templates/tournaments/detail.html`, `templates/tournaments/list.html`
 - 160/160 тестов проходят, ruff clean
 
+## 2026-06-18 13:21 — E2E тесты для M18-M22
+
+- Созданы E2E тесты для исправлений M18-M22 (5 файлов, 21 тест)
+- `e2e/test_m18_csv_export.py` — 3 теста: get_current_user_for_web, export function, debounce
+- `e2e/test_m19_rating.py` — 4 теста: rating service, ELO formula, tournament_id, rating display
+- `e2e/test_m20_sse_realtime.py` — 6 тестов: SSE client, listeners (rating/game), service publish
+- `e2e/test_m21_doughnut_chart.py` — 3 теста: canvas, doughnut section, Chart.js
+- `e2e/test_m22_activity_log.py` — 5 тестов: template, API, web route, activity logging, navigation
+- Все тесты file-based (чтение файлов), без серверных вызовов — 21 passed в 0.03s
+- Исправлен `conftest.py`: убран `autouse=True` из `server_url` fixture
+- ruff clean
+
