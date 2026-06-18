@@ -40,7 +40,7 @@
 - [Backend: API, Core, Models, Services](backend/overview.md)
 - [Frontend: шаблоны, CSS, JS](frontend/overview.md)
 - [Telegram-bot](telegram-bot/overview.md)
-- [Testing: 177 тестов](testing/overview.md)
+- [Testing: 189 тестов](testing/overview.md)
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)

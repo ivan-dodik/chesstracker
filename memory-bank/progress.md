@@ -1,13 +1,13 @@
 # Progress: Chess Tracker
 
 ## Текущий статус
-**Все майлстоуны M1–M17 завершены.** 177 тестов (148 API/service + 29 E2E Playwright). Все требования ДЗ выполнены.
+**Все майлстоуны M1–M17 завершены.** Дополнительно: CRUD-формы, аутентификация, оптимизации производительности, множество фронтенд-фикс. 189 тестов (160 API/service + 29 E2E), ruff clean. Запланированы M18–M22.
 
 ## Что работает
 - ✅ **M1: Архитектура и планирование** — полная документация
 - ✅ **M2: Окружение и Docker** — Docker Compose, Dockerfile, pyproject.toml
 - ✅ **M3: Backend — модели и БД**
-  - ✅ Core: config.py (pydantic-settings), database.py (async engine), security.py (JWT, bcrypt)
+  - ✅ Core: config.py (pydantic-settings), database.py (async engine, pool), security.py (JWT, bcrypt)
   - ✅ Модели: User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
   - ✅ Alembic: async env.py, миграция "initial" накатана (8 таблиц)
   - ✅ Pydantic схемы: User, Player, Tournament, Game, RatingHistory, Favorite, ActivityLog
@@ -17,94 +17,74 @@
 - ✅ **M5: Backend — API: специфичные фичи**
 - ✅ **M6: Frontend — базовая структура и навигация**
 - ✅ **M7: Frontend — дашборд и детальные страницы**
-- ✅ **M8: Frontend — фичи**
-- ✅ **M9: Telegram-bot**
-- ✅ **M10: Тестирование и CI**
-  - ✅ ruff: все ошибки в backend (122) и telegram-bot (12) исправлены
-  - ✅ .pre-commit-config.yaml: ruff hook для backend и telegram-bot
-  - ✅ .github/workflows/ci.yml: ruff lint + pytest с PostgreSQL
-  - ✅ ruff check проходит на всех файлах
-   - ✅ 177/177 тестов проходят (148 API + 29 E2E)
+- ✅ **M8: Frontend — фичи** (SSE, избранное, экспорт/импорт CSV)
+- ✅ **M9: Telegram-bot** (long-polling, /start, /subscribe, /unsubscribe, notifier)
+- ✅ **M10: Тестирование и CI** (ruff clean, pre-commit hook, GitHub Actions CI)
 - ✅ **M11: Финальная документация**
-  - ✅ README.md создан
-  - ✅ ARCHITECTURE.md дополнен
-  - ✅ REPORT.md проверен и дополнен (все майлстоуны, история работы)
-  - ✅ PROMPTS.md проверен и дополнен
-  - ✅ CHANGES.md проверен и дополнен (все майлстоуны)
-  - ✅ Memory Bank обновлён
+- ✅ **M12: TDD-инфраструктура и правила**
+- ✅ **M13: API-тесты — Турниры, Игры, Export, Import (~24 теста)**
+- ✅ **M14: API-тесты — Activity Log, Health, краевые случаи (~12 тестов)**
+- ✅ **M15: Unit-тесты сервисов (~20 тестов)**
+- ✅ **M16: Telegram-bot тесты и CI (~6 тестов)**
+- ✅ **M17: E2E тесты Playwright (29 тестов)**
+- ✅ **CRUD-формы** (create/edit/delete) для players, tournaments, games + 12 web-тестов
+- ✅ **Аутентификация всех страниц** (get_current_user_for_web, cookie jwt_token)
+- ✅ **Docker entrypoint** — авто-миграции (alembic) + seed при пустой БД
+- ✅ **Оптимизации производительности** — N+1 batch, lazy="raise", pool tuning, Jinja2 cache
+- ✅ **Фронтенд-фиксы** — hx-boost, Alpine.js/HTMX swap, guards, SSE cleanup
+- ✅ **Code review** — 22 замечания исправлены
 
 ## Что осталось сделать
+- [ ] M18: CSV экспорт auth + debounce фильтрации турниров
+- [ ] M19: Расчёт рейтинга (ELO) + RatingHistory
+- [ ] M20: SSE real-time — обновление данных на страницах
+- [ ] M21: Круговая диаграмма на странице игрока
+- [ ] M22: Лог активности — UI-страница + аудит рейтинга
 - [ ] Доработка фронтенда (мобильное меню, пустые состояния) — опционально
 
 ## Известные проблемы
 - **bcrypt 5.x** несовместим с passlib 1.7.4 — зафиксирована версия 4.0.1
-- **Jinja2 3.1.x** несовместим со Starlette Jinja2Templates — используется кастомный Environment с cache_size=0
-- **Циклический редирект после логина** — частично исправлено. Корневая причина: гонка между HTMX `hx-trigger="load"` и Alpine.js `x-show`. При входе на дашборд HTMX-запросы к защищённым эндпоинтам (например, `/api/favorites`) могут уйти до того, как Alpine скроет секции для неаутентифицированных пользователей. Если запрос возвращает 401, старый обработчик `htmx:responseError` очищал токен и редиректил на `/login`. Исправлено: добавлено условие `&& localStorage.getItem('jwt_token')` в обработчик, улучшена обработка `/api/auth/me`, добавлена задержка 100ms. **Полный анализ: BUGS.md.**
+- **Jinja2 3.1.x** несовместим со Starlette Jinja2Templates — используется кастомный Environment с cache_size=400
+- **hx-boost + Alpine.js** — скрипты шаблонов должны быть в `{% block content %}`, а не в `{% block extra_head %}`
+- **Alpine.js + HTMX swap** — `alpine:init` event fired ОДИН раз; компоненты регистрируются напрямую + `Alpine.initTree()` в `htmx:afterSwap`
 
 ## Доступные инструменты агента
-- **Агентские скиллы Cline**: установлены 6 пакетов (85+ скиллов). Конфигурация: `skills-lock.json`.
+- **Агентские скиллы Cline**: установлено 32 скилла. Конфигурация: `skills-lock.json`.
   - `use_skill` — активация любого установленного скилла по имени
   - Список всех скиллов: `skills-lock.json` (ключи `skills` → имена скиллов)
-  - Правила документирования при установке скиллов: `.clinerules/memory-bank.md`
+  - Индекс: `skills-index.md`
+  - Правила документирования: `.clinerules/memory-bank.md`
 - **Playwright MCP**: `@executeautomation/playwright-mcp-server` — браузерная автоматизация.
   - MCP-сервер: `github.com/executeautomation/mcp-playwright`
-  - Инструменты: `playwright_navigate`, `playwright_screenshot`, `playwright_click`, `playwright_fill`, `playwright_select`, `playwright_evaluate`, `playwright_resize`, `playwright_drag`, `playwright_upload_file` и др.
-  - Настройки: `cline_mcp_settings.json`
+  - Инструменты: `playwright_navigate`, `playwright_screenshot`, `playwright_click` и др.
 
 ## Эволюция проектных решений
-- **2026-06-06**: Инициализация
-- **2026-06-06 13:35**: IMPLEMENTATION_PLAN, архитектурные решения
-- **2026-06-06 14:17**: M2 завершён — Docker-инфраструктура
-- **2026-06-06 14:38**: M3 завершён — модели, миграции, схемы, seed
-- **2026-06-06 16:40**: M4 завершён — API: auth + CRUD + тесты 8/8
-- **2026-06-06 16:58**: M5 завершён — API: специфичные фичи + тесты 20/20
-- **2026-06-06 20:24**: M6 завершён — Frontend: шаблоны, CSS, JS, веб-роуты
-- **2026-06-06 20:33**: Memory Bank расширен — созданы module-файлы
-- **2026-06-06 20:58**: M7 завершён — дашборд с Chart.js, профили игроков, детали турниров
-- **2026-06-06 21:06**: M8 завершён — SSE-клиент, toast-уведомления, CSS flash-warning
-- **2026-06-06 21:16**: M9 завершён — Telegram-bot (long-polling, /start, /subscribe, /unsubscribe, notifier)
-- **2026-06-06 21:27**: M10 завершён — ruff clean, pre-commit hook, GitHub Actions CI
-- **2026-06-06 21:34**: M11 завершён — README.md, финальная проверка документации, коммит и пуш
-- **2026-06-07 00:00**: Исправлены Alpine.js ошибки (порядок загрузки скриптов)
-- **2026-06-07 01:24**: Исправлена проблема аутентификации (htmx:responseError, логирование)
-- **2026-06-07 02:20**: Создан BUGS.md — полная документация проблемы циклического редиректа после логина
-- **2026-06-07 02:40**: ~~Установлен MCP Browser Tools~~ → заменён на Playwright MCP (2026-06-14)
-- **2026-06-14 17:33**: Установлен Playwright MCP (`@executeautomation/playwright-mcp-server`) — браузерная автоматизация
-
-## 2026-06-13: Docker entrypoint — авто-миграции и seed
-
-**Статус:** ✅ Завершён.
-
-- ✅ Создан `backend/entrypoint.sh` — автоматические миграции (alembic) + seed при пустой БД
-- ✅ Обновлён `backend/Dockerfile` — COPY entrypoint.sh, CMD ./entrypoint.sh
-- ✅ Обновлён `docker-compose.override.yml` — UVICORN_OPTS env var для dev-режима (--reload)
-- ✅ Обновлён `README.md` — примечание о авто-миграциях, entrypoint.sh в структуре
-- ✅ Дополнительные требования ДЗ проверены: docker compose up ✅, REPORT.md ✅, Swagger ✅
-
-## 2026-06-14: Установка дополнительных агентских скиллов
-
-**Статус:** ✅ Завершён.
-
-- ✅ Установлены 9 новых скиллов из `mindrally/skills`:
-  - `fastapi-python` — паттерны и best practices FastAPI
-  - `postgresql-best-practices` — оптимизация PostgreSQL
-  - `python-testing` — паттерны pytest и тестирования
-  - `htmx` — HTMX best practices
-  - `docker` — Docker и Docker Compose
-  - `performance-optimization` — оптимизация производительности Python
-  - `devops` — DevOps практики (CI/CD, мониторинг)
-  - `security-best-practices` — безопасность
-  - `web-scraping` — веб-скрапинг
-- ✅ Количество скиллов увеличено с 76 до 85
-- ⚠️ Firecrawl, wshobson/agents, sickn33/antigravity-awesome-skills — не удалось установить (нет SKILL.md формата)
-- ✅ Обновлены: CHANGES.md, PROMPTS.md, REPORT.md, Memory Bank (techContext.md, activeContext.md, progress.md)
+- **2026-06-06**: Инициализация → M1 (архитектура)
+- **2026-06-06 14:17**: M2 — Docker-инфраструктура
+- **2026-06-06 14:38**: M3 — модели, миграции, схемы, seed
+- **2026-06-06 16:40**: M4 — API: auth + CRUD + тесты 8/8
+- **2026-06-06 16:58**: M5 — API: специфичные фичи + тесты 20/20
+- **2026-06-06 20:24**: M6 — Frontend: шаблоны, CSS, JS, веб-роуты
+- **2026-06-06 20:58**: M7 — дашборд с Chart.js, профили игроков, детали турниров
+- **2026-06-06 21:06**: M8 — SSE-клиент, toast-уведомления
+- **2026-06-06 21:16**: M9 — Telegram-bot
+- **2026-06-06 21:27**: M10 — ruff clean, pre-commit hook, CI
+- **2026-06-06 21:34**: M11 — README.md, финальная документация
+- **2026-06-07**: CRUD-формы, аутентификация всех страниц, 177 тестов
+- **2026-06-07 02:40**: E2E тесты (Playwright) — 29 тестов
+- **2026-06-13**: Docker entrypoint — авто-миграции и seed
+- **2026-06-14**: Playwright MCP установлен, скиллы оптимизированы (85→32), аудит документации
+- **2026-06-14**: Code review — 22 замечания исправлены
+- **2026-06-14–15**: Оптимизации (N+1, pool, cache, lazy="raise") + фронтенд-фиксы (hx-boost, Alpine.js guards, SSE cleanup)
+- **2026-06-15**: Alpine.js/HTMX swap fix — Alpine.initTree() + скрипты в content blocks
+- **2026-06-18**: REPORT_HUMAN.md — человекочитаемый отчёт
 
 ## Ссылки на модули
 Детальное описание каждого слоя — в соответствующих файлах (см. [полный индекс](index.md)):
 - [Backend: все модули](backend/overview.md)
 - [Frontend: шаблоны, CSS, JS](frontend/overview.md)
 - [Telegram-bot](telegram-bot/overview.md)
-- [Testing: 177 тестов](testing/overview.md)
+- [Testing: тесты](testing/overview.md)
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
 - [Meta: баги, security, архитектура](meta/bugs.md)

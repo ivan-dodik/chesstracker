@@ -4,7 +4,8 @@
 - **pytest 9.x** + **pytest-asyncio** (asyncio_mode = "auto")
 - **httpx** (AsyncClient with ASGITransport)
 - **pytest-cov** for coverage reports
-- Total: **177 tests** (148 API + 29 E2E, all pass)
+- **Playwright** for E2E browser tests
+- Total: **189 tests** (160 API/service + 29 E2E, all pass)
 
 ## Test structure
 ```
@@ -24,7 +25,7 @@ tests/
 ├── test_export.py           # CSV export tests
 ├── test_import_route.py     # CSV import tests
 ├── test_health.py           # Health check tests
-├── test_web.py              # Web route tests
+├── test_web.py              # Web route tests (including CRUD forms)
 ├── test_seed_verify.py      # Seed data verification
 ├── test_crud_verify.py      # CRUD verification
 └── services/
@@ -51,8 +52,11 @@ e2e/
 
 ## Running tests
 ```bash
-# All backend tests
+# All backend tests (API + service)
 cd backend && uv run pytest -v
+
+# E2E tests only
+cd backend && uv run pytest e2e/ -v
 
 # Specific file
 uv run pytest -v -k "auth"
@@ -62,12 +66,19 @@ uv run pytest --cov
 
 # Service tests only
 uv run pytest -v tests/services/
+
+# All tests including E2E
+uv run pytest tests/ e2e/ -v
+
+# Telegram-bot tests
+cd telegram-bot && uv run pytest -v
 ```
 
 ## Known issues
 - SQLite doesn't support JSONB → ActivityLog stores JSON as Text
 - SQLite async support limited (aiosqlite works for basic usage)
 - Event loop fixture needed for `asyncio_mode = "auto"` compatibility
+- E2E tests use headless Chromium (Playwright) with separate SQLite database
 
 ## Links
 - → `testing/fixtures.md` — conftest.py details

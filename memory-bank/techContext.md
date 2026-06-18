@@ -11,13 +11,14 @@
 | Frontend | Jinja2 + HTMX + Alpine.js | latest |
 | Графики | Chart.js | 4.x |
 | Telegram-bot | python-telegram-bot | 21.x |
-| Аутентификация | PyJWT | 2.x |
+| Аутентификация | PyJWT + python-jose | 2.x |
 | Docker | Docker Compose | 3.x |
 | CI | GitHub Actions | |
 | Линтер | ruff | latest |
 | Зависимости | uv | latest |
 | Тестирование | pytest | 8.x |
 | HTTP-тестирование | httpx | 0.27+ |
+| E2E тестирование | Playwright | latest |
 
 ## Установка и запуск
 
@@ -30,16 +31,19 @@
 ### Локальная разработка (без Docker)
 ```bash
 # Установка зависимостей
-uv sync
+cd backend && uv sync
 
 # Запуск миграций
 uv run alembic upgrade head
+
+# Запуск seed (опционально)
+uv run python -m app.seed
 
 # Запуск сервера
 uv run uvicorn app.main:app --reload
 
 # Запуск тестов
-uv run pytest
+uv run pytest -v
 
 # Линтер
 uv run ruff check .
@@ -55,34 +59,46 @@ docker compose up --build
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 - PostgreSQL: localhost:5432
+- Автоматические миграции + seed при первом запуске (entrypoint.sh)
 
 ## Структура директорий
 
 ```
-chess-tracker/
+chesstracker/
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI приложение
+│   │   ├── main.py              # FastAPI приложение + lifespan
+│   │   ├── seed.py              # Тестовые данные
 │   │   ├── core/                # Config, database, security
 │   │   ├── models/              # SQLAlchemy ORM (7 моделей)
 │   │   ├── schemas/             # Pydantic v2 (7 файлов)
-│   │   ├── api/                 # 12 route-модулей
-│   │   ├── services/            # 10 сервисов
-│   │   ├── templates/           # Jinja2 (5 шаблонов + 3 partials)
-│   │   ├── static/              # CSS + JS
-│   │   └── seed.py              # Тестовые данные
+│   │   ├── api/                 # 14 route-модулей (включая deps, web, import_route, activity_log)
+│   │   ├── services/            # Бизнес-логика
+│   │   ├── middleware/          # Timing middleware
+│   │   ├── templates/           # Jinja2 (9 шаблонов + partials)
+│   │   └── static/              # CSS + JS (main.js, sse.js)
 │   ├── alembic/                 # Миграции
-│   ├── tests/                   # 20 тестов
+│   ├── tests/                   # API + service тесты
+│   ├── e2e/                     # E2E тесты (Playwright)
+│   ├── entrypoint.sh            # Docker entrypoint (миграции + seed)
 │   ├── Dockerfile
 │   └── pyproject.toml
 ├── telegram-bot/
-│   ├── bot.py                   # Stub
-│   ├── handlers/                # (пусто)
-│   ├── services/                # (пусто)
+│   ├── bot.py                   # Точка входа
+│   ├── config.py                # Pydantic BaseSettings
+│   ├── handlers/                # /start, /subscribe, /unsubscribe
+│   ├── services/                # api_client, notifier
+│   ├── tests/                   # Тесты (api_client, notifier)
 │   ├── Dockerfile
 │   └── pyproject.toml
+├── .github/workflows/ci.yml     # GitHub Actions CI
+├── .pre-commit-config.yaml      # Pre-commit hooks
 ├── docker-compose.yml
-└── docker-compose.override.yml
+├── docker-compose.override.yml
+├── scripts/
+│   ├── benchmark.sh             # Скрипт бенчмарка
+│   └── run_e2e.py               # Запуск E2E тестов
+└── memory-bank/                 # Документация для агента
 ```
 
 ## Технические ограничения и решения
@@ -93,6 +109,11 @@ chess-tracker/
 4. **FastAPI + Jinja2**: единый сервер для API и HTML, упрощает деплой
 5. **python-telegram-bot**: асинхронная работа, совместимость с asyncio FastAPI
 6. **bcrypt 4.0.1**: зафиксирована версия из-за несовместимости passlib с bcrypt 5.x
+7. **Jinja2 cache_size=400**: обход несовместимости Starlette Jinja2Templates с Jinja2 3.1.x
+8. **lazy="raise"**: предотвращает N+1; явный selectinload() в сервисах
+9. **hx-boost + Alpine.js**: скрипты в `{% block content %}` (не в `{% block extra_head %}`)
+10. **Pool warmup**: `SELECT 1` × 3 соединения в lifespan для cold start
+11. **SQL_ECHO**: отдельный флаг от DEBUG, чтобы не спамить SQL-логами
 
 ## Зависимости
 
@@ -122,6 +143,7 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
+    "pytest-cov>=5.0",
     "httpx>=0.27",
     "ruff>=0.5",
 ]
@@ -137,6 +159,14 @@ dependencies = [
     "python-telegram-bot>=21",
     "httpx>=0.27",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "pytest-httpx>=0.30",
+    "ruff>=0.5",
+]
 ```
 
 ## Инструменты разработки
@@ -144,10 +174,12 @@ dependencies = [
 - **Линтер**: `ruff check .` (заменяет flake8, isort, pyupgrade)
 - **Форматтер**: `ruff format .`
 - **Тесты**: `pytest -v` (async через pytest-asyncio)
+- **E2E тесты**: `python scripts/run_e2e.py`
 - **Миграции**: `alembic revision --autogenerate` / `alembic upgrade head`
 - **Docker**: `docker compose up --build`
-- **Агентские скиллы Cline**: установлено 32 скилла (оптимизировано с 85):
-  - `mattpocock/skills` (10) — тdd, diagnose, review, improve-codebase-architecture, frontend-design, zoom-out, handoff, skill-creator, setup-pre-commit, design-an-interface
+- **Бенчмарк**: `scripts/benchmark.sh`
+- **Агентские скиллы Cline**: установлено 32 скилла:
+  - `mattpocock/skills` (10) — tdd, diagnose, review, improve-codebase-architecture, frontend-design, zoom-out, handoff, skill-creator, setup-pre-commit, design-an-interface
   - `obra/superpowers` (7) — brainstorming, writing-plans, executing-plans, finishing-a-development-branch, using-git-worktrees, verification-before-completion, dispatching-parallel-agents, subagent-driven-development
   - `mindrally/skills` (5) — fastapi-python, postgresql-best-practices, python-testing, htmx, docker, security-best-practices, web-scraping
   - `anthropics/skills` (3) — doc-coauthoring, skill-creator, webapp-testing
@@ -162,13 +194,13 @@ dependencies = [
 
 Детальное описание технологии каждого слоя:
 
-- [Core: config, database, security](modules/core-layer.md)
-- [Models: SQLAlchemy ORM](modules/models-layer.md)
-- [Schemas: Pydantic DTO](modules/schemas-layer.md)
-- [Services: business logic](modules/services-layer.md)
-- [API: endpoints & routing](modules/api-layer.md)
-- [Web: templates, CSS, JS](modules/web-layer.md)
-- [Alembic: migrations](modules/alembic.md)
-- [Testing: pytest suite](modules/testing.md)
-- [Telegram bot](modules/telegram-bot.md)
-- [Docker infrastructure](modules/docker-infra.md)
+- [Core: config, database, security](backend/core-layer.md)
+- [Models: SQLAlchemy ORM](backend/models-layer.md)
+- [Schemas: Pydantic DTO](backend/schemas-layer.md)
+- [Services: business logic](backend/services-layer.md)
+- [API: endpoints & routing](backend/api-layer.md)
+- [Web: templates, CSS, JS](backend/web-layer.md)
+- [Alembic: migrations](backend/alembic.md)
+- [Testing: pytest suite](testing/overview.md)
+- [Telegram bot](telegram-bot/overview.md)
+- [Docker infrastructure](infrastructure/docker.md)
