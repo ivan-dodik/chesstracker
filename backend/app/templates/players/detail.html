@@ -48,6 +48,17 @@
         </div>
       </div>
 
+      <!-- Results Distribution Chart -->
+      <div class="card">
+        <h3 class="card-header">🥧 Распределение результатов</h3>
+        <div class="chart-container" style="position:relative;height:250px;">
+          <canvas x-ref="resultsChart"></canvas>
+        </div>
+        <div x-show="!overallStats.wins && !overallStats.losses && !overallStats.draws" style="text-align:center;padding:1rem;color:var(--color-text-light);">
+          Нет данных о результатах
+        </div>
+      </div>
+
       <!-- Rating History Chart -->
       <div class="card">
         <h3 class="card-header">📈 История рейтинга</h3>
@@ -206,7 +217,10 @@
           this.loadTournaments(),
         ]);
 
-        this.$nextTick(() => this.renderRatingChart());
+        this.$nextTick(() => {
+          this.renderResultsChart();
+          this.renderRatingChart();
+        });
       },
 
       async loadPlayer() {
@@ -261,6 +275,42 @@
         } catch(e) {
           console.error('Failed to load tournaments', e);
         }
+      },
+
+      renderResultsChart() {
+        const canvas = this.$refs.resultsChart;
+        if (!canvas) return;
+        const wins = this.overallStats.wins || 0;
+        const losses = this.overallStats.losses || 0;
+        const draws = this.overallStats.draws || 0;
+        if (wins + losses + draws === 0) return;
+
+        if (this._resultsChart) {
+          this._resultsChart.destroy();
+        }
+        const ctx = canvas.getContext('2d');
+        this._resultsChart = new Chart(ctx, {
+          type: 'doughnut',
+          data: {
+            labels: ['Победы', 'Поражения', 'Ничьи'],
+            datasets: [{
+              data: [wins, losses, draws],
+              backgroundColor: ['#27ae60', '#e74c3c', '#f39c12'],
+              borderWidth: 2,
+              borderColor: '#fff',
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: 'bottom',
+                labels: { font: { size: 11 } }
+              }
+            }
+          }
+        });
       },
 
       async renderRatingChart() {

@@ -862,6 +862,14 @@
 - Затронутые файлы: `static/js/sse.js`, `templates/index.html`, `templates/tournaments/detail.html`
 - 169/169 тестов проходят
 
+## 2026-06-18 11:05 — M21: Круговая диаграмма на странице игрока
+
+- Добавлена doughnut chart ("🥧 Распределение результатов") в `players/detail.html`
+- Метод `renderResultsChart()` в Alpine.js компоненте `playerDetail`
+- Данные: wins/losses/draws из `overallStats`, цвета: #27ae60/#e74c3c/#f39c12
+- Guard от дублирования canvas
+- Затронутый файл: `templates/players/detail.html`
+
 ## 2026-06-15 00:18 — Fix SSE bottleneck (50s page freeze)
 
 - **Проблема:** при навигации между страницами браузер зависал на ~50s из-за SSE-соединений, блокирующих HTTP/1.1 connection pool
