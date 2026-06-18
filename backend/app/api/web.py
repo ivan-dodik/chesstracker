@@ -167,3 +167,14 @@ async def tournament_detail(
 ) -> HTMLResponse:
     """Tournament detail page."""
     return template_response("tournaments/detail.html", {"request": request, "tournament_id": tournament_id})
+
+
+@router.get("/activity-log", response_class=HTMLResponse, include_in_schema=False)
+async def activity_log_page(
+    request: Request,
+    current_user: dict = Depends(get_current_user_for_web),
+) -> HTMLResponse:
+    """Activity log page (admin only)."""
+    if current_user.role != "admin":
+        return RedirectResponse(url="/", status_code=303)
+    return template_response("activity_log.html", {"request": request})

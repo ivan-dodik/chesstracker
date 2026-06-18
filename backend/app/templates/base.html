@@ -47,6 +47,7 @@
         <li><a href="/">Дашборд</a></li>
         <li><a href="/players">Игроки</a></li>
         <li><a href="/tournaments">Турниры</a></li>
+        <li x-show="user?.role === 'admin'"><a href="/activity-log" style="font-size:0.875rem;">📋 Лог</a></li>
         <li class="navbar-user" x-show="isAuth">
           <span class="username" x-text="user?.username || ''"></span>
           <button class="btn btn-sm btn-outline" style="color:white;border-color:rgba(255,255,255,0.3);" @click="logout()">Выйти</button>

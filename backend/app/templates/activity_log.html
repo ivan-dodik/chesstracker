@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Лог активности — Chess Tracker{% endblock %}
+
+{% block content %}
+<div x-data="activityLogPage()" x-init="init()">
+  <div class="page-header">
+    <h1>📋 Лог активности</h1>
+  </div>
+
+  <!-- Filters -->
+  <div class="search-bar">
+    <div class="form-group">
+      <select class="form-control" x-model="filterEntity" @change="loadPage(1)">
+        <option value="">Все сущности</option>
+        <option value="player">Игроки</option>
+        <option value="tournament">Турниры</option>
+        <option value="game">Партии</option>
+        <option value="rating">Рейтинг</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <select class="form-control" x-model="filterAction" @change="loadPage(1)">
+        <option value="">Все действия</option>
+        <option value="create">Создание</option>
+        <option value="update">Обновление</option>
+        <option value="delete">Удаление</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card">
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Дата</th>
+            <th>Пользователь</th>
+            <th>Действие</th>
+            <th>Сущность</th>
+            <th>ID</th>
+            <th>До</th>
+            <th>После</th>
+          </tr>
+        </thead>
+        <tbody>
+          <template x-if="!logs.length">
+            <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--color-text-light);">Нет записей</td></tr>
+          </template>
+          <template x-for="log in logs" :key="log.id">
+            <tr>
+              <td style="font-size:0.8125rem;" x-text="formatDateTime(log.timestamp)"></td>
+              <td x-text="log.user_id ? ('#' + log.user_id) : '—'"></td>
+              <td>
+                <span class="badge" :class="{
+                  'badge-active': log.action === 'create',
+                  'badge-completed': log.action === 'delete'
+                }" x-text="log.action"></span>
+              </td>
+              <td x-text="log.entity_type"></td>
+              <td x-text="log.entity_id || '—'"></td>
+              <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;" x-text="log.old_values ? JSON.stringify(log.old_values) : '—'"></td>
+              <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;" x-text="log.new_values ? JSON.stringify(log.new_values) : '—'"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination" x-show="totalPages > 1">
+      <button class="page-btn" @click="loadPage(page - 1)" :disabled="page <= 1">‹</button>
+      <span class="page-info" x-text="page + ' / ' + totalPages"></span>
+      <button class="page-btn" @click="loadPage(page + 1)" :disabled="page >= totalPages">›</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function activityLogPage() {
+  return {
+    logs: [],
+    page: 1,
+    total: 0,
+    perPage: 50,
+    filterEntity: '',
+    filterAction: '',
+
+    get totalPages() {
+      return Math.ceil(this.total / this.perPage) || 1;
+    },
+
+    async init() {
+      await this.loadPage(1);
+    },
+
+    async loadPage(p) {
+      this.page = p;
+      let url = `/api/activity-log?page=${p}&per_page=${this.perPage}`;
+      if (this.filterEntity) url += `&entity_type=${this.filterEntity}`;
+      if (this.filterAction) url += `&action=${this.filterAction}`;
+      try {
+        const resp = await fetch(url, { headers: Auth.getAuthHeaders() });
+        const data = await resp.json();
+        this.logs = data.items || [];
+        this.total = data.total || 0;
+      } catch(e) {
+        console.error('Failed to load activity log', e);
+      }
+    },
+
+    formatDateTime(dt) {
+      if (!dt) return '—';
+      return new Date(dt).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    }
+  };
+}
+</script>
+{% endblock %}
