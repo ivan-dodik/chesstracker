@@ -27,9 +27,9 @@
           </div>
         </div>
         <div class="tournament-header-actions" x-data="{ isAdmin: Auth.isAdmin() }">
-          <a :href="'/api/tournaments/' + tournament.id + '/export/csv'" class="btn btn-success" download>
+          <button class="btn btn-success" @click="exportCSV()">
             📥 Экспорт CSV
-          </a>
+          </button>
           <a x-show="isAdmin" :href="'/tournaments/' + tournament.id + '/edit'" class="btn btn-outline">✏️ Редактировать</a>
         </div>
       </div>
@@ -184,6 +184,26 @@
 
       toggleRound(idx) {
         this.openRounds[idx] = !this.openRounds[idx];
+      },
+
+      async exportCSV() {
+        try {
+          const resp = await fetch(`/api/tournaments/${this.tournamentId}/export/csv`, {
+            headers: Auth.getAuthHeaders(),
+          });
+          if (!resp.ok) throw new Error('Export failed');
+          const blob = await resp.blob();
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `tournament_${this.tournamentId}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch(e) {
+          showFlash('Ошибка экспорта CSV', 'error');
+        }
       },
 
       async importCSV() {

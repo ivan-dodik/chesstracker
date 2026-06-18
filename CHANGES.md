@@ -1037,3 +1037,11 @@
 
 **Описание:** Человекочитаемый отчёт о процессе разработки (3-4 стр.) по требованиям преподавателя. Структура: Введение → Обвязка AI-агента (Memory Bank, правила, скиллы, MCP, документация) → Процесс работы → Удачные решения → Ключевые проблемы → Выводы. Обновлён PROMPTS.md.
 
+## 2026-06-18 10:39 — M18: CSV экспорт + debounce
+
+- Исправлен CSV экспорт: `export.py` — заменён `get_current_user` → `get_current_user_for_web` (поддержка cookie + header)
+- Исправлен фронтенд CSV экспорт: `tournaments/detail.html` — заменён `<a download>` на JS fetch + blob download (надёжнее)
+- Добавлен debounce (300ms) на фильтрацию турниров: `tournaments/list.html`
+- Затронутые файлы: `app/api/export.py`, `templates/tournaments/detail.html`, `templates/tournaments/list.html`
+- 160/160 тестов проходят, ruff clean
+

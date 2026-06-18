@@ -498,3 +498,110 @@
   - `test_navigation.py` — навигация по страницам
 - [x] Создать `scripts/run_e2e.py` — запуск backend через `with_server.py` + Playwright
 - [x] Обновить `.github/workflows/ci.yml` — добавить job `e2e` (с PostgreSQL)
+
+---
+
+## M18: Исправление багов — CSV экспорт + debounce фильтрации
+**Коммит:** `fix: CSV export auth and tournament filter debounce`
+
+Замечания преподавателя: ошибка CSV экспорта, слишком много запросов при фильтрации турниров.
+
+- [ ] **CSV экспорт** — исправить авторизацию:
+  - `backend/app/api/export.py`: заменить `get_current_user` → `get_current_user_for_web` (поддержка cookie)
+  - Причина: `<a download>` не отправляет Authorization header, endpoint требует Bearer token → 401
+  - Альтернатива: изменить frontend на JS fetch с auth header + blob download (надёжнее)
+  - Затронутые файлы: `backend/app/api/export.py`, `backend/app/templates/tournaments/detail.html`
+- [ ] **Debounce фильтрации турниров**:
+  - `backend/app/templates/tournaments/list.html`: добавить debounce (300ms) на `onkeyup="loadTournamentsPage(1)"`
+  - Реализация: обернуть вызов в `setTimeout` с `clearTimeout` предыдущего таймера
+  - Затронутый файл: `backend/app/templates/tournaments/list.html`
+- [ ] Тесты: проверить CSV экспорт через `test_export.py`, добавить тест на debounce (опционально)
+- [ ] ruff check
+- [ ] **Документирование и коммит**
+
+## M19: Расчёт рейтинга + RatingHistory
+**Коммит:** `feat: add rating calculation and RatingHistory on game result`
+
+Замечание преподавателя: добавляю партию в турнир, рейтинг не меняется. Рейтинговая история не заполняется.
+
+- [ ] Создать `backend/app/services/rating_calculation_service.py`:
+  - Функция `calculate_elo_rating(player_rating, opponent_rating, result, k_factor=32)` → новый рейтинг
+  - Функция `update_ratings_after_game(db, game)` → обновляет Player.rating + создаёт RatingHistory
+  - Функция `recalculate_all_ratings(db, tournament_id)` → пересчёт рейтингов по результатам турнира
+  - Формула ELO: `E = 1 / (1 + 10^((Rb - Ra)/400))`, `Ra' = Ra + K * (Sa - Ea)`
+  - Результаты: 1-0 → Sa=1 (победа белых), 0-1 → Sa=0, ½-½ → Sa=0.5
+- [ ] Интегрировать в `backend/app/services/game_service.py`:
+  - `create_game()`: если result не None → вызвать `update_ratings_after_game()`
+  - `update_game_result()`: если result изменился → пересчитать рейтинги
+  - Добавить SSE event `rating_updated` при изменении рейтинга
+- [ ] Добавить `tournament_id` в RatingHistory при записи (для отслеживания по турнирам)
+- [ ] Логировать изменения рейтинга в ActivityLog (old_values: {rating: old}, new_values: {rating: new})
+- [ ] Тесты:
+  - `tests/services/test_rating_calculation_service.py` — unit-тесты расчёта ELO (победа белых, победа чёрных, ничья, k-factor)
+  - Обновить `tests/services/test_game_service.py` — интеграционные тесты (создание игры обновляет рейтинг)
+- [ ] ruff check
+- [ ] **Документирование и коммит**
+
+## M20: SSE real-time — обновление данных на страницах
+**Коммит:** `feat: SSE real-time updates for dashboard and tournament pages`
+
+Замечания преподавателя: рейтинг в админке меняю, в топ 10 не обновляется. Уведомления в реальном времени не выполнены.
+
+- [ ] **Серверная часть** — `backend/app/services/game_service.py`:
+  - Добавить `publish_event("rating_updated", {...})` при изменении рейтинга (после M19)
+  - Добавить `publish_event("game_created", {...})` с полными данными (имена игроков, результат)
+  - Добавить `publish_event("game_result_updated", {...})` с полными данными
+- [ ] **Дашборд** — `backend/app/templates/index.html`:
+  - Добавить SSE listener на событие `rating_updated` → автоматически обновить top-10 таблицу
+  - Реализация: `window.sseClient.eventSource.addEventListener('rating_updated', ...)` → fetch `/api/stats/top-rated` → перерисовать таблицу
+- [ ] **Страница турнира** — `backend/app/templates/tournaments/detail.html`:
+  - Добавить SSE listener на `game_created` и `game_result_updated` → обновить standings + games
+  - Реализация: fetch standings + games, перерисовать accordion и таблицу
+- [ ] **SSE клиент** — `backend/app/static/js/sse.js`:
+  - Добавить возможность регистрации callback'ов на события извне (не только toast)
+  - Метод `on(eventName, callback)` для подписки страниц
+  - Автоматическая отписка при `htmx:afterSwap` (старые listeners)
+- [ ] Тесты: E2E тест через Playwright (создать партию в другой вкладке → проверить обновление)
+- [ ] ruff check
+- [ ] **Документирование и коммит**
+
+## M21: Круговая диаграмма на странице игрока
+**Коммит:** `feat: add results distribution doughnut chart on player detail page`
+
+Замечание преподавателя: "круговая диаграмма результатов (победы/ничьи/поражения)" — требование не выполнено на странице игрока.
+
+- [ ] Добавить doughnut chart в `backend/app/templates/players/detail.html`:
+  - Новый `<div class="card">` с заголовком "🥧 Распределение результатов"
+  - `<canvas x-ref="resultsChart">` для Chart.js doughnut
+  - Данные: `overallStats.wins`, `overallStats.losses`, `overallStats.draws`
+  - Цвета: победы (#27ae60), поражения (#e74c3c), ничьи (#f39c12)
+  - Аналогичный компонент уже есть на дашборде (`overallStatsChart` в main.js) — переиспользовать логику
+- [ ] Добавить метод `renderResultsChart()` в Alpine.js компонент `playerDetail`:
+  - Вызывать после загрузки `overallStats` (в `init()`)
+  - Уничтожать предыдущий chart перед созданием нового (guard от дублирования canvas)
+- [ ] Затронутые файлы: `backend/app/templates/players/detail.html`
+- [ ] Тесты: E2E проверка что canvas рендерится, unit-тест `get_overall_stats()` возвращает корректные данные
+- [ ] ruff check
+- [ ] **Документирование и коммит**
+
+## M22: Лог активности — UI-страница + аудит рейтинга
+**Коммит:** `feat: activity log web page and rating change audit`
+
+Замечание преподавателя: "Лог активности: фиксация всех изменений с указанием пользователя, времени и значений до/после — нет аудита."
+
+- [ ] **UI-страница лога активности** (admin only):
+  - `backend/app/api/web.py`: добавить маршрут `GET /activity-log`
+  - Создать `backend/app/templates/activity_log.html`:
+    - Таблица с колонками: Дата, Пользователь, Действие, Сущность, ID, До, После
+    - Фильтры: entity_type (player/tournament/game), action (create/update/delete), дата
+    - Пагинация
+  - Добавить ссылку "📋 Лог активности" в навигацию (base.html, только для admin)
+- [ ] **Аудит рейтинга** (после M19):
+  - В `rating_calculation_service.py`: логировать каждое изменение рейтинга через `log_activity()`
+  - Old values: `{rating: old_rating, player_name: name}`
+  - New values: `{rating: new_rating, change: new - old, tournament_id: tid}`
+- [ ] Тесты:
+  - Тест API `/api/activity-log` — проверка что записи создаются
+  - Тест что рейтинговые изменения логируются
+- [ ] ruff check
+- [ ] **Документирование и коммит**

@@ -586,3 +586,15 @@ API-тесты не покрывают фронтенд-поведение. Ну
 - **Причина:** `alpine:init` event fired ОДИН раз при старте Alpine.js; при HTMX swap скрипты шаблона добавляют новые listeners, но event не повторяется
 - **Решение:** убрать обёртку `alpine:init`, вызывать `Alpine.data()` напрямую + `Alpine.initTree()` в `htmx:afterSwap`
 - **Результат:** работает
+
+---
+
+## История работы
+
+- 2026-06-18 10:32 — **M18: CSV экспорт + debounce**
+  - Изучены файлы: export.py, deps.py, tournaments/detail.html, tournaments/list.html
+  - Исправлен CSV экспорт: `export.py` — замена `get_current_user` → `get_current_user_for_web` (поддержка cookie + header)
+  - Исправлен фронтенд: заменён `<a download>` на JS fetch + blob download
+  - Добавлен debounce (300ms) на фильтрацию турниров в `tournaments/list.html`
+  - 160/160 тестов, ruff clean
+  - Затронутые файлы: `app/api/export.py`, `templates/tournaments/detail.html`, `templates/tournaments/list.html`

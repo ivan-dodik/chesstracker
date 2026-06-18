@@ -1615,3 +1615,61 @@ Set up the MCP server from https://github.com/executeautomation/mcp-playwright w
 - Создан `REPORT_HUMAN.md` — человекочитаемый отчёт в 6 разделах
 - Структура: Введение → Обвязка AI-агента → Процесс → Удачные решения → Проблемы → Выводы
 - Стиль: личный, с конкретными примерами промптов и результатов
+
+---
+
+## 2026-06-18 10:13 — Анализ замечаний преподавателя и составление плана исправлений
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Преподаватель проверил мою домашнюю работу (этот проект) и сделал следующие замечания:
+1. фильтрация - слишком много запросов при быстрой печати в поле фильтра турниров
+2. "круговая диаграмма результатов (победы/ничьи/поражения)" - требование не выполнено
+3. "Оповещения: в браузере (через SSE)" - рейтинг в админке меняю, в топ 10 не обновляется
+4. "Рейтинговая история" - добавляю партию в турнир, рейтинг не меняется
+5. "Уведомления в реальном времени (SSE)" - не выполнено
+6. Экспорт турнирной таблицы в CSV - ошибка на /api/tournaments/3/export/csv
+7. Лог активности: нет аудита
+
+Проанализируй их и составь подробный пошаговый план по их исправлению. Используй скиллы.
+```
+
+**План (Plan mode):**
+- Анализ 7 замечаний преподавателя с исследованием кодовой базы
+- Найдены корневые причины каждого замечания:
+  1. Нет debounce на `onkeyup` в tournaments/list.html
+  2. На странице игрока нет pie/doughnut chart
+  3. Сервер не отправляет SSE event `rating_updated`, дашборд не слушает SSE
+  4. `game_service.py` не рассчитывает рейтинг и не создаёт RatingHistory
+  5. Страница турнира не слушает SSE-события
+  6. Export endpoint использует `get_current_user` (Bearer only), `<a>` тег не шлёт заголовок
+  7. Сервис лога есть, но нет UI-страницы и не логируются изменения рейтинга
+
+**Результат:**
+- Составлен план из 5 майлстоунов (M18–M22) для IMPLEMENTATION_PLAN.md
+
+---
+
+## 2026-06-18 10:32 — Выполнение M18–M22
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Прочитай 'IMPLEMENTATION_PLAN.md' и приступи к выполнению плана. Используй TDD. Используй скиллы.
+/caveman
+```
+
+**План (Plan mode):**
+- Изучены файлы для M18–M22: export.py, deps.py, game_service.py, rating_service.py, rating_history model, sse_service.py, activity_log_service.py, web.py, players/detail.html, tournaments/detail.html, tournaments/list.html, index.html, sse.js, main.js, base.html, conftest.py, test_export.py
+- Составлен план из 5 майлстоунов:
+  - M18: CSV экспорт (export.py → get_current_user_for_web) + debounce (tournaments/list.html)
+  - M19: Rating calculation service (ELO) + RatingHistory интеграция в game_service.py
+  - M20: SSE real-time (publish_event + on() в sse.js + listeners на дашборде/турнире)
+  - M21: Doughnut chart на странице игрока (players/detail.html)
+  - M22: Activity log UI (activity_log.html + web.py route + nav link) + rating audit
+
+**Результат:**
+- (в процессе)

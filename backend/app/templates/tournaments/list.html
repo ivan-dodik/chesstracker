@@ -23,7 +23,7 @@
   <div class="form-group">
     <input type="text" class="form-control" id="location-filter"
            placeholder="Город" style="max-width:200px;"
-           onkeyup="loadTournamentsPage(1)">
+           onkeyup="debounceTournamentsLoad()">
   </div>
 </div>
 
@@ -98,6 +98,12 @@ function renderTournamentsTable(target, data) {
   }
 
   target.innerHTML = html;
+}
+
+let _tournamentsLoadTimer = null;
+function debounceTournamentsLoad() {
+  clearTimeout(_tournamentsLoadTimer);
+  _tournamentsLoadTimer = setTimeout(() => loadTournamentsPage(1), 300);
 }
 
 function loadTournamentsPage(page) {
