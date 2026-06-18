@@ -7,9 +7,10 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models import Game
+from app.models import Game, Player
 from app.schemas.game import GameCreate, GameResult
 from app.services.activity_log_service import log_activity
+from app.services.rating_calculation_service import update_ratings_after_game
 from app.services.sse_service import publish_event
 
 
@@ -105,7 +106,33 @@ async def create_game(
         db, user_id, "create", "game", game.id,
         new_values=data.model_dump(),
     )
-    await publish_event("game_created", {"game_id": game.id, "tournament_id": data.tournament_id})
+
+    # Calculate ratings if result is provided
+    if game.result:
+        await update_ratings_after_game(db, game)
+
+    # Enrich SSE event with player names
+    white_name = None
+    black_name = None
+    try:
+        w = await db.execute(select(Player).where(Player.id == game.white_player_id))
+        wp = w.scalar_one_or_none()
+        if wp:
+            white_name = wp.name
+        b = await db.execute(select(Player).where(Player.id == game.black_player_id))
+        bp = b.scalar_one_or_none()
+        if bp:
+            black_name = bp.name
+    except Exception:
+        pass
+
+    await publish_event("game_created", {
+        "game_id": game.id,
+        "tournament_id": data.tournament_id,
+        "result": game.result,
+        "white_player_name": white_name,
+        "black_player_name": black_name,
+    })
 
     return game
 
@@ -132,7 +159,32 @@ async def update_game_result(
         old_values={"result": old_result},
         new_values={"result": data.result},
     )
-    await publish_event("game_result_updated", {"game_id": game_id, "result": data.result})
+
+    # Recalculate ratings if result changed
+    if data.result and data.result != old_result:
+        await update_ratings_after_game(db, game)
+
+    # Enrich SSE event with player names
+    white_name = None
+    black_name = None
+    try:
+        w = await db.execute(select(Player).where(Player.id == game.white_player_id))
+        wp = w.scalar_one_or_none()
+        if wp:
+            white_name = wp.name
+        b = await db.execute(select(Player).where(Player.id == game.black_player_id))
+        bp = b.scalar_one_or_none()
+        if bp:
+            black_name = bp.name
+    except Exception:
+        pass
+
+    await publish_event("game_result_updated", {
+        "game_id": game_id,
+        "result": data.result,
+        "white_player_name": white_name,
+        "black_player_name": black_name,
+    })
 
     return game
 

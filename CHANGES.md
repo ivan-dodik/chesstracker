@@ -843,6 +843,17 @@
 - Затронутые файлы: `backend/app/templates/games/create.html`, `backend/app/services/game_service.py`, `backend/app/api/games.py`
 - 160/160 тестов проходят, ruff clean
 
+## 2026-06-18 10:45 — M19: Расчёт рейтинга ELO + RatingHistory
+
+- Создан `app/services/rating_calculation_service.py` — ELO rating formula (K=32), update_ratings_after_game(), recalculate_all_ratings()
+- Интегрирован в `game_service.py`: create_game() и update_game_result() автоматически пересчитывают рейтинг при наличии результата
+- Создание RatingHistory записей при каждом изменении рейтинга
+- Логирование изменений рейтинга в ActivityLog (old/new values)
+- SSE события `rating_updated`, `game_created`, `game_result_updated` с именами игроков
+- Создан `tests/services/test_rating_calculation_service.py` — 9 unit-тестов ELO
+- Затронутые файлы: `app/services/rating_calculation_service.py`, `app/services/game_service.py`, `tests/services/test_rating_calculation_service.py`
+- 169/169 тестов проходят, ruff clean
+
 ## 2026-06-15 00:18 — Fix SSE bottleneck (50s page freeze)
 
 - **Проблема:** при навигации между страницами браузер зависал на ~50s из-за SSE-соединений, блокирующих HTTP/1.1 connection pool
