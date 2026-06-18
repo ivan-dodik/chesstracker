@@ -12,6 +12,7 @@ class SSEClient {
     this.reconnectDelay = 3000;
     this.maxReconnectDelay = 30000;
     this.currentDelay = this.reconnectDelay;
+    this._externalListeners = {};
     this.connect();
   }
 
@@ -82,6 +83,31 @@ class SSEClient {
     if (typeof showFlash === 'function') {
       showFlash(message, type);
     }
+  }
+
+  on(eventName, callback) {
+    if (!this._externalListeners[eventName]) {
+      this._externalListeners[eventName] = [];
+    }
+    this._externalListeners[eventName].push(callback);
+    // Also listen on EventSource if connected
+    if (this.eventSource) {
+      this.eventSource.addEventListener(eventName, (e) => {
+        try {
+          const data = JSON.parse(e.data);
+          callback(data);
+        } catch (err) {
+          console.error('SSE on(): failed to parse', eventName, err);
+        }
+      });
+    }
+  }
+
+  _notifyExternal(eventName, data) {
+    const listeners = this._externalListeners[eventName] || [];
+    listeners.forEach(cb => {
+      try { cb(data); } catch (err) { console.error('SSE callback error:', err); }
+    });
   }
 
   close() {

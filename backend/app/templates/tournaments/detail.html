@@ -248,4 +248,32 @@
     });
   }
 </script>
+
+<script>
+// SSE: auto-refresh standings and games on tournament detail page
+(function() {
+  function refreshTournament() {
+    // Find the Alpine component data via the DOM
+    const el = document.querySelector('[x-data*="tournamentDetail"]');
+    if (!el || !el.__x) return;
+    const comp = el.__x.$data || el._x_dataStack?.[0];
+    if (!comp) return;
+    comp.loadStandings();
+    comp.loadGames();
+  }
+
+  function setupTournamentSSE() {
+    if (!window.sseClient) return;
+    window.sseClient.on('game_created', refreshTournament);
+    window.sseClient.on('game_result_updated', refreshTournament);
+    window.sseClient.on('rating_updated', refreshTournament);
+  }
+
+  if (window.sseClient) {
+    setupTournamentSSE();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupTournamentSSE);
+  }
+})();
+</script>
 {% endblock %}

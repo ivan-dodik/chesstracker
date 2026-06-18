@@ -10,7 +10,7 @@
 <div class="dashboard-grid">
   <!-- Top 10 Players -->
   <div class="dashboard-card">
-    <h3>🏆 Топ-10 игроков</h3>
+    <h3>🏆 Топ-10 игроков <span id="sse-top-rated" style="display:none;font-size:0.75rem;color:var(--color-success);">● live</span></h3>
     <div id="top-rated" hx-get="/api/stats/top-rated" hx-trigger="load" hx-swap="innerHTML">
       <div style="text-align:center;padding:2rem;">
         <div class="spinner"></div>
@@ -188,5 +188,37 @@
       }
     }
   });
+</script>
+
+<script>
+// SSE: auto-refresh top-10 when ratings change
+(function() {
+  function refreshTopRated() {
+    fetch('/api/stats/top-rated', { headers: Auth.getAuthHeaders() })
+      .then(r => r.json())
+      .then(data => {
+        const target = document.getElementById('top-rated');
+        if (!target) return;
+        let html = '<table><thead><tr><th>#</th><th>Имя</th><th>Рейтинг</th><th>Город</th></tr></thead><tbody>';
+        data.forEach(function(p, i) {
+          html += '<tr><td>' + (i+1) + '</td><td><a href="/players/' + p.id + '">' + escapeHtml(p.name) + '</a></td><td><strong>' + p.rating + '</strong></td><td>' + escapeHtml(p.city || '—') + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        target.innerHTML = html;
+        // Flash "live" indicator
+        const live = document.getElementById('sse-top-rated');
+        if (live) { live.style.display = 'inline'; setTimeout(() => live.style.display = 'none', 3000); }
+      })
+      .catch(() => {});
+  }
+
+  if (window.sseClient) {
+    window.sseClient.on('rating_updated', refreshTopRated);
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (window.sseClient) window.sseClient.on('rating_updated', refreshTopRated);
+    });
+  }
+})();
 </script>
 {% endblock %}

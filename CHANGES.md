@@ -854,6 +854,14 @@
 - Затронутые файлы: `app/services/rating_calculation_service.py`, `app/services/game_service.py`, `tests/services/test_rating_calculation_service.py`
 - 169/169 тестов проходят, ruff clean
 
+## 2026-06-18 11:00 — M20: SSE real-time обновления
+
+- Добавлен метод `on(eventName, callback)` в `sse.js` для подписки страниц на SSE-события
+- Добавлен SSE listener на дашборде (`index.html`): событие `rating_updated` → автоматическое обновление таблицы топ-10 + индикатор "● live"
+- Добавлен SSE listener на странице турнира (`tournaments/detail.html`): события `game_created`, `game_result_updated`, `rating_updated` → обновление standings + games
+- Затронутые файлы: `static/js/sse.js`, `templates/index.html`, `templates/tournaments/detail.html`
+- 169/169 тестов проходят
+
 ## 2026-06-15 00:18 — Fix SSE bottleneck (50s page freeze)
 
 - **Проблема:** при навигации между страницами браузер зависал на ~50s из-за SSE-соединений, блокирующих HTTP/1.1 connection pool
