@@ -80,7 +80,7 @@ def test_render_results_chart_checks_ctx():
     # Find the function definition (not the call site)
     idx = content.find("renderResultsChart() {")
     assert idx != -1, "renderResultsChart function definition not found"
-    body = content[idx:idx+600]
+    body = content[idx:idx+1200]
     assert "if (!ctx) return;" in body or "if (! ctx) return;" in body, (
         "renderResultsChart must check ctx validity before creating Chart"
     )
@@ -90,3 +90,15 @@ def test_x_cloak_on_player_container():
     """Player container uses x-cloak to prevent flash of unstyled content."""
     content = _read(TEMPLATE)
     assert 'x-cloak' in content, "Player detail must use x-cloak"
+
+
+def test_chart_uses_update_not_destroy():
+    """Charts use chart.update() instead of destroy+create on SSE refresh."""
+    content = _read(TEMPLATE)
+    # renderResultsChart should use .update() when chart exists
+    idx = content.find("renderResultsChart() {")
+    body = content[idx:idx+800]
+    assert ".update();" in body, "renderResultsChart must use .update() for existing chart"
+    assert "this._resultsChart.destroy();" not in body, (
+        "renderResultsChart must NOT destroy chart — use .update() instead"
+    )
