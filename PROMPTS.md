@@ -1712,3 +1712,40 @@ Set up the MCP server from https://github.com/executeautomation/mcp-playwright w
 - Все тесты file-based (чтение файлов), без серверных вызовов
 - Исправлен conftest.py: убран autouse=True из server_url
 - 21 passed в 0.03s, ruff clean
+
+## 2026-06-19 12:01 — Исправление SSE real-time обновлений
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Server Side Events (SSE) не работают. Я открыл две вкладки: в одной дашборд топ 10 игроков, в другой - вкладку игроки. Меняю рейтинг у игрока, сохраняю. Дашборд в другой вкладке не обновляется, хотя должен согласно требованиям.
+
+Также не выполняется требование: "при добавлении результата партии в активном турнире все подключённые пользователи получают уведомление без перезагрузки страницы".
+
+Думай тщательно. Используй скиллы.
+```
+
+**Дополнительный промпт:**
+```
+Добавь, пожалуйста, SSE события ко всем правкам объектов и ко все возможным изменениям, которые могут затрагивать пользователей.
+```
+
+**Дополнительный промпт:**
+```
+Добавь в план E2E тесты, код ревью перед коммитом, обновление документации, мемори банка, истории промптов, изменений и отчета - перед коммитом. Используй TDD.
+```
+
+**Ответ/план (Plan mode):**
+- Исследованы все файлы SSE (sse_service.py, sse.py, sse.js, все шаблоны)
+- Найдено 4 критических бага: двойное кодирование data, отсутствие event поля, нет publish в player_service, потеря listeners при реконнекте
+- Полный аудит мутаций: player, tournament, game, import CRUD
+- План: 6 фаз (TDD tests → fix backend → add events → fix frontend → E2E tests → docs+commit)
+
+**Результат:**
+- Исправлен корневой баг: `publish_event` теперь yield dict `{"event": ..., "data": ...}` вместо предформатированной строки
+- Добавлены SSE события во все сервисы: player (create/update/delete), tournament (create/update/delete), game (create/update/delete + renamed), import
+- Исправлен `sse.js`: реконнект перерегистрирует внешние listeners
+- Обновлены шаблоны: dashboard (game/tournament/player listeners), players (auto-refresh), tournament detail (Alpine.js fix + listeners), tournaments list (auto-refresh)
+- 7 новых тестовых файлов, 20+ unit тестов, 5 E2E тестов
+- 193 passed, 0 failed, ruff clean

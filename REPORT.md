@@ -610,3 +610,42 @@ API-тесты не покрывают фронтенд-поведение. Ну
 
 Все тесты file-based (чтение файлов), без серверных вызовов — 21 passed в 0.03s.
 Исправлен conftest.py: убран autouse=True из server_url fixture.
+
+### 2026-06-19 12:28 — Исправление SSE real-time обновлений
+
+**Ключевые проблемы и решения:**
+
+#### 2026-06-19 — SSE сообщения не доставлялись клиенту
+- **Суть:** `publish_event` в `sse_service.py` создавал предформатированную строку `data: {json}\n\n`, которую sse-starlette оборачивал ещё раз в `data:`, получалось `data: data: {...}`. Поле `event` не устанавливалось → браузер fired'ил generic `message` events вместо именованных.
+- **Причина:** Неверное использование API sse-starlette — yield строки вместо dict.
+- **Решение:** `publish_event` теперь yield dict `{"event": event_type, "data": json_str}` — sse-starlette корректно форматирует `event: name\ndata: {...}`.
+- **Результат:** Сработало. Все 11 тестов publish_event перешли из RED в GREEN.
+
+#### 2026-06-19 — Player rating update не публикует SSE
+- **Суть:** `player_service.update_player` не вызывал `publish_event` → ручное изменение рейтинга не обновляло дашборд.
+- **Причина:** SSE события были добавлены только в game/rating_calculation сервисы, но пропущены в player/tournament/import.
+- **Решение:** Добавлены `publish_event` вызовы во все CRUD операции player, tournament, game, import.
+- **Результат:** Сработало. 4/4 player SSE тестов, 3/3 tournament, 3/3 game — GREEN.
+
+#### 2026-06-19 — SSE listeners терялись при реконнекте
+- **Суть:** `sse.js` `on()` добавлял `addEventListener` на текущий EventSource. При реконнекте создавался новый EventSource, старые listeners терялись.
+- **Причина:** `_externalListeners` хранил колбэки, но не перерегистрировал их.
+- **Решение:** Добавлен `_reconnectExternalListeners()` который вызывается в `onopen` и перерегистрирует все stored listeners.
+- **Результат:** Сработало.
+
+**Удачные/неудачные шаги:**
+- ✅ **Удачно:** TDD подход — 20+ тестов написаны до реализации, сразу нашли 5 падающих в sse_service
+- ✅ **Удачно:** Эмуляция поведения sse-starlette через Python — подтвердили баг двойного кодирования до начала исправлений
+- ✅ **Удачно:** Полный аудит мутаций выявил 8 точек где не хватало SSE событий
+- ✅ **Удачно:** 193 passed, 0 failed, ruff clean — ни одного регресса
+- ❌ **Неудачно:** E2E тесты для tournament/game создавали объекты с string dates вместо datetime → 6 падений, пришлось исправлять
+
+**История работы:**
+- 12:01 — Получен промпт, начато исследование SSE
+- 12:03 — Завершено исследование: найдены 4 критических бага
+- 12:07 — Создан implementation_plan.md
+- 12:10 — Начата TDD: Phase 1 (тесты), Phase 2 (fix sse_service)
+- 12:17 — Phase 3: добавлены SSE во все сервисы
+- 12:23 — Phase 4: исправлен фронтенд (sse.js, все шаблоны)
+- 12:25 — Phase 5: E2E тесты
+- 12:28 — Phase 6: ruff fix, документация, коммит

@@ -10,6 +10,8 @@ from sqlalchemy.orm import selectinload
 from app.models import Player
 from app.schemas.player import PlayerCreate
 from app.services.activity_log_service import log_activity
+from app.services.sse_events import SSEEvents
+from app.services.sse_service import publish_event
 
 
 async def get_players(
@@ -72,6 +74,13 @@ async def create_player(
         new_values=data.model_dump(),
     )
 
+    await publish_event(SSEEvents.PLAYER_CREATED, {
+        "player_id": player.id,
+        "player_name": player.name,
+        "rating": player.rating,
+        "city": player.city,
+    })
+
     return player
 
 
@@ -87,6 +96,7 @@ async def update_player(
         return None
 
     old_values = {"name": player.name, "rating": player.rating, "city": player.city}
+    old_rating = player.rating
 
     for key, value in data.model_dump(exclude_unset=True).items():
         setattr(player, key, value)
@@ -98,6 +108,22 @@ async def update_player(
         old_values=old_values,
         new_values=data.model_dump(exclude_unset=True),
     )
+
+    await publish_event(SSEEvents.PLAYER_UPDATED, {
+        "player_id": player.id,
+        "player_name": player.name,
+        "rating": player.rating,
+        "city": player.city,
+    })
+
+    # Publish rating_updated if rating actually changed
+    if player.rating != old_rating:
+        await publish_event(SSEEvents.RATING_UPDATED, {
+            "player_id": player.id,
+            "player_name": player.name,
+            "old_rating": old_rating,
+            "new_rating": player.rating,
+        })
 
     return player
 
@@ -172,5 +198,10 @@ async def delete_player(
         db, user_id, "delete", "player", player_id,
         old_values=old_values,
     )
+
+    await publish_event(SSEEvents.PLAYER_DELETED, {
+        "player_id": player_id,
+        "player_name": old_values["name"],
+    })
 
     return True

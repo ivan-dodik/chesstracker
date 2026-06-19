@@ -191,7 +191,7 @@
 </script>
 
 <script>
-// SSE: auto-refresh top-10 when ratings change
+// SSE: auto-refresh dashboard sections on real-time events
 (function() {
   function refreshTopRated() {
     fetch('/api/stats/top-rated', { headers: Auth.getAuthHeaders() })
@@ -212,12 +212,61 @@
       .catch(() => {});
   }
 
-  if (window.sseClient) {
+  function refreshActiveTournaments() {
+    const target = document.getElementById('active-tournaments');
+    if (!target) return;
+    target.innerHTML = '<div style="text-align:center;padding:1rem;"><div class="spinner"></div></div>';
+    fetch('/api/tournaments?status=active&per_page=5', { headers: Auth.getAuthHeaders() })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.items || data.items.length === 0) {
+          target.innerHTML = '<p style="color:var(--color-text-light);">Нет активных турниров.</p>';
+          return;
+        }
+        let html = '<table><thead><tr><th>Название</th><th>Дата</th><th>Тип</th></tr></thead><tbody>';
+        data.items.forEach(function(t) {
+          html += '<tr><td><a href="/tournaments/' + t.id + '">' + escapeHtml(t.name) + '</a></td><td>' + formatDate(t.start_date) + '</td><td><span class="badge badge-active">' + t.type + '</span></td></tr>';
+        });
+        html += '</tbody></table>';
+        target.innerHTML = html;
+      })
+      .catch(() => {});
+  }
+
+  function refreshRecentResults() {
+    const target = document.getElementById('recent-results');
+    if (!target) return;
+    fetch('/api/tournaments?per_page=1&status=completed', { headers: Auth.getAuthHeaders() })
+      .then(r => r.json())
+      .then(data => {
+        if (!data.items || data.items.length === 0) {
+          target.innerHTML = '<p style="color:var(--color-text-light);">Нет завершённых турниров</p>';
+          return;
+        }
+        const t = data.items[0];
+        let html = '<div class="recent-result-item"><a href="/tournaments/' + t.id + '"><strong>' + escapeHtml(t.name) + '</strong></a><p style="color:var(--color-text-light);font-size:0.875rem;">' + (t.location || '—') + ' · ' + formatDate(t.start_date) + ' — ' + formatDate(t.end_date) + '</p></div>';
+        target.innerHTML = html;
+      })
+      .catch(() => {});
+  }
+
+  function setupDashboardSSE() {
+    if (!window.sseClient) return;
     window.sseClient.on('rating_updated', refreshTopRated);
+    window.sseClient.on('game_created', () => { refreshActiveTournaments(); refreshRecentResults(); });
+    window.sseClient.on('game_updated', refreshRecentResults);
+    window.sseClient.on('player_created', refreshTopRated);
+    window.sseClient.on('player_updated', refreshTopRated);
+    window.sseClient.on('player_deleted', refreshTopRated);
+    window.sseClient.on('tournament_created', refreshActiveTournaments);
+    window.sseClient.on('tournament_updated', refreshActiveTournaments);
+    window.sseClient.on('tournament_deleted', refreshActiveTournaments);
+  }
+
+  if (window.sseClient) {
+    setupDashboardSSE();
   } else {
-    document.addEventListener('DOMContentLoaded', () => {
-      if (window.sseClient) window.sseClient.on('rating_updated', refreshTopRated);
-    });
+    document.addEventListener('DOMContentLoaded', setupDashboardSSE);
   }
 })();
 </script>

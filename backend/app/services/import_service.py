@@ -11,6 +11,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Game, Player, Tournament
+from app.services.sse_events import SSEEvents
+from app.services.sse_service import publish_event
 
 
 def parse_result(result_str: str) -> str | None:
@@ -132,6 +134,13 @@ async def import_tournament_csv(
         except (ValueError, KeyError) as e:
             errors.append(f"Row {row_idx}: {e!s}")
             games_skipped += 1
+
+    # Publish SSE event if games were imported
+    if games_created > 0:
+        await publish_event(SSEEvents.GAME_CREATED, {
+            "tournament_id": tournament_id,
+            "games_imported": games_created,
+        })
 
     return {
         "success": True,

@@ -1084,3 +1084,30 @@
 - Исправлен `conftest.py`: убран `autouse=True` из `server_url` fixture
 - ruff clean
 
+
+## 2026-06-19 12:28 — Исправление SSE real-time обновлений
+
+### Описание
+Полное исправление системы Server-Sent Events: формат сообщений, добавление событий во все сервисы, исправление фронтенда.
+
+### Созданные файлы
+- `app/services/sse_events.py` — константы типов SSE-событий
+- `tests/test_sse_service.py` — 11 unit тестов SSE сервиса
+- `tests/test_sse_events.py` — 3 unit теста констант
+- `tests/test_player_sse.py` — 4 unit теста player SSE
+- `tests/test_tournament_sse.py` — 3 unit теста tournament SSE
+- `tests/test_game_sse.py` — 3 unit теста game SSE
+- `e2e/test_sse_realtime_e2e.py` — 5 E2E тестов SSE
+
+### Обновлённые файлы
+- `app/services/sse_service.py` — `publish_event` теперь yield dict с `event`+`data` ключами
+- `app/services/player_service.py` — добавлены publish_event в create/update/delete + RATING_UPDATED
+- `app/services/tournament_service.py` — добавлены publish_event в create/update/delete
+- `app/services/game_service.py` — переименовано событие game_result_updated → game_updated, добавлен GAME_DELETED
+- `app/services/import_service.py` — добавлен GAME_CREATED после импорта
+- `app/static/js/sse.js` — исправлен реконнект, переименован listener, добавлен _reconnectExternalListeners
+- `app/templates/index.html` — добавлены listeners для game/tournament/player events
+- `app/templates/players/list.html` — добавлен SSE auto-refresh
+- `app/templates/tournaments/detail.html` — исправлен Alpine.js доступ + добавлен tournament_updated listener
+- `app/templates/tournaments/list.html` — добавлен SSE auto-refresh
+- `e2e/test_m20_sse_realtime.py` — добавлены assertions для новых событий

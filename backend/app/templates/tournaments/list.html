@@ -119,5 +119,23 @@ function loadTournamentsPage(page) {
     .then(data => renderTournamentsTable(target, data))
     .catch(() => { target.innerHTML = '<p style="color:var(--color-text-light);">Ошибка загрузки.</p>'; });
 }
+
+// SSE: auto-refresh tournaments table on changes
+(function() {
+  function refreshTournaments() { loadTournamentsPage(1); }
+
+  function setupTournamentsSSE() {
+    if (!window.sseClient) return;
+    window.sseClient.on('tournament_created', refreshTournaments);
+    window.sseClient.on('tournament_updated', refreshTournaments);
+    window.sseClient.on('tournament_deleted', refreshTournaments);
+  }
+
+  if (window.sseClient) {
+    setupTournamentsSSE();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupTournamentsSSE);
+  }
+})();
 </script>
 {% endblock %}

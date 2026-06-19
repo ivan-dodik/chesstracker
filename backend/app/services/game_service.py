@@ -11,6 +11,7 @@ from app.models import Game, Player
 from app.schemas.game import GameCreate, GameResult
 from app.services.activity_log_service import log_activity
 from app.services.rating_calculation_service import update_ratings_after_game
+from app.services.sse_events import SSEEvents
 from app.services.sse_service import publish_event
 
 
@@ -126,7 +127,7 @@ async def create_game(
     except Exception:
         pass
 
-    await publish_event("game_created", {
+    await publish_event(SSEEvents.GAME_CREATED, {
         "game_id": game.id,
         "tournament_id": data.tournament_id,
         "result": game.result,
@@ -179,7 +180,7 @@ async def update_game_result(
     except Exception:
         pass
 
-    await publish_event("game_result_updated", {
+    await publish_event(SSEEvents.GAME_UPDATED, {
         "game_id": game_id,
         "result": data.result,
         "white_player_name": white_name,
@@ -209,5 +210,10 @@ async def delete_game(
         db, user_id, "delete", "game", game_id,
         old_values=old_values,
     )
+
+    await publish_event(SSEEvents.GAME_DELETED, {
+        "game_id": game_id,
+        "tournament_id": old_values["tournament_id"],
+    })
 
     return True

@@ -31,14 +31,22 @@ def unsubscribe(event_type: str, queue: asyncio.Queue) -> None:
 
 
 async def publish_event(event_type: str, data: dict[str, Any]) -> None:
-    """Publish an event to all subscribers of the given type."""
+    """Publish an event to all subscribers of the given type.
+
+    Yields a dict with 'event' and 'data' keys so that sse-starlette's
+    EventSourceResponse correctly formats the SSE message with the
+    event type name and JSON data payload.
+    """
     event_data = {
         "type": event_type,
         "data": data,
         "timestamp": datetime.now(UTC).isoformat(),
     }
 
-    message = f"data: {json.dumps(event_data, default=str)}\n\n"
+    message = {
+        "event": event_type,
+        "data": json.dumps(event_data, default=str),
+    }
 
     # Publish to specific event type subscribers
     if event_type in event_subscribers:

@@ -116,6 +116,25 @@ function loadPlayersPage(page) {
     .catch(() => { target.innerHTML = '<p style="color:var(--color-text-light);">Ошибка загрузки.</p>'; });
 }
 
+// SSE: auto-refresh players table on rating/player changes
+(function() {
+  function refreshPlayers() { loadPlayersPage(1); }
+
+  function setupPlayersSSE() {
+    if (!window.sseClient) return;
+    window.sseClient.on('rating_updated', refreshPlayers);
+    window.sseClient.on('player_created', refreshPlayers);
+    window.sseClient.on('player_updated', refreshPlayers);
+    window.sseClient.on('player_deleted', refreshPlayers);
+  }
+
+  if (window.sseClient) {
+    setupPlayersSSE();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupPlayersSSE);
+  }
+})();
+
 function escapeHtml(str) {
   if (!str) return '';
   const div = document.createElement('div');

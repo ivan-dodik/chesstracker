@@ -255,18 +255,21 @@
   function refreshTournament() {
     // Find the Alpine component data via the DOM
     const el = document.querySelector('[x-data*="tournamentDetail"]');
-    if (!el || !el.__x) return;
-    const comp = el.__x.$data || el._x_dataStack?.[0];
-    if (!comp) return;
+    if (!el) return;
+    // Alpine.js v3 stores data in _x_dataStack
+    const comp = el._x_dataStack?.[0] || el.__x?.$data;
+    if (!comp || typeof comp.loadStandings !== 'function') return;
     comp.loadStandings();
     comp.loadGames();
+    comp.loadTournament();
   }
 
   function setupTournamentSSE() {
     if (!window.sseClient) return;
     window.sseClient.on('game_created', refreshTournament);
-    window.sseClient.on('game_result_updated', refreshTournament);
+    window.sseClient.on('game_updated', refreshTournament);
     window.sseClient.on('rating_updated', refreshTournament);
+    window.sseClient.on('tournament_updated', refreshTournament);
   }
 
   if (window.sseClient) {

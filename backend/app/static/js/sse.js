@@ -35,7 +35,7 @@ class SSEClient {
       }
     });
 
-    this.eventSource.addEventListener('game_result_updated', (e) => {
+    this.eventSource.addEventListener('game_updated', (e) => {
       try {
         const data = JSON.parse(e.data);
         this.showNotification(
@@ -43,7 +43,7 @@ class SSEClient {
           'warning'
         );
       } catch (err) {
-        console.error('SSE: failed to parse game_result_updated', err);
+        console.error('SSE: failed to parse game_updated', err);
       }
     });
 
@@ -65,6 +65,7 @@ class SSEClient {
 
     this.eventSource.onopen = () => {
       this.currentDelay = this.reconnectDelay;  // Reset delay on successful connection
+      this._reconnectExternalListeners();
     };
 
     this.eventSource.onerror = () => {
@@ -90,24 +91,30 @@ class SSEClient {
       this._externalListeners[eventName] = [];
     }
     this._externalListeners[eventName].push(callback);
-    // Also listen on EventSource if connected
+    // Register on current EventSource if connected
     if (this.eventSource) {
-      this.eventSource.addEventListener(eventName, (e) => {
-        try {
-          const data = JSON.parse(e.data);
-          callback(data);
-        } catch (err) {
-          console.error('SSE on(): failed to parse', eventName, err);
-        }
-      });
+      this._addListener(this.eventSource, eventName, callback);
     }
   }
 
-  _notifyExternal(eventName, data) {
-    const listeners = this._externalListeners[eventName] || [];
-    listeners.forEach(cb => {
-      try { cb(data); } catch (err) { console.error('SSE callback error:', err); }
+  _addListener(eventSource, eventName, callback) {
+    eventSource.addEventListener(eventName, (e) => {
+      try {
+        const data = JSON.parse(e.data);
+        callback(data);
+      } catch (err) {
+        console.error('SSE on(): failed to parse', eventName, err);
+      }
     });
+  }
+
+  _reconnectExternalListeners() {
+    if (!this.eventSource) return;
+    for (const [eventName, callbacks] of Object.entries(this._externalListeners)) {
+      for (const cb of callbacks) {
+        this._addListener(this.eventSource, eventName, cb);
+      }
+    }
   }
 
   close() {

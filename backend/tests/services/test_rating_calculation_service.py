@@ -3,7 +3,6 @@
 
 """Unit tests for rating calculation service (ELO)."""
 
-import pytest
 
 from app.services.rating_calculation_service import calculate_elo_rating
 

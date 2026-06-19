@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import Tournament
 from app.schemas.tournament import TournamentCreate
 from app.services.activity_log_service import log_activity
+from app.services.sse_events import SSEEvents
+from app.services.sse_service import publish_event
 from app.services.standings_service import calculate_standings
 
 
@@ -62,6 +64,12 @@ async def create_tournament(
         new_values=data.model_dump(),
     )
 
+    await publish_event(SSEEvents.TOURNAMENT_CREATED, {
+        "tournament_id": tournament.id,
+        "tournament_name": tournament.name,
+        "status": tournament.status,
+    })
+
     return tournament
 
 
@@ -92,6 +100,12 @@ async def update_tournament(
         new_values=data.model_dump(exclude_unset=True),
     )
 
+    await publish_event(SSEEvents.TOURNAMENT_UPDATED, {
+        "tournament_id": tournament.id,
+        "tournament_name": tournament.name,
+        "status": tournament.status,
+    })
+
     return tournament
 
 
@@ -114,6 +128,11 @@ async def delete_tournament(
         db, user_id, "delete", "tournament", tournament_id,
         old_values=old_values,
     )
+
+    await publish_event(SSEEvents.TOURNAMENT_DELETED, {
+        "tournament_id": tournament_id,
+        "tournament_name": old_values["name"],
+    })
 
     return True
 
