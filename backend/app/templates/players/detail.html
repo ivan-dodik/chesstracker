@@ -349,12 +349,12 @@
           this._ratingChart = new ApexCharts(container, {
             series: [{ name: 'Рейтинг', data: series }],
             chart: { type: 'line', height: 300, toolbar: { show: false } },
-            colors: ['#1976d2'],
-            stroke: { curve: 'smooth', width: 3 },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.05 } },
+            colors: ['#1565c0'],
+            stroke: { curve: 'smooth', width: 4 },
+            fill: { type: 'solid' },
             xaxis: { type: 'category' },
             yaxis: { decimalsInFloat: 0 },
-            markers: { size: 4, hover: { size: 7 } },
+            markers: { size: 5, hover: { size: 9 } },
             dataLabels: { enabled: false },
             legend: { show: false },
           });
