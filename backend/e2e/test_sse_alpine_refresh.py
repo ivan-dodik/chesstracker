@@ -36,8 +36,7 @@ def test_player_detail_has_custom_event_handler():
     assert "@sse:refresh-player.window" in content, (
         "Player detail must use @sse:refresh-player.window for SSE refresh"
     )
-    assert "loadPlayer" in content
-    assert "loadGames" in content
+    assert "refreshAll" in content, "Player detail must have refreshAll() method"
 
 
 def test_tournament_sse_dispatches_custom_event():
