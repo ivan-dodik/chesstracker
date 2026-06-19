@@ -10,15 +10,15 @@
     <p style="margin-top:1rem;color:var(--color-text-light);">Загрузка...</p>
   </div>
 
-  <div x-show="player" style="display:none;">
+  <div x-show="player" x-cloak>
       <!-- Player Header -->
       <div class="page-header">
         <div class="player-header-info">
-          <h1 x-text="player.name"></h1>
+          <h1 x-text="player?.name"></h1>
           <div class="player-meta">
-            <span class="stat-value" x-text="player.rating"></span>
+            <span class="stat-value" x-text="player?.rating"></span>
             <span class="stat-label">Рейтинг</span>
-            <span x-show="player.city" style="margin-left:1rem;color:var(--color-text-light);" x-text="'🏙 ' + player.city"></span>
+            <span x-show="player?.city" style="margin-left:1rem;color:var(--color-text-light);" x-text="player?.city ? '🏙 ' + player.city : ''"></span>
           </div>
         </div>
         <div class="player-header-actions">
@@ -282,8 +282,11 @@
           this.loadOverallStats(),
           this.loadGames(),
         ]);
-        this.renderResultsChart();
-        this.renderRatingChart();
+        // Use $nextTick to ensure Alpine has finished DOM updates before Chart.js reads canvas
+        this.$nextTick(() => {
+          this.renderResultsChart();
+          this.renderRatingChart();
+        });
       },
 
       renderResultsChart() {
@@ -296,8 +299,10 @@
 
         if (this._resultsChart) {
           this._resultsChart.destroy();
+          this._resultsChart = null;
         }
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
         this._resultsChart = new Chart(ctx, {
           type: 'doughnut',
           data: {

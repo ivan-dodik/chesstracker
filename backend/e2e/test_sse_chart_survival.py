@@ -64,3 +64,29 @@ def test_chart_canvas_has_x_ref():
     content = _read(TEMPLATE)
     assert 'x-ref="resultsChart"' in content, "Doughnut chart canvas must have x-ref"
     assert 'x-ref="ratingChart"' in content, "Rating chart canvas must have x-ref"
+
+
+def test_player_properties_use_optional_chaining():
+    """Player properties use optional chaining to avoid null errors on load."""
+    content = _read(TEMPLATE)
+    assert "player?.name" in content, "player.name must use optional chaining"
+    assert "player?.rating" in content, "player.rating must use optional chaining"
+    assert "player?.city" in content, "player.city must use optional chaining"
+
+
+def test_render_results_chart_checks_ctx():
+    """renderResultsChart checks ctx before creating Chart."""
+    content = _read(TEMPLATE)
+    # Find the function definition (not the call site)
+    idx = content.find("renderResultsChart() {")
+    assert idx != -1, "renderResultsChart function definition not found"
+    body = content[idx:idx+600]
+    assert "if (!ctx) return;" in body or "if (! ctx) return;" in body, (
+        "renderResultsChart must check ctx validity before creating Chart"
+    )
+
+
+def test_x_cloak_on_player_container():
+    """Player container uses x-cloak to prevent flash of unstyled content."""
+    content = _read(TEMPLATE)
+    assert 'x-cloak' in content, "Player detail must use x-cloak"
