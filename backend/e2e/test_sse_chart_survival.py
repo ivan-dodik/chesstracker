@@ -92,13 +92,11 @@ def test_x_cloak_on_player_container():
     assert 'x-cloak' in content, "Player detail must use x-cloak"
 
 
-def test_chart_uses_update_not_destroy():
-    """Charts use chart.update() instead of destroy+create on SSE refresh."""
+def test_chart_uses_requestAnimationFrame():
+    """Charts use requestAnimationFrame before creating Chart.js instances."""
     content = _read(TEMPLATE)
-    # renderResultsChart should use .update() when chart exists
     idx = content.find("renderResultsChart() {")
-    body = content[idx:idx+800]
-    assert ".update();" in body, "renderResultsChart must use .update() for existing chart"
-    assert "this._resultsChart.destroy();" not in body, (
-        "renderResultsChart must NOT destroy chart — use .update() instead"
+    body = content[idx:idx+1500]
+    assert "requestAnimationFrame" in body, (
+        "renderResultsChart must use requestAnimationFrame before creating Chart"
     )
