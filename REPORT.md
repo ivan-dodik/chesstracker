@@ -649,3 +649,23 @@ API-тесты не покрывают фронтенд-поведение. Ну
 - 12:23 — Phase 4: исправлен фронтенд (sse.js, все шаблоны)
 - 12:25 — Phase 5: E2E тесты
 - 12:28 — Phase 6: ruff fix, документация, коммит
+
+### 2026-06-19 13:41 — Исправление SSE (Envelope + Timing + Player detail)
+
+**Ключевые проблемы и решения:**
+
+#### 2026-06-19 — "?" в SSE уведомлениях (envelope mismatch)
+- **Суть:** `publish_event` оборачивал data в `{"type": ..., "data": ..., "timestamp": ...}`, фронтенд обращался к `data.white_player_name` → undefined → "?"
+- **Решение:** Убран envelope, data сериализуется напрямую `json.dumps(data)`
+
+#### 2026-06-19 — Турнир не обновлялся (timing race)
+- **Суть:** `sse.js` создавал SSEClient в `DOMContentLoaded`, но inline scripts страниц проверяли `window.sseClient` до его создания → listeners не регились
+- **Решение:** SSEClient создаётся сразу на уровне скрипта, не в DOMContentLoaded
+
+#### 2026-06-19 — Страница игрока не обновлялась (нет listeners)
+- **Суть:** `players/detail.html` не имел SSE listeners вообще
+- **Решение:** Добавлены listeners для game_created, game_updated, rating_updated, player_updated
+
+**Удачные/неудачные шаги:**
+- ✅ Быстрая диагностика — envelope mismatch подтверждён через Python-эмуляцию
+- ✅ 193 passed, 0 failed

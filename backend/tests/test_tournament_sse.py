@@ -35,7 +35,7 @@ async def test_create_tournament_publishes_event(client: AsyncClient, admin_toke
         message = await queue.get()
         assert message["event"] == SSEEvents.TOURNAMENT_CREATED
         data = json.loads(message["data"])
-        assert data["data"]["tournament_name"] == "SSE Tournament"
+        assert data["tournament_name"] == "SSE Tournament"
     finally:
         unsubscribe("all", queue)
 
@@ -76,7 +76,7 @@ async def test_update_tournament_publishes_event(client: AsyncClient, admin_toke
         message = await queue.get()
         assert message["event"] == SSEEvents.TOURNAMENT_UPDATED
         data = json.loads(message["data"])
-        assert data["data"]["tournament_name"] == "Updated Tournament"
+        assert data["tournament_name"] == "Updated Tournament"
     finally:
         unsubscribe("all", queue)
 
@@ -109,6 +109,6 @@ async def test_delete_tournament_publishes_event(client: AsyncClient, admin_toke
         message = await queue.get()
         assert message["event"] == SSEEvents.TOURNAMENT_DELETED
         data = json.loads(message["data"])
-        assert data["data"]["tournament_id"] == tournament_id
+        assert data["tournament_id"] == tournament_id
     finally:
         unsubscribe("all", queue)

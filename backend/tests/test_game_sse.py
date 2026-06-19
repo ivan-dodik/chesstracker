@@ -57,7 +57,7 @@ async def test_create_game_publishes_event(client: AsyncClient, admin_token: str
         game_events = [m for m in messages if m["event"] == SSEEvents.GAME_CREATED]
         assert len(game_events) >= 1, "Should publish GAME_CREATED event"
         data = json.loads(game_events[0]["data"])
-        assert data["data"]["tournament_id"] == tournament_id
+        assert data["tournament_id"] == tournament_id
     finally:
         unsubscribe("all", queue)
 
@@ -107,7 +107,7 @@ async def test_update_game_publishes_event(client: AsyncClient, admin_token: str
             "Should publish GAME_UPDATED event (not game_result_updated)"
         )
         data = json.loads(game_events[0]["data"])
-        assert data["data"]["result"] == "1-0"
+        assert data["result"] == "1-0"
     finally:
         unsubscribe("all", queue)
 
@@ -155,7 +155,7 @@ async def test_delete_game_publishes_event(client: AsyncClient, admin_token: str
         game_events = [m for m in messages if m["event"] == SSEEvents.GAME_DELETED]
         assert len(game_events) >= 1, "Should publish GAME_DELETED event"
         data = json.loads(game_events[0]["data"])
-        assert data["data"]["game_id"] == game_id
-        assert data["data"]["tournament_id"] == tournament_id
+        assert data["game_id"] == game_id
+        assert data["tournament_id"] == tournament_id
     finally:
         unsubscribe("all", queue)

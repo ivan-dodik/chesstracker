@@ -1111,3 +1111,17 @@
 - `app/templates/tournaments/detail.html` — исправлен Alpine.js доступ + добавлен tournament_updated listener
 - `app/templates/tournaments/list.html` — добавлен SSE auto-refresh
 - `e2e/test_m20_sse_realtime.py` — добавлены assertions для новых событий
+
+## 2026-06-19 13:41 — Исправление SSE (Envelope mismatch + Timing race + Player detail)
+
+### Описание
+Исправлены 3 бага SSE: data envelope mismatch (?" в уведомлениях), timing race (турнир не обновлялся), отсутствие SSE listeners на странице игрока.
+
+### Исправленные файлы
+- `app/services/sse_service.py` — убран envelope wrapper, data отправляется напрямую
+- `app/static/js/sse.js` — SSEClient создаётся сразу (не в DOMContentLoaded) для устранения timing race
+- `app/templates/players/detail.html` — добавлены SSE listeners (game_created, game_updated, rating_updated, player_updated)
+- `tests/test_sse_service.py` — обновлён test data format (flat, no envelope)
+- `tests/test_player_sse.py` — обновлён data access pattern
+- `tests/test_tournament_sse.py` — обновлён data access pattern
+- `tests/test_game_sse.py` — обновлён data access pattern

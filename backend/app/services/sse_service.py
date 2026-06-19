@@ -5,7 +5,6 @@
 
 import asyncio
 import json
-from datetime import UTC, datetime
 from typing import Any
 
 event_subscribers: dict[str, list[asyncio.Queue]] = {}
@@ -36,16 +35,14 @@ async def publish_event(event_type: str, data: dict[str, Any]) -> None:
     Yields a dict with 'event' and 'data' keys so that sse-starlette's
     EventSourceResponse correctly formats the SSE message with the
     event type name and JSON data payload.
-    """
-    event_data = {
-        "type": event_type,
-        "data": data,
-        "timestamp": datetime.now(UTC).isoformat(),
-    }
 
+    The data dict is serialized directly (no envelope wrapper) so that
+    frontend listeners can access fields like data.white_player_name
+    without unwrapping.
+    """
     message = {
         "event": event_type,
-        "data": json.dumps(event_data, default=str),
+        "data": json.dumps(data, default=str),
     }
 
     # Publish to specific event type subscribers

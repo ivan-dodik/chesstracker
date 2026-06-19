@@ -27,8 +27,8 @@ async def test_create_player_publishes_event(client: AsyncClient, admin_token: s
         message = await queue.get()
         assert message["event"] == SSEEvents.PLAYER_CREATED
         data = json.loads(message["data"])
-        assert data["data"]["player_name"] == "SSE Player"
-        assert data["data"]["rating"] == 1500
+        assert data["player_name"] == "SSE Player"
+        assert data["rating"] == 1500
     finally:
         unsubscribe("all", queue)
 
@@ -58,7 +58,7 @@ async def test_update_player_publishes_event(client: AsyncClient, admin_token: s
         message = await queue.get()
         assert message["event"] == SSEEvents.PLAYER_UPDATED
         data = json.loads(message["data"])
-        assert data["data"]["player_name"] == "New Name"
+        assert data["player_name"] == "New Name"
     finally:
         unsubscribe("all", queue)
 
@@ -93,8 +93,8 @@ async def test_update_player_rating_publishes_rating_event(client: AsyncClient, 
         rating_events = [m for m in messages if m["event"] == SSEEvents.RATING_UPDATED]
         assert len(rating_events) >= 1, "Should publish RATING_UPDATED when rating changes"
         data = json.loads(rating_events[0]["data"])
-        assert data["data"]["old_rating"] == 1500
-        assert data["data"]["new_rating"] == 1700
+        assert data["old_rating"] == 1500
+        assert data["new_rating"] == 1700
     finally:
         unsubscribe("all", queue)
 
@@ -123,7 +123,7 @@ async def test_delete_player_publishes_event(client: AsyncClient, admin_token: s
         message = await queue.get()
         assert message["event"] == SSEEvents.PLAYER_DELETED
         data = json.loads(message["data"])
-        assert data["data"]["player_id"] == player_id
-        assert data["data"]["player_name"] == "Delete Me"
+        assert data["player_id"] == player_id
+        assert data["player_name"] == "Delete Me"
     finally:
         unsubscribe("all", queue)

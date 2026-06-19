@@ -84,7 +84,7 @@ async def test_publish_event_sets_event_type():
 
 @pytest.mark.asyncio
 async def test_publish_event_data_is_json_string():
-    """The 'data' field must be a JSON-encoded string."""
+    """The 'data' field must be a JSON-encoded string with flat payload (no envelope)."""
     queue = await subscribe("all")
     payload = {"player_id": 1, "player_name": "Test", "rating": 1500}
     await publish_event("rating_updated", payload)
@@ -92,7 +92,7 @@ async def test_publish_event_data_is_json_string():
     message = await queue.get()
     assert isinstance(message["data"], str)
     parsed = json.loads(message["data"])
-    assert parsed["data"] == payload
+    assert parsed == payload, "Data should be serialized directly without envelope"
     unsubscribe("all", queue)
 
 

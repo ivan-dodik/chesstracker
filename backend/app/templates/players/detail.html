@@ -406,4 +406,34 @@
     });
   }
 </script>
+
+<script>
+// SSE: auto-refresh player data when relevant events arrive
+(function() {
+  function refreshPlayer() {
+    const el = document.querySelector('[x-data*="playerDetail"]');
+    if (!el) return;
+    const comp = el._x_dataStack?.[0] || el.__x?.$data;
+    if (!comp || typeof comp.loadPlayer !== 'function') return;
+    comp.loadPlayer();
+    comp.loadGames();
+    comp.loadOverallStats();
+    comp.$nextTick(() => { comp.renderResultsChart(); comp.renderRatingChart(); });
+  }
+
+  function setupPlayerSSE() {
+    if (!window.sseClient) return;
+    window.sseClient.on('game_created', refreshPlayer);
+    window.sseClient.on('game_updated', refreshPlayer);
+    window.sseClient.on('rating_updated', refreshPlayer);
+    window.sseClient.on('player_updated', refreshPlayer);
+  }
+
+  if (window.sseClient) {
+    setupPlayerSSE();
+  } else {
+    document.addEventListener('DOMContentLoaded', setupPlayerSSE);
+  }
+})();
+</script>
 {% endblock %}
