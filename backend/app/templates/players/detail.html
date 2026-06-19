@@ -278,15 +278,19 @@
       },
 
       async refreshAll() {
+        // Destroy charts before data load to avoid stale refs
+        if (this._resultsChart) { this._resultsChart.destroy(); this._resultsChart = null; }
+        if (this.ratingChart) { this.ratingChart.destroy(); this.ratingChart = null; }
         await Promise.all([
           this.loadPlayer(),
           this.loadOverallStats(),
           this.loadGames(),
         ]);
-        this.$nextTick(() => {
+        // Use setTimeout to wait for Alpine DOM re-render (template x-if destroys canvas)
+        setTimeout(() => {
           this.renderResultsChart();
           this.renderRatingChart();
-        });
+        }, 150);
       },
 
       renderResultsChart() {
