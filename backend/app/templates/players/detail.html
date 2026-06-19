@@ -304,6 +304,7 @@
         // First render: create ApexCharts donut
         const container = this.$refs.resultsChart;
         if (!container || typeof ApexCharts === 'undefined') return;
+        const _donutTotal = wins + losses + draws;
         this._resultsChart = new ApexCharts(container, {
           series: [wins, losses, draws],
           chart: { type: 'donut', height: 250 },
@@ -315,8 +316,7 @@
           tooltip: {
             y: {
               formatter: function(val) {
-                const total = this.w.globals.series.reduce((a, b) => a + b, 0);
-                const pct = total > 0 ? Math.round(val / total * 100) : 0;
+                const pct = _donutTotal > 0 ? Math.round(val / _donutTotal * 100) : 0;
                 return val + ' (' + pct + '%)';
               }
             }
@@ -349,12 +349,12 @@
           this._ratingChart = new ApexCharts(container, {
             series: [{ name: 'Рейтинг', data: series }],
             chart: { type: 'line', height: 300, toolbar: { show: false } },
-            colors: ['#3498db'],
-            stroke: { curve: 'smooth', width: 2 },
-            fill: { type: 'gradient', gradient: { opacityFrom: 0.4, opacityTo: 0.1 } },
+            colors: ['#1976d2'],
+            stroke: { curve: 'smooth', width: 3 },
+            fill: { type: 'gradient', gradient: { opacityFrom: 0.3, opacityTo: 0.05 } },
             xaxis: { type: 'category' },
             yaxis: { decimalsInFloat: 0 },
-            markers: { size: 3, hover: { size: 6 } },
+            markers: { size: 4, hover: { size: 7 } },
             dataLabels: { enabled: false },
             legend: { show: false },
           });
