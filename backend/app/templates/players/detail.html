@@ -10,8 +10,7 @@
     <p style="margin-top:1rem;color:var(--color-text-light);">Загрузка...</p>
   </div>
 
-  <template x-if="player">
-    <div>
+  <div x-show="player" style="display:none;">
       <!-- Player Header -->
       <div class="page-header">
         <div class="player-header-info">
@@ -175,8 +174,7 @@
           </div>
         </template>
       </div>
-    </div>
-  </template>
+  </div>
 </div>
 
 <script>
@@ -278,19 +276,14 @@
       },
 
       async refreshAll() {
-        // Destroy charts before data load to avoid stale refs
-        if (this._resultsChart) { this._resultsChart.destroy(); this._resultsChart = null; }
-        if (this.ratingChart) { this.ratingChart.destroy(); this.ratingChart = null; }
+        // Only refresh stats + games (player name/rating don't change on game add)
+        // Do NOT call loadPlayer() — it triggers x-if re-render which destroys canvas
         await Promise.all([
-          this.loadPlayer(),
           this.loadOverallStats(),
           this.loadGames(),
         ]);
-        // Use setTimeout to wait for Alpine DOM re-render (template x-if destroys canvas)
-        setTimeout(() => {
-          this.renderResultsChart();
-          this.renderRatingChart();
-        }, 150);
+        this.renderResultsChart();
+        this.renderRatingChart();
       },
 
       renderResultsChart() {
