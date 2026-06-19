@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2026 Ivan Dodik
 # SPDX-License-Identifier: AGPL-3.0-only
 
-"""E2E tests: SSE chart survival — doughnut chart persists after SSE refresh.
+"""E2E tests: SSE chart survival — ApexCharts donut persists after SSE refresh.
 
-The core bug: Alpine's x-if destroys/recreates DOM on data change, which kills
-the Chart.js canvas. The fix uses x-show instead, so the canvas survives.
+Uses ApexCharts with updateSeries() for reactive data updates.
+No canvas destroy/create cycle needed.
 """
 
 import os
@@ -21,49 +21,70 @@ TEMPLATE = os.path.join(
 
 
 def test_player_detail_uses_x_show_not_x_if():
-    """Player content container uses x-show (not x-if) to preserve canvas DOM."""
+    """Player content container uses x-show (not x-if) to preserve chart DOM."""
     content = _read(TEMPLATE)
-    # The main player content div should use x-show, not x-if
     assert 'x-show="player"' in content, (
-        "Player detail must use x-show=\"player\" to avoid destroying canvas on re-render"
+        "Player detail must use x-show=\"player\""
     )
-    # There should NOT be a <template x-if="player"> wrapping the charts
     assert "<template x-if=\"player\">" not in content, (
-        "Player detail must NOT use <template x-if=\"player\"> — it destroys canvas"
+        "Player detail must NOT use <template x-if=\"player\">"
     )
 
 
 def test_refresh_all_does_not_call_load_player():
-    """refreshAll() must NOT call loadPlayer() to avoid triggering x-if re-render."""
+    """refreshAll() must NOT call loadPlayer()."""
     content = _read(TEMPLATE)
-    # Find the refreshAll function body
     idx = content.find("async refreshAll()")
     assert idx != -1, "refreshAll() method must exist"
-    # Get the function body (until next method or closing brace)
     body_end = content.find("renderResultsChart()", idx)
     body = content[idx:body_end]
     assert "this.loadPlayer" not in body, (
-        "refreshAll() must NOT call this.loadPlayer() — it triggers unnecessary DOM re-render"
+        "refreshAll() must NOT call this.loadPlayer()"
     )
 
 
-def test_refresh_all_has_no_settimeout():
-    """refreshAll() should not need setTimeout — x-show preserves DOM."""
+def test_uses_apexcharts_not_chartjs():
+    """Template uses ApexCharts, not Chart.js."""
     content = _read(TEMPLATE)
-    idx = content.find("async refreshAll()")
-    assert idx != -1
-    body_end = content.find("renderResultsChart()", idx)
-    body = content[idx:body_end]
-    assert "setTimeout" not in body, (
-        "refreshAll() should not need setTimeout when using x-show"
+    assert "ApexCharts" in content, "Must use ApexCharts"
+    assert "new Chart(" not in content, "Must NOT use Chart.js"
+    assert "new ApexCharts(" in content, "Must create ApexCharts instance"
+
+
+def test_doughnut_uses_update_series():
+    """Doughnut chart uses updateSeries() for reactive updates."""
+    content = _read(TEMPLATE)
+    idx = content.find("renderResultsChart() {")
+    assert idx != -1, "renderResultsChart must exist"
+    body = content[idx:idx+1200]
+    assert "updateSeries" in body, "renderResultsChart must use updateSeries()"
+    assert "chart: { type: 'donut'" in body or "type: 'donut'" in body, (
+        "renderResultsChart must create donut chart"
     )
 
 
-def test_chart_canvas_has_x_ref():
-    """Chart canvas has x-ref for Alpine access."""
+def test_line_chart_uses_update_series():
+    """Line chart uses updateSeries() for reactive updates."""
     content = _read(TEMPLATE)
-    assert 'x-ref="resultsChart"' in content, "Doughnut chart canvas must have x-ref"
-    assert 'x-ref="ratingChart"' in content, "Rating chart canvas must have x-ref"
+    idx = content.find("renderRatingChart() {")
+    assert idx != -1, "renderRatingChart must exist"
+    body = content[idx:idx+1500]
+    assert "updateSeries" in body, "renderRatingChart must use updateSeries()"
+    assert "type: 'line'" in body, "renderRatingChart must create line chart"
+
+
+def test_chart_containers_are_divs():
+    """ApexCharts uses div containers, not canvas elements."""
+    content = _read(TEMPLATE)
+    assert '<canvas' not in content.split('<script>')[0], (
+        "ApexCharts uses <div>, not <canvas>"
+    )
+
+
+def test_x_cloak_on_player_container():
+    """Player container uses x-cloak."""
+    content = _read(TEMPLATE)
+    assert 'x-cloak' in content, "Player detail must use x-cloak"
 
 
 def test_player_properties_use_optional_chaining():
@@ -72,31 +93,3 @@ def test_player_properties_use_optional_chaining():
     assert "player?.name" in content, "player.name must use optional chaining"
     assert "player?.rating" in content, "player.rating must use optional chaining"
     assert "player?.city" in content, "player.city must use optional chaining"
-
-
-def test_render_results_chart_checks_ctx():
-    """renderResultsChart checks ctx before creating Chart."""
-    content = _read(TEMPLATE)
-    # Find the function definition (not the call site)
-    idx = content.find("renderResultsChart() {")
-    assert idx != -1, "renderResultsChart function definition not found"
-    body = content[idx:idx+1200]
-    assert "if (!ctx) return;" in body or "if (! ctx) return;" in body, (
-        "renderResultsChart must check ctx validity before creating Chart"
-    )
-
-
-def test_x_cloak_on_player_container():
-    """Player container uses x-cloak to prevent flash of unstyled content."""
-    content = _read(TEMPLATE)
-    assert 'x-cloak' in content, "Player detail must use x-cloak"
-
-
-def test_chart_uses_requestAnimationFrame():
-    """Charts use requestAnimationFrame before creating Chart.js instances."""
-    content = _read(TEMPLATE)
-    idx = content.find("renderResultsChart() {")
-    body = content[idx:idx+1500]
-    assert "requestAnimationFrame" in body, (
-        "renderResultsChart must use requestAnimationFrame before creating Chart"
-    )
