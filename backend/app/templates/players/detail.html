@@ -3,7 +3,7 @@
 {% block title %}Игрок — Chess Tracker{% endblock %}
 
 {% block content %}
-<div x-data="playerDetail({{ player_id }})" x-init="init()">
+<div x-data="playerDetail({{ player_id }})" x-init="init()" @sse:refresh-player.window="loadPlayer(); loadGames(); loadOverallStats(); $nextTick(() => { renderResultsChart(); renderRatingChart(); })">
   <!-- Loading State -->
   <div x-show="!player" style="text-align:center;padding:3rem;">
     <div class="spinner" style="width:2rem;height:2rem;"></div>
@@ -411,14 +411,8 @@
 // SSE: auto-refresh player data when relevant events arrive
 (function() {
   function refreshPlayer() {
-    const el = document.querySelector('[x-data*="playerDetail"]');
-    if (!el) return;
-    const comp = el._x_dataStack?.[0] || el.__x?.$data;
-    if (!comp || typeof comp.loadPlayer !== 'function') return;
-    comp.loadPlayer();
-    comp.loadGames();
-    comp.loadOverallStats();
-    comp.$nextTick(() => { comp.renderResultsChart(); comp.renderRatingChart(); });
+    // Dispatch custom event — Alpine template listens via @sse:refresh-player.window
+    window.dispatchEvent(new CustomEvent('sse:refresh-player'));
   }
 
   function setupPlayerSSE() {

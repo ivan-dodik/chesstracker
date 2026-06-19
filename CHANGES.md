@@ -1125,3 +1125,13 @@
 - `tests/test_player_sse.py` — обновлён data access pattern
 - `tests/test_tournament_sse.py` — обновлён data access pattern
 - `tests/test_game_sse.py` — обновлён data access pattern
+
+## 2026-06-19 14:31 — Исправление Alpine.js SSE refresh (custom DOM events)
+
+### Описание
+Заменён ненадёжный доступ к Alpine.js internals (_x_dataStack) на идиоматичный паттерн с custom DOM events.
+
+### Исправленные файлы
+- `app/templates/tournaments/detail.html` — `@sse:refresh-tournament.window="..."` + dispatch CustomEvent
+- `app/templates/players/detail.html` — `@sse:refresh-player.window="..."` + dispatch CustomEvent
+- `e2e/test_sse_alpine_refresh.py` — 5 E2E тестов проверяющих custom event pattern

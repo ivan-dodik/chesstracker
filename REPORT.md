@@ -669,3 +669,12 @@ API-тесты не покрывают фронтенд-поведение. Ну
 **Удачные/неудачные шаги:**
 - ✅ Быстрая диагностика — envelope mismatch подтверждён через Python-эмуляцию
 - ✅ 193 passed, 0 failed
+
+### 2026-06-19 14:31 — Исправление Alpine.js SSE refresh
+
+**Ключевые проблемы и решения:**
+
+#### 2026-06-19 — Страницы не обновлялись despite SSE events arriving
+- **Суть:** `refreshTournament()` и `refreshPlayer()` использовали `el._x_dataStack?.[0]` для доступа к данным Alpine.js. В Alpine.js v3.14.8 это внутреннее свойство недоступно → comp = undefined → early return.
+- **Решение:** Custom DOM events pattern — SSE callback dispatch'ит `window.dispatchEvent(new CustomEvent('sse:refresh-tournament'))`, Alpine template слушает `@sse:refresh-tournament.window="loadStandings(); loadGames(); loadTournament()"`.
+- **Результат:** Гарантированно работает с любой версией Alpine.js, не зависит от internals.

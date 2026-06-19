@@ -3,7 +3,7 @@
 {% block title %}Турнир — Chess Tracker{% endblock %}
 
 {% block content %}
-<div x-data="tournamentDetail({{ tournament_id }})" x-init="init()">
+<div x-data="tournamentDetail({{ tournament_id }})" x-init="init()" @sse:refresh-tournament.window="loadStandings(); loadGames(); loadTournament()">
   <!-- Loading State -->
   <div x-show="!tournament" style="text-align:center;padding:3rem;">
     <div class="spinner" style="width:2rem;height:2rem;"></div>
@@ -253,15 +253,8 @@
 // SSE: auto-refresh standings and games on tournament detail page
 (function() {
   function refreshTournament() {
-    // Find the Alpine component data via the DOM
-    const el = document.querySelector('[x-data*="tournamentDetail"]');
-    if (!el) return;
-    // Alpine.js v3 stores data in _x_dataStack
-    const comp = el._x_dataStack?.[0] || el.__x?.$data;
-    if (!comp || typeof comp.loadStandings !== 'function') return;
-    comp.loadStandings();
-    comp.loadGames();
-    comp.loadTournament();
+    // Dispatch custom event — Alpine template listens via @sse:refresh-tournament.window
+    window.dispatchEvent(new CustomEvent('sse:refresh-tournament'));
   }
 
   function setupTournamentSSE() {
