@@ -1155,3 +1155,15 @@
 - 201/201 backend тестов проходят
 - ruff check чист
 - Все мутации покрыты activity log: player, tournament, game, rating, import, favorite
+
+## 2026-06-20 11:29 — Fix: DEBUG-логирование игнорировало параметр DEBUG=false
+
+### Описание
+Уровень логирования в `main.py` был захардкожен на `logging.IGNORE`, поэтому параметр `DEBUG=false` из `.env` не влиял на вывод DEBUG-сообщений в консоль.
+
+### Изменённые файлы
+- `app/main.py` — уровень логирования определяется через `settings.DEBUG` (`DEBUG → logging.DEBUG`, `false → logging.INFO`)
+
+### Результат
+- 202/202 тестов проходят
+- ruff check чист

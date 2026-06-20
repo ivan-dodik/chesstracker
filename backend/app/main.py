@@ -28,6 +28,7 @@ logger = logging.getLogger(__name__)
 
 # ── File logging setup ──────────────────────────────────────────────
 LOG_DIR = Path(__file__).resolve().parent.parent / "logs"
+_log_level = logging.DEBUG if settings.DEBUG else logging.INFO
 _log_handlers: list[logging.Handler] = [logging.StreamHandler()]
 
 try:
@@ -36,7 +37,7 @@ try:
     file_handler = logging.handlers.RotatingFileHandler(
         str(LOG_FILE), maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8",
     )
-    file_handler.setLevel(logging.DEBUG)
+    file_handler.setLevel(_log_level)
     file_handler.setFormatter(
         logging.Formatter("%(asctime)s %(levelname)-7s %(name)s — %(message)s"),
     )
@@ -47,7 +48,7 @@ except OSError as exc:
     print(f"WARNING: Cannot create log file ({exc}). Logging to stderr only.")
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=_log_level,
     format="%(asctime)s %(levelname)-7s %(name)s — %(message)s",
     handlers=_log_handlers,
 )

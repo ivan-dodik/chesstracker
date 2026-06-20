@@ -709,3 +709,13 @@ API-тесты не покрывают фронтенд-поведение. Ну
 - **201/201 backend тестов** + **10/10 E2E** проходят
 - **ruff check** чист
 - Все мутации покрыты activity log: player, tournament, game, rating, import, favorite
+
+---
+
+### История работы (продолжение)
+
+#### 2026-06-20 11:22 — Исправление DEBUG-логирования
+- Промпт: "Сейчас в `.env` файле стоит параметр DEBUG=false. Однако в консоли докера всё равно выводятся сообщения с тегом DEBUG."
+- Найдена корневая причина: `backend/app/main.py` хардкодит `logging.basicConfig(level=logging.DEBUG)` и `file_handler.setLevel(logging.DEBUG)` — параметр `settings.DEBUG` загружается, но не используется
+- Исправление: добавлена переменная `_log_level = logging.DEBUG if settings.DEBUG else logging.INFO` → `file_handler.setLevel(_log_level)` + `logging.basicConfig(level=_log_level, ...)`
+- 202/202 тестов, ruff чист
