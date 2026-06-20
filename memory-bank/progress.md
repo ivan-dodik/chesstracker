@@ -28,3 +28,9 @@
 
 ### Known Issues
 - None currently
+
+## Test Status (2026-06-20)
+- Unit/Integration: 202 passed
+- E2E: 76 passed
+- Total: 278 tests
+- ruff check: clean

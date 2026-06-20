@@ -9,18 +9,6 @@ import urllib.request
 from e2e.conftest import login_and_set_token
 
 
-def _get_admin_token(server_url: str) -> str:
-    """Helper: get admin JWT token."""
-    req = urllib.request.Request(
-        f"{server_url}/api/auth/login",
-        data=json.dumps({"username": "admin", "password": "admin123"}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())["access_token"]
-
-
 def test_sse_connection(page, server_url):
     """8.1 EventSource connects to /api/events when logged in."""
     login_and_set_token(page, server_url, "admin", "admin123")

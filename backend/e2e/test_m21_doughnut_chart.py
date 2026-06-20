@@ -12,11 +12,12 @@ def _read(path: str) -> str:
 
 
 def test_player_detail_has_canvas():
-    """M21.1 Player detail template has canvas element for Chart.js."""
+    """M21.1 Player detail template has chart container element (ApexCharts or Chart.js)."""
     content = _read(
         os.path.join(os.path.dirname(__file__), "..", "app", "templates", "players", "detail.html")
     )
-    assert "<canvas" in content, "Player detail should have canvas element for charts"
+    has_chart = any(kw in content for kw in ["<canvas", "resultsChart", "ratingChart", "ApexCharts"])
+    assert has_chart, "Player detail should have chart element for charts"
 
 
 def test_player_detail_has_doughnut_section():
@@ -39,10 +40,10 @@ def test_player_detail_has_doughnut_section():
     assert has_section, "Player detail should have results distribution section"
 
 
-def test_player_detail_has_chart_js_import():
-    """M21.3 Player detail template uses Chart.js."""
+def test_player_detail_has_chart_library():
+    """M21.3 Player detail template uses a chart library (ApexCharts or Chart.js)."""
     content = _read(
         os.path.join(os.path.dirname(__file__), "..", "app", "templates", "players", "detail.html")
     )
-    has_chart = any(kw in content for kw in ["Chart", "chart.js", "chartjs", "Chart.js"])
-    assert has_chart, "Player detail should use Chart.js for doughnut chart"
+    has_chart = any(kw in content for kw in ["ApexCharts", "Chart", "chart.js", "chartjs", "Chart.js", "apexcharts"])
+    assert has_chart, "Player detail should use a chart library for doughnut chart"

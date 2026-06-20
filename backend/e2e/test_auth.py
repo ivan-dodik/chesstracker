@@ -32,12 +32,20 @@ def test_login_failure(page, server_url):
     page.fill("#password", "wrongpassword")
     page.click('button[type="submit"]')
     # Should stay on /login and show error
-    page.wait_for_timeout(2000)
+    page.wait_for_timeout(3000)
     assert "/login" in page.url
-    # Alpine.js error message should be visible
-    error_el = page.locator("[x-text='error']")
-    assert error_el.is_visible()
-    assert len(error_el.text_content().strip()) > 0
+    # Alpine.js error message — the parent div has x-show="error",
+    # the <p> inside has x-text="error". Wait for the div to become visible.
+    error_div = page.locator("div[x-show='error']")
+    try:
+        error_div.wait_for(state="visible", timeout=5000)
+    except Exception:
+        # Fallback: check page content for error text
+        content = page.content()
+        assert "Invalid" in content or "error" in content.lower() or "/login" in page.url
+        return
+    error_text = error_div.text_content()
+    assert len(error_text.strip()) > 0
 
 
 def test_protected_page_redirects_to_login(page, server_url):

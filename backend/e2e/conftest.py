@@ -21,6 +21,7 @@ _server_url: str | None = None
 _server_proc = None
 _test_db_fd: int = -1
 _test_db_path: str = ""
+_admin_token_cache: str | None = None
 
 
 def _seed_database(db_path: str) -> None:
@@ -137,6 +138,19 @@ def server_url() -> Generator[str]:
             f"stderr: {stderr_out[:500]}"
         )
 
+    # Pre-fetch admin token to avoid rate limiting in login_and_set_token()
+    global _admin_token_cache
+    import json as _json
+
+    login_req = urllib.request.Request(
+        f"{_server_url}/api/auth/login",
+        data=_json.dumps({"username": "admin", "password": "admin123"}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(login_req) as resp:
+        _admin_token_cache = _json.loads(resp.read())["access_token"]
+
     yield _server_url
 
     # Cleanup
@@ -176,6 +190,26 @@ def page(context: BrowserContext, server_url: str) -> Generator[Page]:
     p.close()
 
 
+@pytest.fixture(scope="session")
+def admin_token(server_url: str) -> str:
+    """Session-scoped fixture: get admin JWT token once, reuse across all tests."""
+    global _admin_token_cache
+    if _admin_token_cache is not None:
+        return _admin_token_cache
+    import json
+    import urllib.request as _req
+
+    req = _req.Request(
+        f"{server_url}/api/auth/login",
+        data=json.dumps({"username": "admin", "password": "admin123"}).encode(),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with _req.urlopen(req) as resp:
+        _admin_token_cache = json.loads(resp.read())["access_token"]
+    return _admin_token_cache
+
+
 def login(page: Page, url: str, username: str, password: str) -> None:
     """Login via the UI form. Navigates to /login, fills form, submits."""
     page.goto(f"{url}/login", wait_until="domcontentloaded")
@@ -193,14 +227,19 @@ def login_and_set_token(page: Page, url: str, username: str, password: str) -> N
     import json
     import urllib.request
 
-    req = urllib.request.Request(
-        f"{url}/api/auth/login",
-        data=json.dumps({"username": username, "password": password}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req) as resp:
-        token = json.loads(resp.read())["access_token"]
+    # Use cached admin token to avoid rate limiting
+    global _admin_token_cache
+    if username == "admin" and password == "admin123" and _admin_token_cache is not None:
+        token = _admin_token_cache
+    else:
+        req = urllib.request.Request(
+            f"{url}/api/auth/login",
+            data=json.dumps({"username": username, "password": password}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req) as resp:
+            token = json.loads(resp.read())["access_token"]
 
     # Navigate to the app first (to set cookies/context)
     page.goto(url, wait_until="domcontentloaded")
@@ -218,14 +257,19 @@ def set_token_only(page: Page, url: str, username: str, password: str) -> None:
     import json
     import urllib.request as _req
 
-    req = _req.Request(
-        f"{url}/api/auth/login",
-        data=json.dumps({"username": username, "password": password}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with _req.urlopen(req) as resp:
-        token = json.loads(resp.read())["access_token"]
+    # Use cached admin token to avoid rate limiting
+    global _admin_token_cache
+    if username == "admin" and password == "admin123" and _admin_token_cache is not None:
+        token = _admin_token_cache
+    else:
+        req = _req.Request(
+            f"{url}/api/auth/login",
+            data=json.dumps({"username": username, "password": password}).encode(),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with _req.urlopen(req) as resp:
+            token = json.loads(resp.read())["access_token"]
 
     # Navigate to /login (lightweight, no SSE/API calls) to set tokens on correct origin
     page.goto(f"{url}/login", wait_until="domcontentloaded")

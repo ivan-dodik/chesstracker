@@ -21,21 +21,9 @@ def _create_player(server_url: str, token: str, name: str, rating: int = 1500) -
         return json.loads(resp.read())["id"]
 
 
-def _get_admin_token(server_url: str) -> str:
-    """Helper: get admin JWT token."""
-    req = urllib.request.Request(
-        f"{server_url}/api/auth/login",
-        data=json.dumps({"username": "admin", "password": "admin123"}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())["access_token"]
-
-
-def test_player_detail_loads(page, server_url):
+def test_player_detail_loads(page, server_url, admin_token):
     """5.1 Player detail page shows name, rating, city."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     player_id = _create_player(server_url, token, "TestPlayer", 1600)
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -47,23 +35,23 @@ def test_player_detail_loads(page, server_url):
     assert "TestPlayer" in content
 
 
-def test_player_rating_chart(page, server_url):
-    """5.2 Rating history chart (Chart.js) renders on player page."""
-    token = _get_admin_token(server_url)
+def test_player_rating_chart(page, server_url, admin_token):
+    """5.2 Rating history chart renders on player page (ApexCharts or Chart.js)."""
+    token = admin_token
     player_id = _create_player(server_url, token, "ChartPlayer", 1500)
 
     login_and_set_token(page, server_url, "admin", "admin123")
     page.goto(f"{server_url}/players/{player_id}")
     page.wait_for_load_state("domcontentloaded")
 
-    # Chart.js creates a <canvas> element
-    canvas = page.locator("canvas")
-    assert canvas.count() > 0, "Chart.js canvas element not found"
+    # Check for chart container — ApexCharts uses <div>, Chart.js uses <canvas>
+    chart_container = page.locator("canvas, .apexcharts-canvas, [x-ref='ratingChart'], [id='ratingChart']")
+    assert chart_container.count() > 0, "Chart element not found on player page"
 
 
-def test_player_stats(page, server_url):
+def test_player_stats(page, server_url, admin_token):
     """5.3 Player stats (wins/draws/losses) are displayed."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     player_id = _create_player(server_url, token, "StatsPlayer", 1500)
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -75,9 +63,9 @@ def test_player_stats(page, server_url):
     assert "Статистика" in content or "stats" in content.lower() or "победы" in content.lower() or "Победы" in content
 
 
-def test_player_favorite_toggle(page, server_url):
+def test_player_favorite_toggle(page, server_url, admin_token):
     """5.4 Clicking ★ adds/removes player from favorites."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     player_id = _create_player(server_url, token, "FavPlayer", 1500)
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -93,9 +81,9 @@ def test_player_favorite_toggle(page, server_url):
         assert True  # Favorite action completed without error
 
 
-def test_player_head_to_head(page, server_url):
+def test_player_head_to_head(page, server_url, admin_token):
     """5.5 Head-to-head selector shows match results between two players."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     p1_id = _create_player(server_url, token, "H2HPlayer1", 1500)
     _create_player(server_url, token, "H2HPlayer2", 1600)
 

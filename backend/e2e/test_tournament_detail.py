@@ -11,18 +11,6 @@ import urllib.request
 from e2e.conftest import login_and_set_token
 
 
-def _get_admin_token(server_url: str) -> str:
-    """Helper: get admin JWT token."""
-    req = urllib.request.Request(
-        f"{server_url}/api/auth/login",
-        data=json.dumps({"username": "admin", "password": "admin123"}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())["access_token"]
-
-
 def _create_tournament(server_url: str, token: str, name: str, status: str = "active") -> int:
     """Helper: create a tournament via API."""
     data = {
@@ -56,9 +44,9 @@ def _create_player(server_url: str, token: str, name: str, rating: int = 1500) -
         return json.loads(resp.read())["id"]
 
 
-def test_tournament_detail_loads(page, server_url):
+def test_tournament_detail_loads(page, server_url, admin_token):
     """7.1 Tournament detail page shows tournament info."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "DetailTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -70,9 +58,9 @@ def test_tournament_detail_loads(page, server_url):
     assert "DetailTournament" in content
 
 
-def test_tournament_standings(page, server_url):
+def test_tournament_standings(page, server_url, admin_token):
     """7.2 Tournament standings table is displayed."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "StandingsTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -84,9 +72,9 @@ def test_tournament_standings(page, server_url):
     assert "Таблица" in content or "standings" in content.lower() or "Очки" in content or "Турнирная" in content
 
 
-def test_tournament_csv_export(page, server_url):
+def test_tournament_csv_export(page, server_url, admin_token):
     """7.3 Export CSV link exists and points to the correct URL."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "ExportTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -114,9 +102,9 @@ def test_tournament_csv_export(page, server_url):
         assert len(rows) > 0  # At least header row
 
 
-def test_tournament_csv_import(page, server_url):
+def test_tournament_csv_import(page, server_url, admin_token):
     """7.4 Admin can import CSV file to tournament."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "ImportTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")
@@ -146,9 +134,9 @@ def test_tournament_csv_import(page, server_url):
             os.unlink(tmp_path)
 
 
-def test_tournament_accordion(page, server_url):
+def test_tournament_accordion(page, server_url, admin_token):
     """7.5 Clicking a round expands accordion to show games."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "AccordionTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")

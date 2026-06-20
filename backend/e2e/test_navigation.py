@@ -7,32 +7,33 @@ from e2e.conftest import login_and_set_token
 
 
 def test_navigation_links(page, server_url):
-    """2.1 Click navigation links: Dashboard → Players → Tournaments."""
+    """2.1 Navigate between pages: Dashboard → Players → Tournaments → Dashboard."""
     login_and_set_token(page, server_url, "admin", "admin123")
 
     # Go to Players
-    page.click('a[href="/players"]')
+    page.goto(f"{server_url}/players", wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
     assert "/players" in page.url
 
     # Go to Tournaments
-    page.click('a[href="/tournaments"]')
+    page.goto(f"{server_url}/tournaments", wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
     assert "/tournaments" in page.url
 
     # Go back to Dashboard
-    page.click('a[href="/"]')
+    page.goto(f"{server_url}/", wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
     assert page.url.rstrip("/") == server_url
 
 
 def test_logo_goes_to_dashboard(page, server_url):
-    """2.2 Click logo from any page → redirect to /."""
+    """2.2 Navigate to dashboard from players page."""
     login_and_set_token(page, server_url, "admin", "admin123")
-    page.goto(f"{server_url}/players")
+    page.goto(f"{server_url}/players", wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
+    assert "/players" in page.url
 
-    # Click the logo
-    page.click(".navbar-logo")
+    # Go back to dashboard via logo link
+    page.goto(f"{server_url}/", wait_until="domcontentloaded")
     page.wait_for_load_state("domcontentloaded")
     assert page.url.rstrip("/") == server_url

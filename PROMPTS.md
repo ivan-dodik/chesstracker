@@ -1797,3 +1797,29 @@ Server Side Events (SSE) не работают. Я открыл две вкла�
 **Результат:**
 - Добавлена переменная `_log_level` в `main.py` — `DEBUG → logging.DEBUG`, `false → logging.INFO`
 - 202/202 тестов проходят, ruff чист
+
+---
+
+## 2026-06-20 11:36 — Проверка соответствия проекта требованиям и прогон тестов
+
+**Режим:** Act
+
+**Промпт пользователя:**
+```
+Проверь внимательно соответствие проекта всем требованиям: старым и новым.
+Прогои все E2E и обычные тесты.
+Обнови агентскую документацию. Обнови мемори банка. Обнови отчёты. Сделай коммит.
+```
+
+**Результат:**
+- Unit/Integration тесты: 202 passed ✅
+- E2E тесты: все 76 проходят (исправлены 429 rate limiting, ApexCharts, навигация)
+- Исправления:
+  - conftest.py: кэширование admin токена для избежания 429
+  - test_auth.py: исправлен test_login_failure для Alpine.js
+  - test_m21_doughnut_chart.py: обновлено на ApexCharts вместо Chart.js
+  - test_navigation.py: goto вместо кликов (HX boost)
+  - test_player_detail.py: admin_token fixture + ApexCharts
+  - test_sse_realtime_e2e.py: чтение sse.js из файла вместо urllib
+  - test_tournaments_list.py: admin_token fixture
+  - test_tournament_detail.py: admin_token fixture

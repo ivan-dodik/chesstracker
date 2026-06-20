@@ -9,6 +9,9 @@ import urllib.request
 from e2e.conftest import login_and_set_token
 
 
+# _get_admin_token removed — use admin_token fixture from conftest instead
+
+
 def _create_tournament(server_url: str, token: str, name: str, status: str = "active") -> int:
     """Helper: create a tournament via API, return tournament ID."""
     data = {
@@ -30,21 +33,9 @@ def _create_tournament(server_url: str, token: str, name: str, status: str = "ac
         return json.loads(resp.read())["id"]
 
 
-def _get_admin_token(server_url: str) -> str:
-    """Helper: get admin JWT token."""
-    req = urllib.request.Request(
-        f"{server_url}/api/auth/login",
-        data=json.dumps({"username": "admin", "password": "admin123"}).encode(),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    with urllib.request.urlopen(req) as resp:
-        return json.loads(resp.read())["access_token"]
-
-
-def test_tournaments_list_loads(page, server_url):
+def test_tournaments_list_loads(page, server_url, admin_token):
     """6.1 Tournaments list page loads with tournament data."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     _create_tournament(server_url, token, "TestTournament1")
     _create_tournament(server_url, token, "TestTournament2")
 
@@ -56,9 +47,9 @@ def test_tournaments_list_loads(page, server_url):
     assert "TestTournament1" in content or "Турнир" in content
 
 
-def test_tournaments_filter_by_status(page, server_url):
+def test_tournaments_filter_by_status(page, server_url, admin_token):
     """6.2 Filter tournaments by status shows only matching ones."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     _create_tournament(server_url, token, "ActiveTournament", status="active")
     _create_tournament(server_url, token, "CompletedTournament", status="completed")
 
@@ -92,9 +83,9 @@ def test_tournaments_pagination(page, server_url):
             assert "/tournaments" in page.url
 
 
-def test_click_tournament_navigates_to_detail(page, server_url):
+def test_click_tournament_navigates_to_detail(page, server_url, admin_token):
     """6.4 Clicking a tournament name navigates to /tournaments/{id}."""
-    token = _get_admin_token(server_url)
+    token = admin_token
     t_id = _create_tournament(server_url, token, "ClickableTournament")
 
     login_and_set_token(page, server_url, "admin", "admin123")
