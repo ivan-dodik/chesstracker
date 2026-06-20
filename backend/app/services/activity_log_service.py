@@ -9,8 +9,26 @@ from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
-from app.models import ActivityLog
+from app.models import ActivityLog, User
+
+# Russian display names for entity types
+ENTITY_TYPE_NAMES: dict[str, str] = {
+    "player": "Игрок",
+    "tournament": "Турнир",
+    "game": "Партия",
+    "rating": "Рейтинг",
+    "favorite": "Избранное",
+    "import": "Импорт",
+}
+
+# Russian display names for actions
+ACTION_NAMES: dict[str, str] = {
+    "create": "Создание",
+    "update": "Обновление",
+    "delete": "Удаление",
+}
 
 
 class _DateTimeEncoder(json.JSONEncoder):
@@ -63,7 +81,11 @@ async def get_activity_log(
     date_to: datetime | None = None,
 ) -> tuple[list[dict[str, Any]], int]:
     """Get paginated activity log with optional filters."""
-    query = select(ActivityLog)
+    user_alias = aliased(User)
+
+    query = select(ActivityLog, user_alias.username).outerjoin(
+        user_alias, ActivityLog.user_id == user_alias.id
+    )
     count_query = select(func.count(ActivityLog.id))
 
     if entity_type:
@@ -87,16 +109,19 @@ async def get_activity_log(
 
     query = query.order_by(ActivityLog.timestamp.desc()).offset((page - 1) * per_page).limit(per_page)
     result = await db.execute(query)
-    logs = list(result.scalars().all())
+    rows = result.all()
 
-    # Convert to dict with deserialized values
+    # Convert to dict with deserialized values and resolved names
     result_list: list[dict[str, Any]] = []
-    for log in logs:
+    for log, username in rows:
         log_dict = {
             "id": log.id,
             "user_id": log.user_id,
+            "username": username or None,
             "action": log.action,
+            "action_name": ACTION_NAMES.get(log.action, log.action),
             "entity_type": log.entity_type,
+            "entity_type_name": ENTITY_TYPE_NAMES.get(log.entity_type, log.entity_type),
             "entity_id": log.entity_id,
             "old_values": log.old_values,
             "new_values": log.new_values,

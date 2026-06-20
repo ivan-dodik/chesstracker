@@ -53,14 +53,14 @@
           <template x-for="log in logs" :key="log.id">
             <tr>
               <td style="font-size:0.8125rem;" x-text="formatDateTime(log.timestamp)"></td>
-              <td x-text="log.user_id ? ('#' + log.user_id) : '—'"></td>
+              <td x-text="log.username || '—'"></td>
               <td>
                 <span class="badge" :class="{
                   'badge-active': log.action === 'create',
-                  'badge-completed': log.action === 'delete'
-                }" x-text="log.action"></span>
+                   'badge-completed': log.action === 'delete'
+                 }" x-text="log.action_name || log.action"></span>
               </td>
-              <td x-text="log.entity_type"></td>
+              <td x-text="log.entity_type_name || log.entity_type"></td>
               <td x-text="log.entity_id || '—'"></td>
               <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;" x-text="log.old_values ? JSON.stringify(log.old_values) : '—'"></td>
               <td style="font-size:0.75rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;" x-text="log.new_values ? JSON.stringify(log.new_values) : '—'"></td>

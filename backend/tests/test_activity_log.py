@@ -344,3 +344,33 @@ async def test_activity_log_timestamp(client: AsyncClient, admin_token: str):
     # Timestamp should be a valid ISO format string
     from datetime import datetime
     datetime.fromisoformat(entry["timestamp"].replace("Z", "+00:00"))
+
+
+@pytest.mark.asyncio
+async def test_activity_log_resolves_username_and_names(client: AsyncClient, admin_token: str):
+    """Test that activity log returns username, entity_type_name, action_name."""
+    headers = {"Authorization": f"Bearer {admin_token}"}
+
+    # Create a player to generate a log entry
+    resp = await client.post("/api/players", json={"name": "NameResolve", "rating": 1500}, headers=headers)
+    assert resp.status_code == 201
+    player_id = resp.json()["id"]
+
+    # Get the log entry
+    resp = await client.get(
+        "/api/activity-log?entity_type=player&action=create",
+        headers=headers,
+    )
+    assert resp.status_code == 200
+    data = resp.json()
+    entry = next((e for e in data["items"] if e["entity_id"] == player_id), None)
+    assert entry is not None
+
+    # Verify new fields
+    assert entry["username"] == "admin"
+    assert entry["entity_type_name"] == "Игрок"
+    assert entry["action_name"] == "Создание"
+    # Original fields still present
+    assert entry["user_id"] is not None
+    assert entry["entity_type"] == "player"
+    assert entry["action"] == "create"
