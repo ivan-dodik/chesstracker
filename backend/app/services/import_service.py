@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Game, Player, Tournament
+from app.services.activity_log_service import log_activity
 from app.services.sse_events import SSEEvents
 from app.services.sse_service import publish_event
 
@@ -31,6 +32,7 @@ async def import_tournament_csv(
     db: AsyncSession,
     tournament_id: int,
     csv_content: str,
+    user_id: int | None = None,
 ) -> dict[str, Any]:
     """Import tournament results from CSV content.
 
@@ -131,12 +133,33 @@ async def import_tournament_csv(
             await db.flush()
             games_created += 1
 
+            await log_activity(
+                db, user_id, "create", "game", game.id,
+                new_values={
+                    "tournament_id": tournament_id,
+                    "game_round": round_num,
+                    "white_player_id": white_id,
+                    "black_player_id": black_id,
+                    "result": result_value,
+                },
+            )
+
         except (ValueError, KeyError) as e:
             errors.append(f"Row {row_idx}: {e!s}")
             games_skipped += 1
 
-    # Publish SSE event if games were imported
+    # Log the import operation itself
     if games_created > 0:
+        await log_activity(
+            db, user_id, "import", "import", tournament_id,
+            new_values={
+                "games_created": games_created,
+                "games_skipped": games_skipped,
+                "errors_count": len(errors),
+            },
+        )
+
+        # Publish SSE event if games were imported
         await publish_event(SSEEvents.GAME_CREATED, {
             "tournament_id": tournament_id,
             "games_imported": games_created,

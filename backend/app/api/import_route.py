@@ -38,7 +38,7 @@ async def import_csv(
             detail=f"File too large. Maximum size is {MAX_CSV_SIZE // (1024 * 1024)} MB",
         )
     content = raw_data.decode("utf-8")
-    result = await import_tournament_csv(db, tournament_id, content)
+    result = await import_tournament_csv(db, tournament_id, content, user_id=current_user.id)
 
     if not result["success"]:
         raise HTTPException(

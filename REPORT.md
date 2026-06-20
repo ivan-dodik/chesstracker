@@ -678,3 +678,34 @@ API-тесты не покрывают фронтенд-поведение. Ну
 - **Суть:** `refreshTournament()` и `refreshPlayer()` использовали `el._x_dataStack?.[0]` для доступа к данным Alpine.js. В Alpine.js v3.14.8 это внутреннее свойство недоступно → comp = undefined → early return.
 - **Решение:** Custom DOM events pattern — SSE callback dispatch'ит `window.dispatchEvent(new CustomEvent('sse:refresh-tournament'))`, Alpine template слушает `@sse:refresh-tournament.window="loadStandings(); loadGames(); loadTournament()"`.
 - **Результат:** Гарантированно работает с любой версией Alpine.js, не зависит от internals.
+
+---
+
+## 2026-06-20 10:25 — Реализация лога активности: покрытие всех мутаций
+
+### Описание
+Реализовано требование "Лог активности: фиксация всех изменений с указанием пользователя, времени и значений до/после".
+
+### Ключевые проблемы и решения
+
+#### 2026-06-20 — Rating logs без user_id
+- **Суть:** `rating_calculation_service.py` вызывал `log_activity(db, None, ...)` — rating update логировались без привязки к пользователю
+- **Решение:** Добавлен параметр `user_id` в `update_ratings_after_game()`, проброс из `game_service.py`
+
+#### 2026-06-20 — CSV import без логирования
+- **Суть:** `import_service.py` создавал игры через CSV без записей в activity log
+- **Решение:** Добавлен `user_id` параметр + `log_activity()` для каждой партии + сводная запись `action="import"`
+
+#### 2026-06-20 — Favorite без логирования
+- **Суть:** `favorite_service.py` (add/remove) не логировал операции
+- **Решение:** Добавлен `log_activity()` в `add_favorite()` и `remove_favorite()`
+
+#### 2026-06-20 — Frontend фильтры неполные
+- **Суть:** Шаблон `activity_log.html` не содержал фильтры для entity_type "favorite" и "import"
+- **Решение:** Добавлены `<option>` элементы в выпадающий список
+
+### Итоги
+- **12 unit-тестов** + **10 E2E тестов** написаны
+- **201/201 backend тестов** + **10/10 E2E** проходят
+- **ruff check** чист
+- Все мутации покрыты activity log: player, tournament, game, rating, import, favorite

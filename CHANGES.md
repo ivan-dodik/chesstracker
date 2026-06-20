@@ -1135,3 +1135,23 @@
 - `app/templates/tournaments/detail.html` — `@sse:refresh-tournament.window="..."` + dispatch CustomEvent
 - `app/templates/players/detail.html` — `@sse:refresh-player.window="..."` + dispatch CustomEvent
 - `e2e/test_sse_alpine_refresh.py` — 5 E2E тестов проверяющих custom event pattern
+
+## 2026-06-20 10:25 — Реализация лога активности: покрытие всех мутаций
+
+### Описание
+Реализовано требование "Лог активности: фиксация всех изменений с указанием пользователя, времени и значений до/после". Добавлено логирование в ранее непокрытые сервисы (import, favorite), проброшен user_id в rating logs.
+
+### Изменённые файлы
+- `app/services/rating_calculation_service.py` — добавлен параметр `user_id` в `update_ratings_after_game()`, передаётся в `log_activity()` вместо `None`
+- `app/services/game_service.py` — проброс `user_id` в вызовы `update_ratings_after_game()`
+- `app/services/import_service.py` — добавлен `user_id` параметр + `log_activity()` для каждой созданной игры и сводной операции импорта
+- `app/services/favorite_service.py` — добавлен `log_activity()` для add/remove favorite
+- `app/api/import_route.py` — передача `current_user.id` в `import_tournament_csv()`
+- `app/templates/activity_log.html` — добавлены фильтры "Избранное" и "Импорт"
+- `tests/test_activity_log.py` — 12 unit-тестов (player/game/rating/import/favorite CRUD + фильтры + timestamps)
+- `e2e/test_m22_activity_log.py` — 10 E2E тестов (проверка наличия логирования во всех сервисах + фильтры)
+
+### Результат
+- 201/201 backend тестов проходят
+- ruff check чист
+- Все мутации покрыты activity log: player, tournament, game, rating, import, favorite

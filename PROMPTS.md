@@ -1749,3 +1749,32 @@ Server Side Events (SSE) не работают. Я открыл две вкла�
 - Обновлены шаблоны: dashboard (game/tournament/player listeners), players (auto-refresh), tournament detail (Alpine.js fix + listeners), tournaments list (auto-refresh)
 - 7 новых тестовых файлов, 20+ unit тестов, 5 E2E тестов
 - 193 passed, 0 failed, ruff clean
+
+---
+
+## 2026-06-20 10:21 — Реализация лога активности (требование проекта)
+
+**Режим:** Plan → Act
+
+**Промпт пользователя:**
+```
+Есть требование к проекту:
+Лог активности: фиксация всех изменений (создание/редактирование турнира, добавление результата партии, изменение рейтинга) с указанием пользователя, времени и значений до/после
+Сейчас оно не выпонляется. реализуй его.
+```
+
+**План (Plan mode):**
+- Проброс user_id в rating_calculation_service
+- Добавление логирования CSV-импорта
+- Добавление логирования избранного
+- Обновление фронтенд-фильтров
+- Unit-тесты и E2E-тесты
+- Pre-commit hook
+
+**Результат:**
+- Проброшен `user_id` в `rating_calculation_service.py` — теперь rating log содержит ID пользователя
+- Добавлено логирование CSV-импорта в `import_service.py` — каждая импортированная партия + сводная запись
+- Добавлено логирование избранного в `favorite_service.py` — add/remove
+- Обновлены фронтенд-фильтры в `activity_log.html` — added favorite, import options
+- 12 unit-тестов + 10 E2E тестов написаны
+- 201/201 backend тестов, ruff чист

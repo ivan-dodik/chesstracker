@@ -110,7 +110,7 @@ async def create_game(
 
     # Calculate ratings if result is provided
     if game.result:
-        await update_ratings_after_game(db, game)
+        await update_ratings_after_game(db, game, user_id=user_id)
 
     # Enrich SSE event with player names
     white_name = None
@@ -163,7 +163,7 @@ async def update_game_result(
 
     # Recalculate ratings if result changed
     if data.result and data.result != old_result:
-        await update_ratings_after_game(db, game)
+        await update_ratings_after_game(db, game, user_id=user_id)
 
     # Enrich SSE event with player names
     white_name = None

@@ -52,6 +52,7 @@ def calculate_elo_rating(
 async def update_ratings_after_game(
     db: AsyncSession,
     game: Game,
+    user_id: int | None = None,
 ) -> None:
     """Update player ratings and create RatingHistory after a game.
 
@@ -119,7 +120,7 @@ async def update_ratings_after_game(
     # Log rating changes
     if new_white_rating != old_white_rating:
         await log_activity(
-            db, None, "update", "rating", white.id,
+            db, user_id, "update", "rating", white.id,
             old_values={"rating": old_white_rating, "player_name": white.name},
             new_values={
                 "rating": new_white_rating,
@@ -129,7 +130,7 @@ async def update_ratings_after_game(
         )
     if new_black_rating != old_black_rating:
         await log_activity(
-            db, None, "update", "rating", black.id,
+            db, user_id, "update", "rating", black.id,
             old_values={"rating": old_black_rating, "player_name": black.name},
             new_values={
                 "rating": new_black_rating,
