@@ -5,7 +5,7 @@
 - **httpx** (AsyncClient with ASGITransport)
 - **pytest-cov** for coverage reports
 - **Playwright** for E2E browser tests
-- Total: **189 tests** (160 API/service + 29 E2E, all pass)
+- Total: **278 tests** (202 unit/integration + 76 E2E, all pass)
 
 ## Test structure
 ```

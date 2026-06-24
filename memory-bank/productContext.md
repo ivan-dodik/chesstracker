@@ -26,7 +26,7 @@
 - Адаптивная вёрстка: одинаково удобно на desktop и mobile
 - Real-time обновления через SSE
 - Минимальное количество перезагрузок страницы
-- Интуитивно понятные дашборды с Chart.js
+- Интуитивно понятные дашборды с ApexCharts
 
 ## Целевая аудитория
 - Шахматные болельщики
@@ -40,7 +40,6 @@
 - [Backend: API, Core, Models, Services](backend/overview.md)
 - [Frontend: шаблоны, CSS, JS](frontend/overview.md)
 - [Telegram-bot](telegram-bot/overview.md)
-- [Testing: 189 тестов](testing/overview.md)
+- [Testing: 278 тестов](testing/overview.md)
 - [Infrastructure: Docker, CI, pre-commit](infrastructure/docker.md)
 - [Config: зависимости, env](config/backend-pyproject.md)
-- [Meta: баги, security, архитектура](meta/bugs.md)

@@ -5,7 +5,7 @@
 - Auth toggle via Alpine.js `authState()` — shows login/logout
 - Flash messages container (`#flash-messages`, JS-managed)
 - Footer with copyright
-- CDN imports: HTMX 2.0.4, Alpine.js 3.14.8, Chart.js 4.4.7, local main.js + sse.js
+- CDN imports: HTMX 2.0.4, Alpine.js 3.14.8, ApexCharts 3.54.1, local main.js + sse.js
 
 ## `index.html` (Dashboard)
 - Top 10 players (HTMX → `GET /api/stats/top-rated`)
@@ -31,7 +31,7 @@
   - `loadPlayer()` → `GET /api/players/{id}`
   - `loadOverallStats()` → `GET /api/stats/overall/{id}`
   - `loadPlayersList()` → `GET /api/players?per_page=200`
-  - `renderRatingChart()` — Chart.js line chart from rating history
+  - `renderRatingChart()` — ApexCharts line chart from rating history
   - `loadHeadToHead()` → `GET /api/stats/head-to-head/{p1}/{p2}`
   - `toggleFavorite()` → POST/DELETE `/api/favorites/{id}`
 - Sections: player header, stats grid (wins/losses/draws/win%), rating chart, head-to-head selector, tournaments list
@@ -46,7 +46,7 @@
 - Tournament info header (name, dates, location, type, status)
 - Standings table (HTMX → `GET /api/tournaments/{id}/standings`)
 - Games table (HTMX → `GET /api/tournaments/{id}/games`)
-- Chart.js doughnut chart for result distribution
+- ApexCharts doughnut chart for result distribution
 - Export CSV button → `GET /api/tournaments/{id}/export/csv`
 - Import CSV form (admin only) → POST multipart upload
 

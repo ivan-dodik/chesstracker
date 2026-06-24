@@ -8,7 +8,7 @@ Full-stack приложение для отслеживания шахматны
 ### Функциональные
 - CRUD для игроков, турниров, партий с валидацией
 - Поиск и фильтрация (турниры по дате/статусу, игроки по имени/рейтингу)
-- Дашборд с визуализацией (Chart.js): график рейтинга, круговая диаграмма результатов, топ-10, избранные
+- Дашборд с визуализацией (ApexCharts): график рейтинга, круговая диаграмма результатов, топ-10, избранные
 - Пагинация списков
 - Адаптивная вёрстка (desktop + mobile)
 - Турнирная таблица в реальном времени
@@ -20,12 +20,12 @@ Full-stack приложение для отслеживания шахматны
 - Экспорт турнирной таблицы в CSV
 - Импорт результатов турнира из CSV
 - Регистрация/авторизация (JWT): admin + user
-- Лог активности
+- Лог активности (UI + запись всех изменений)
 - Telegram-bot для уведомлений
 
 ### Нефункциональные
 - REST API с OpenAPI/Swagger
-- Не менее 10 unit/integration тестов
+- 278 тестов (202 unit/integration + 76 E2E)
 - CI pipeline (GitHub Actions): ruff lint + pytest
 - Docker Compose: одна команда для запуска всех сервисов
 - Документация: README.md, ARCHITECTURE.md, REPORT.md
@@ -33,8 +33,8 @@ Full-stack приложение для отслеживания шахматны
 ## Стек технологий
 - **Backend**: Python 3.12+, FastAPI
 - **Database**: PostgreSQL 16, SQLAlchemy + Alembic
-- **Frontend**: Jinja2 + HTMX + Alpine.js
-- **Bot**: python-telegram-bot
+- **Frontend**: Jinja2 + HTMX + Alpine.js + ApexCharts
+- **Bot**: python-telegram-bot (long-polling)
 - **Deployment**: Docker Compose
 - **Linter**: ruff
 - **CI**: GitHub Actions
@@ -48,18 +48,13 @@ Full-stack приложение для отслеживания шахматны
 
 ## Структура модулей (для агента)
 
-Подробное описание каждого модуля — в `memory-bank/modules/`:
+Подробное описание каждого модуля — в `memory-bank/`:
 
-| Файл | Описание |
-|------|----------|
-| `modules/overview.md` | Карта модулей, dependency graph, quick lookup index |
-| `modules/core-layer.md` | Config, database, security (JWT, bcrypt) |
-| `modules/models-layer.md` | 7 SQLAlchemy ORM моделей |
-| `modules/schemas-layer.md` | 7 Pydantic схем валидации |
-| `modules/services-layer.md` | 10 сервисов бизнес-логики |
-| `modules/api-layer.md` | 12 route-модулей, endpoints, deps |
-| `modules/web-layer.md` | Jinja2 шаблоны, CSS, JS (HTMX, Alpine.js) |
-| `modules/alembic.md` | Миграции БД |
-| `modules/testing.md` | Тесты (pytest, 20 тестов) |
-| `modules/telegram-bot.md` | Telegram-бот (stub, M9) |
-| `modules/docker-infra.md` | Docker Compose, network, commands |
+| Директория | Описание |
+|------------|----------|
+| `backend/` | Backend-модули: core, models, schemas, services, API, web, alembic, seed, main, docker |
+| `frontend/` | Frontend: шаблоны, CSS, JS (main.js, sse.js) |
+| `testing/` | Тесты: API, сервисные, fixtures |
+| `telegram-bot/` | Telegram-бот: архитектура и обработчики |
+| `infrastructure/` | Docker, CI/CD, pre-commit |
+| `config/` | Конфигурация: pyproject.toml, .env |

@@ -47,14 +47,14 @@ backend/
 │   │   ├── export_service.py
 │   │   ├── favorite_service.py
 │   │   └── ...
-│   ├── templates/        # Jinja2 шаблоны (9 шаблонов + partials)
-│   ├── static/           # CSS, JS (Alpine.js, Chart.js, SSE client)
+│   ├── templates/        # Jinja2 шаблоны (17 шаблонов + partials)
+│   ├── static/           # CSS, JS (Alpine.js, ApexCharts, SSE client)
 │   ├── core/             # Config, database, security
 │   │   ├── config.py     # Pydantic BaseSettings
 │   │   ├── database.py   # async engine + session
 │   │   └── security.py   # JWT + bcrypt
-│   ├── middleware/        # Timing middleware
-│   └── main.py           # FastAPI app + lifespan (pool warmup)
+│   ├── middleware/        # TimingMiddleware + HealthCheckFilter
+│   └── main.py           # FastAPI app + lifespan (pool warmup, rate limiting, file logging)
 ├── alembic/              # Миграции
 ├── tests/                # API + service тесты
 ├── e2e/                  # E2E тесты (Playwright)
@@ -67,7 +67,7 @@ backend/
 - Jinja2 шаблоны в `backend/app/templates/`
 - HTMX для динамической загрузки контента (hx-boost, hx-get, hx-post, hx-swap)
 - Alpine.js для реактивности на клиенте (x-data, x-init)
-- Chart.js для графиков на дашборде и странице игрока
+- ApexCharts для графиков на дашборде и странице игрока
 - SSE клиент (`sse.js`) для real-time уведомлений (toast)
 - Никакого отдельного frontend-сервера
 - **hx-boost + Alpine.js**: скрипты в `{% block content %}`, `Alpine.initTree()` в `htmx:afterSwap`
@@ -90,7 +90,7 @@ telegram-bot/
 2. **Frontend как часть backend**: шаблоны Jinja2 отдаются FastAPI, без отдельного сервера
 3. **Микросервис для Telegram-bot**: отдельный контейнер, общается с backend по HTTP
 4. **SSE вместо WebSocket**: для простых уведомлений не нужен WebSocket
-5. **JWT аутентификация**: два предзаполненных аккаунта (admin, user), cookie jwt_token для веб-страниц
+5. **JWT аутентификация**: два предзаполненных аккаунта (admin, user), cookie jwt_token для веб-страниц, rate limiting через slowapi
 6. **lazy="raise" на моделях**: предотвращает N+1; явный selectinload() в сервисах
 7. **entrypoint.sh**: Docker entrypoint для автоматических миграций и seed
 

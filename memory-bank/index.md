@@ -49,11 +49,6 @@ memory-bank/
 │   ├── backend-pyproject.md    ← backend/pyproject.toml
 │   ├── bot-pyproject.md        ← telegram-bot/pyproject.toml
 │   └── env.md                  ← .env.example
-│
-└── meta/                       ← project documentation & bugs
-    ├── architecture.md         ← ARCHITECTURE.md summary
-    ├── bugs.md                 ← BUGS.md summary
-    └── security.md             ← SECURITY_AUDIT.md summary
 ```
 
 ## Quick lookup
@@ -87,6 +82,3 @@ memory-bank/
 | Dependencies (backend) | `config/backend-pyproject.md` |
 | Dependencies (bot) | `config/bot-pyproject.md` |
 | Environment variables | `config/env.md` |
-| Known bugs | `meta/bugs.md` |
-| Security audit | `meta/security.md` |
-| Architecture overview | `meta/architecture.md` |

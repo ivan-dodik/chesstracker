@@ -1,20 +1,29 @@
 # Active Context — Chess Tracker
 
 ## Current Focus
-Все тесты проходят (202 unit + 76 E2E). E2E тесты исправлены.
+Проект сдан преподавателю. Текущая работа — рефакторинг процесса разработки: уборка документации, обновление Memory Bank, добавление шага консолидации.
 
-## Recent Changes (2026-06-20)
-- Исправлены E2E тесты: rate limiting (429), ApexCharts, HX boost навигация
-- Кэширование admin токена в conftest.py для избежания 429
-- Обновлены тесты на ApexCharts вместо Chart.js
-- Тесты навигации: goto вместо click (HX boost)
-- 202 passed, 76 E2E passed
+## Recent Changes (2026-06-24)
+- Проведён полный аудит документации
+- Убраны дублирующие файлы из корня (3 отчёта → 1, 2 плана → 1)
+- Артефакты перемещены в docs/
+- Удалён memory-bank/meta/ (дублировал корневые документы)
+- Memory Bank обновлён: исправлены ссылки, данные, добавлены новые компоненты
 
 ## Key Decisions
+- ЕДИНСТВЕННЫЙ отчёт: REPORT.md (автоматический) + REPORT_HUMAN.md (ручной, не трогать)
+- ЕДИНСТВЕННЫЙ план: IMPLEMENTATION_PLAN.md
+- Архивные документы: docs/ (CODE_REVIEW, SECURITY_AUDIT, BUGS, тесты)
+- Memory Bank: core-файлы + модульные файлы по директориям (backend/, frontend/, testing/, etc.)
+- Правило: агент ОБЯЗАН читать index.md + модульный файл перед работой с кодом
+
+## Key Technical Notes
 - SSE event format: `{"event": "name", "data": "json_string"}`
+- ApexCharts (не Chart.js) для графиков
 - E2E conftest: session-scoped token caching для rate limiting avoidance
-- Тесты читают файлы напрямую из ФС вместо HTTP-запросов
+- Тесты: 202 unit/integration + 76 E2E = 278 всего
 
 ## Next Steps
-- Мониторинг производительности SSE
-- Возможные улучшения: SSE heartbeat, оптимизация N+1
+- Добавить шаг консолидации в процесс (.clinerules/)
+- Обновить правила чтения Memory Bank
+- Проверить актуальность всех модульных файлов

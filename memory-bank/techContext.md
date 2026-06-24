@@ -9,7 +9,7 @@
 | ORM | SQLAlchemy | 2.0+ |
 | Миграции | Alembic | 1.13+ |
 | Frontend | Jinja2 + HTMX + Alpine.js | latest |
-| Графики | Chart.js | 4.x |
+| Графики | ApexCharts | 3.54 |
 | Telegram-bot | python-telegram-bot | 21.x |
 | Аутентификация | PyJWT + python-jose | 2.x |
 | Docker | Docker Compose | 3.x |
@@ -75,7 +75,7 @@ chesstracker/
 │   │   ├── api/                 # 14 route-модулей (включая deps, web, import_route, activity_log)
 │   │   ├── services/            # Бизнес-логика
 │   │   ├── middleware/          # Timing middleware
-│   │   ├── templates/           # Jinja2 (9 шаблонов + partials)
+│   │   ├── templates/           # Jinja2 (17 шаблонов + partials)
 │   │   └── static/              # CSS + JS (main.js, sse.js)
 │   ├── alembic/                 # Миграции
 │   ├── tests/                   # API + service тесты
@@ -114,6 +114,8 @@ chesstracker/
 9. **hx-boost + Alpine.js**: скрипты в `{% block content %}` (не в `{% block extra_head %}`)
 10. **Pool warmup**: `SELECT 1` × 3 соединения в lifespan для cold start
 11. **SQL_ECHO**: отдельный флаг от DEBUG, чтобы не спамить SQL-логами
+12. **Rate limiting**: slowapi для ограничения частоты запросов
+13. **File logging**: RotatingFileHandler для backend логов
 
 ## Зависимости
 
@@ -137,6 +139,10 @@ dependencies = [
     "python-dotenv>=1.0",
     "pydantic-settings>=2.5",
     "httpx>=0.27",
+    "sse-starlette>=2.0",
+    "slowapi>=0.1",
+    "aiofiles>=23.0",
+    "bcrypt>=4.0",
 ]
 
 [project.optional-dependencies]

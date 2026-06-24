@@ -1156,6 +1156,26 @@
 - ruff check чист
 - Все мутации покрыты activity log: player, tournament, game, rating, import, favorite
 
+## 2026-06-24 14:30 — Рефакторинг документации по замечаниям преподавателя
+
+**Описание:** Устранён «бардак с файлами»: перемещены отчёты/ревью в `docs/`, удалены дубли, обновлена Memory Bank (Chart.js → ApexCharts, 189 → 278 тестов), добавлен шаг консолидации в правила.
+
+**Созданные/обновлённые файлы:**
+- `docs/` — перемещены: BUGS.md, CODE_REVIEW.md, SECURITY_AUDIT.md, FRONTEND_TEST_PLAN.md, FRONTEND_TEST_REPORT.md
+- Удалены: `implementation_plan.md` (дубль IMPLEMENTATION_PLAN.md), `REPORT_MY.MD`, `REPORT.md.bak`, `memory-bank/meta/` (дублировала корневые документы)
+- `memory-bank/projectbrief.md` — 278 тестов, ApexCharts, 17 шаблонов
+- `memory-bank/productContext.md` — исправлены ссылки
+- `memory-bank/activeContext.md` — обновлён контекст
+- `memory-bank/systemPatterns.md` — ApexCharts, security, rate limiting
+- `memory-bank/techContext.md` — обновлён стек
+- `memory-bank/progress.md` — 278 тестов
+- `memory-bank/index.md` — удалены ссылки на meta/
+- `memory-bank/backend/overview.md` — ApexCharts, 17 шаблонов
+- `memory-bank/backend/web-layer.md` — ApexCharts
+- `memory-bank/frontend/templates.md` — ApexCharts
+- `memory-bank/testing/overview.md` — 278 тестов
+- `.clinerules/documentation.md` — добавлен шаг консолидации
+
 ## 2026-06-20 11:29 — Fix: DEBUG-логирование игнорировало параметр DEBUG=false
 
 ### Описание

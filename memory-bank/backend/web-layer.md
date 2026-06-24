@@ -4,7 +4,7 @@
 - **No separate frontend server** — HTML rendered by FastAPI via Jinja2
 - **HTMX** — dynamic content loading via `hx-*` attributes (no custom JS for API calls)
 - **Alpine.js** — client-side reactivity (auth state, forms, pagination)
-- **Chart.js** — charts (planned for M7, not yet used)
+- **ApexCharts 3.54.1** — charts (line, donut)
 
 ## Templates (`templates/`)
 
